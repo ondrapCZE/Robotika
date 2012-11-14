@@ -1,3 +1,10 @@
+/*
+	Author: Ondrej Pilat
+	Date: 8/10/2012
+	Web: ondrap.cz
+	Mail: ondrap@ondrap.cz
+*/
+
 #include "serialPort.h"
 #include <iostream>
 #include <sstream>

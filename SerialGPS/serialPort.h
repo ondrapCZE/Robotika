@@ -1,9 +1,16 @@
+/*
+	Author: Ondrej Pilat
+	Date: 8/10/2012
+	Web: ondrap.cz
+	Mail: ondrap@ondrap.cz
+*/
+
 #ifndef SERIAL_PORT_H
 #define SERIAL_PORT_H
 
-#define UNIX
-
 #include <string>
+
+#define WIN
 
 using namespace std;
 
@@ -21,6 +28,12 @@ using namespace std;
 	#define BAUDRATE_SET B115200
 #endif
 #endif
+
+struct GPSData{ 
+	double latitude;
+	double longitude;
+	double accuracy; // accurancy in metres
+};
 
 class serialPort_CLASS{
 #ifdef WIN
