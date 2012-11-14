@@ -30,6 +30,8 @@ using namespace std;
 #endif
 
 struct GPSData{ 
+	GPSData(double Lat = 0, double Lon = 0, double Acc = 0){latitude = Lat; longitude = Lon; accuracy = Acc;};
+
 	double latitude;
 	double longitude;
 	double accuracy; // accurancy in metres
@@ -43,10 +45,14 @@ class serialPort_CLASS{
 	int serialPort;
 #endif
 #endif
+
+	string rawDataSerial;
+	string readSerial();
 public:
 	~serialPort_CLASS();
+
+	struct GPSData getGPS();
 	bool connect(string SerialPort);
-	string readSerial();
 };
 
 #endif
