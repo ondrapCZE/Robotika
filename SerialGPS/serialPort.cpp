@@ -1,3 +1,10 @@
+/*
+	Author: Ondrej Pilat
+	Date: 8/10/2012
+	Web: ondrap.cz
+	Mail: ondrap@ondrap.cz
+*/
+
 #include "serialPort.h"
 #include <iostream>
 #include <sstream>
@@ -119,11 +126,60 @@ string serialPort_CLASS::readSerial(){
 #endif
 }
 
+string parseValue(string &Line);
+
+string getLine(string &In){
+	int index = In.find('\n');
+	string line = "";
+
+	if((int) In.length() > index + 1 && index != -1){
+		line = In.substr(0,index);
+		In = In.substr(index + 1);
+	}
+	
+	return line;
+}
+
+GPSData serialPort_CLASS::getGPS(){
+	GPSData gps;
+
+	bool gpsDataSet = false;
+
+	do{
+		rawDataSerial += readSerial();
+		string line = getLine(rawDataSerial);
+		if(line == "")
+			continue;
+
+		string dataType = parseValue(line);
+		if(dataType.compare("$GPGGA") == 0){ // parse global positioning system fix data
+			parseValue(line); // Time
+			string lat = parseValue(line);
+			gps.latitude = atoi(lat.substr(0,2).c_str()) + atof(lat.substr(2).c_str())/60.0;
+			parseValue(line); // N,S
+
+			string lon = parseValue(line);
+			gps.longitude = atoi(lon.substr(0,3).c_str()) + atof(lon.substr(3).c_str())/60.0;
+			parseValue(line); // W,E
+
+			parseValue(line); // Fix quality
+			parseValue(line); // Number of satellites
+
+			gps.accuracy = atof(parseValue(line).c_str()); // horizontal accuracy
+
+			gpsDataSet = true;
+		}
+
+	}while(!gpsDataSet);
+
+	return gps;
+}
+
 string parseValue(string &Line){
 	int index = Line.find(',');
 	string value;
 
-	if(index != -1 && Line.length() > index+1){
+	if(index != -1 && (int) Line.length() > index+1){
 		value = Line.substr(0,index);
 		Line = Line.substr(index+1);
 	}else{
@@ -134,65 +190,64 @@ string parseValue(string &Line){
 	return value;
 }
 
-string getLine(string &In){
-	int index = In.find('\n');
-	string line = "";
+//string parseLine(string &Line){
+//	stringstream value;
+//	value.precision(12);
+//	string time = "";
+//
+//	if(parseValue(Line) == "$GPGGA"){
+//		string temp;
+//
+//		value << "gps ";
+//		time = parseValue(Line);
+//		// sirka
+//		temp = parseValue(Line);
+//		value << (atoi(temp.substr(0,2).c_str()) + atof(temp.substr(2).c_str())/60.0) << " ";
+//		parseValue(Line);
+//		// delka
+//		temp = parseValue(Line);
+//		value << (atoi(temp.substr(0,3).c_str()) + atof(temp.substr(3).c_str())/60.0) << " ";
+//		parseValue(Line);
+//		// odchylka
+//		parseValue(Line);
+//		parseValue(Line);
+//		value << parseValue(Line) + " ";
+//	    value << time + "\n";
+//	}
+//
+//	return value.str();
+//}
 
-	if(In.length() > index + 1 && index != -1){
-		line = In.substr(0,index);
-		In = In.substr(index + 1);
-	}
-	
-	return line;
-}
-
-string parseLine(string &Line){
-	stringstream value;
-	value.precision(12);
-	string time = "";
-
-	if(parseValue(Line) == "$GPGGA"){
-		string temp;
-
-		value << "gps ";
-		time = parseValue(Line);
-		// sirka
-		temp = parseValue(Line);
-		value << (atoi(temp.substr(0,2).c_str()) + atof(temp.substr(2).c_str())/60.0) << " ";
-		parseValue(Line);
-		// delka
-		temp = parseValue(Line);
-		value << (atoi(temp.substr(0,3).c_str()) + atof(temp.substr(3).c_str())/60.0) << " ";
-		parseValue(Line);
-		// odchylka
-		parseValue(Line);
-		parseValue(Line);
-		value << parseValue(Line) + " ";
-	    value << time + "\n";
-	}
-
-	return value.str();
-}
-
-string getPosition(string &Temp){
-	string position = "";
-	string line = getLine(Temp);
-	while(line!=""){
-		position = parseLine(line);
-		if(position != "")
-			break;
-
-		line = getLine(Temp);
-	}
-
-	return position;
-}
+//string getPosition(string &Temp){
+//	string position = "";
+//	string line = getLine(Temp);
+//	while(line!=""){
+//		position = parseLine(line);
+//		if(position != "")
+//			break;
+//
+//		line = getLine(Temp);
+//	}
+//
+//	return position;
+//}
 
 int main(){
 	serialPort_CLASS test;
-	if(!test.connect("/dev/ttyUSB0"))
+
+	if(!test.connect("com3"))
 		return 1;
+
+	// Linux 
+	/*if(!test.connect("/dev/ttyUSB0"))
+		return 1;*/
 	
+	while(true){
+		GPSData gps = test.getGPS();
+		cout << "gps:" << gps.latitude << " | " << gps.longitude << " | " << gps.accuracy << endl;
+	}
+
+	/*
 	string temp = test.readSerial();
 	while(true){
 		while(true){
@@ -204,7 +259,7 @@ int main(){
 		}
 
 		temp += test.readSerial();
-	}
+	}*/
 
 	return 0;
 }
