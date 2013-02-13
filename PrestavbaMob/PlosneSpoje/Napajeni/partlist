@@ -1,0 +1,34 @@
+Partlist
+
+Exported from napajeniMOB.sch at 2/7/2013 8:35:52 AM
+
+EAGLE Version 6.4.0 Copyright (c) 1988-2013 CadSoft
+
+Assembly variant: 
+
+Part           Value             Device            Package  Library          Sheet
+
+BAT                              AK500/4           AK500/4  #Svorkovnice     1
+C1                               C-ELEKTROLYT_7,5+ C-EL7,5+ #PaJa_30         1
+C2             0.33uF            C-KERAMIK_5       C-5      #PaJa_30         1
+C3             0.1uF             C-KERAMIK_5       C-5      #PaJa_30         1
+CHARGE                           AK500/2           AK500/2  #Svorkovnice     1
+D1                               LEDLED5MM         LED5MM   #Led             1
+DEKODER_POWER                    AK500/2           AK500/2  #Svorkovnice     1
+DZ1            D-ZENEROVA_2W_BZY D-ZENEROVA_2W_BZY DO41     #PaJa_30         1
+FREE                             AK500/2           AK500/2  #Svorkovnice     1
+IC1            7805TV            7805TV            TO220V   linear           1
+IRF3205        IRF520            IRF520            TO220BV  transistor-power 1
+MD22_POWER                       AK500/2           AK500/2  #Svorkovnice     1
+MOTOR_POWER                      AK500/2           AK500/2  #Svorkovnice     1
+POJ1           POJISTKYKS20      POJISTKYKS20      POJ_KS20 #PaJa_30         1
+R1             100k              R_10              R-10     #PaJa_30         1
+R2             10k               R_10              R-10     #PaJa_30         1
+R3                               R_10              R-10     #PaJa_30         1
+RASP_POWER                       AK500/2           AK500/2  #Svorkovnice     1
+SICK_POWER                       AK500/2           AK500/2  #Svorkovnice     1
+SWITCH-SICK                      AK500/2           AK500/2  #Svorkovnice     1
+SWITCH_MOTOR                     AK500/2           AK500/2  #Svorkovnice     1
+SWITCH_PRIMARY                   AK500/2           AK500/2  #Svorkovnice     1
+T1             BC327             BC327             TO-92    #PaJa_30         1
+TLACITKO                         AK500/2           AK500/2  #Svorkovnice     1
