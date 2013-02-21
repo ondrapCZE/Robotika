@@ -32,6 +32,7 @@ UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/74xx-little-de.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/74xx-little-us.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/74xx-us.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/751xx.lbr"
+UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/_hhn_attiny25_45_85.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/advanced-test-technologies.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/agilent-technologies.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/allegro.lbr"
@@ -354,12 +355,12 @@ UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/xilinx-xc9.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/xilinx-xcv.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/zetex.lbr"
 UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/zilog.lbr"
-UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/_hhn_attiny25_45_85.lbr"
+UsedLibrary="C:/Program Files (x86)/EAGLE-6.4.0/lbr/atmega8.lbr"
 
 [Win_1]
 Type="Control Panel"
 Loc="332 293 931 692"
-State=1
+State=3
 Number=0
 
 [Desktop]
