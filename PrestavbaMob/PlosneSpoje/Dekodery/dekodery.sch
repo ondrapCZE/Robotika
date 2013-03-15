@@ -2087,8 +2087,8 @@ paja-trb@seznam.cz
 <part name="P+2" library="supply1" deviceset="VCC" device=""/>
 <part name="P+3" library="supply1" deviceset="VCC" device=""/>
 <part name="C1" library="#PaJa_30" deviceset="C-KERAMIK" device="_SMD_1206"/>
-<part name="C2" library="#PaJa_30" deviceset="C-KERAMIK" device="_SMD_1206"/>
-<part name="C3" library="#PaJa_30" deviceset="C-KERAMIK" device="_SMD_1206"/>
+<part name="C2" library="#PaJa_30" deviceset="C-KERAMIK" device="_SMD_1206" value="15pf"/>
+<part name="C3" library="#PaJa_30" deviceset="C-KERAMIK" device="_SMD_1206" value="15p"/>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="CON1" library="#PaJa_konektory" deviceset="MLW06" device="_90°"/>
 <part name="P+4" library="supply1" deviceset="VCC" device=""/>
@@ -2099,12 +2099,12 @@ paja-trb@seznam.cz
 <part name="D4" library="#PaJa_30" deviceset="LED" device="_SMD_1206"/>
 <part name="D5" library="#PaJa_30" deviceset="LED" device="_SMD_1206"/>
 <part name="D6" library="#PaJa_30" deviceset="LED" device="_SMD_1206"/>
-<part name="R1" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R2" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R3" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R4" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R5" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R6" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
+<part name="R1" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="150"/>
+<part name="R2" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="150"/>
+<part name="R3" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="150"/>
+<part name="R4" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="150"/>
+<part name="R5" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="150"/>
+<part name="R6" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="150"/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
 <part name="K3" library="#PaJa_konektory" deviceset="PSH02-02" device="W"/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
@@ -2114,12 +2114,14 @@ paja-trb@seznam.cz
 <part name="T2" library="ondrap" deviceset="BUZ11" device=""/>
 <part name="K4" library="#PaJa_konektory" deviceset="PSH02-03" device="W"/>
 <part name="P+6" library="supply1" deviceset="VCC" device=""/>
-<part name="R7" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R8" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
+<part name="R7" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="4.7k"/>
+<part name="R8" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="4.7k"/>
 <part name="P+7" library="supply1" deviceset="VCC" device=""/>
-<part name="R9" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
-<part name="R10" library="#PaJa_30" deviceset="R" device="_SMD_1206"/>
+<part name="R9" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="3.3k"/>
+<part name="R10" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="3.3k"/>
 <part name="K5" library="#PaJa_konektory" deviceset="PSH02-02" device="W"/>
+<part name="R11" library="#PaJa_30" deviceset="R" device="_SMD_1206" value="10k"/>
+<part name="P+8" library="supply1" deviceset="VCC" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -2169,6 +2171,8 @@ paja-trb@seznam.cz
 <instance part="R9" gate="R" x="200.66" y="116.84" rot="R180"/>
 <instance part="R10" gate="R" x="200.66" y="134.62" rot="R270"/>
 <instance part="K5" gate="KON" x="165.1" y="134.62" rot="MR0"/>
+<instance part="R11" gate="R" x="48.26" y="101.6"/>
+<instance part="P+8" gate="VCC" x="60.96" y="101.6" rot="R270"/>
 </instances>
 <busses>
 </busses>
@@ -2187,6 +2191,10 @@ paja-trb@seznam.cz
 <wire x1="60.96" y1="63.5" x2="63.5" y2="63.5" width="0.1524" layer="91"/>
 <wire x1="60.96" y1="63.5" x2="60.96" y2="66.04" width="0.1524" layer="91"/>
 <junction x="60.96" y="66.04"/>
+<pinref part="IC1" gate="1" pin="AVCC"/>
+<wire x1="63.5" y1="58.42" x2="60.96" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="60.96" y1="58.42" x2="60.96" y2="63.5" width="0.1524" layer="91"/>
+<junction x="60.96" y="63.5"/>
 </segment>
 <segment>
 <pinref part="K1" gate="KON" pin="3"/>
@@ -2219,6 +2227,11 @@ paja-trb@seznam.cz
 <pinref part="R8" gate="R" pin="2"/>
 <pinref part="P+7" gate="VCC" pin="VCC"/>
 <wire x1="172.72" y1="139.7" x2="172.72" y2="142.24" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="P+8" gate="VCC" pin="VCC"/>
+<pinref part="R11" gate="R" pin="2"/>
+<wire x1="58.42" y1="101.6" x2="53.34" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="GND" class="0">
@@ -2360,10 +2373,15 @@ paja-trb@seznam.cz
 <net name="RST" class="0">
 <segment>
 <pinref part="IC1" gate="1" pin="PC6(/RESET/PCINT14)"/>
-<wire x1="63.5" y1="93.98" x2="30.48" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="63.5" y1="93.98" x2="38.1" y2="93.98" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="93.98" x2="30.48" y2="93.98" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="93.98" x2="30.48" y2="30.48" width="0.1524" layer="91"/>
 <pinref part="CON1" gate="C" pin="5"/>
 <wire x1="30.48" y1="30.48" x2="137.16" y2="30.48" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="93.98" x2="38.1" y2="101.6" width="0.1524" layer="91"/>
+<junction x="38.1" y="93.98"/>
+<pinref part="R11" gate="R" pin="1"/>
+<wire x1="38.1" y1="101.6" x2="43.18" y2="101.6" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$10" class="0">
