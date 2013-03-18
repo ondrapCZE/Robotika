@@ -1969,7 +1969,7 @@ paja-trb@seznam.cz
 <instance part="R11" gate="R" x="48.26" y="101.6"/>
 <instance part="P+8" gate="VCC" x="60.96" y="101.6" rot="R270"/>
 <instance part="P+9" gate="VCC" x="152.4" y="121.92" rot="R90"/>
-<instance part="GND8" gate="1" x="152.4" y="127" rot="R270"/>
+<instance part="GND8" gate="1" x="147.32" y="127" rot="R270"/>
 <instance part="GND9" gate="1" x="195.58" y="147.32" rot="R270"/>
 <instance part="C4" gate="C" x="55.88" y="53.34" rot="R90"/>
 </instances>
@@ -2125,7 +2125,7 @@ paja-trb@seznam.cz
 <pinref part="K5" gate="KON" pin="4"/>
 <pinref part="GND8" gate="1" pin="GND"/>
 <wire x1="157.48" y1="132.08" x2="157.48" y2="127" width="0.1524" layer="91"/>
-<wire x1="157.48" y1="127" x2="154.94" y2="127" width="0.1524" layer="91"/>
+<wire x1="157.48" y1="127" x2="149.86" y2="127" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
