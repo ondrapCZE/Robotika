@@ -25,7 +25,7 @@ static uint8_t encoderState[4][2] = {
 	{2,1},		
 	};
 
-uint8_t EEMEM TWI_SlaveAddress = DEFAULT_ADRESS; //set on default address
+uint8_t EEMEM TWI_SlaveAddressEEPROM = DEFAULT_ADRESS; //set on default address
 volatile struct encoders encodersValue;
 
 //last quadrature state
@@ -33,14 +33,12 @@ uint8_t lastLeftState;
 uint8_t lastRightState;
 
 // Update I2C address in internal eeprom memory
-void setAddress(uint8_t Address){
-	if(Address > 127)
-		Address = Address >> 1; // use only 7 upper bits from address
-	eeprom_write_byte(&TWI_SlaveAddress, Address);
+void setTWIAddress(uint8_t Address){
+	eeprom_write_byte(&TWI_SlaveAddressEEPROM, Address);
 }
 
-uint8_t readAddress(){
-	return eeprom_read_byte(&TWI_SlaveAddress);
+uint8_t readTWIAddress(){
+	return eeprom_read_byte(&TWI_SlaveAddressEEPROM);
 }
 
 void setEncodersValue(volatile struct encoders *EncodersValue, uint16_t Value){
@@ -114,7 +112,7 @@ ISR(PCINT2_vect){
 int main(void)
 {
 	unsigned char messageBuf[TWI_BUFFER_SIZE];
-	setEncodersValue(&encodersValue,0);
+	setEncodersValue(&encodersValue,32767);
 	// TEST counter
 	DDRD |= (1 << PD5) | (1 << PD6);
 	PORTD |= (1 << PD5) | (1 << PD6);
@@ -122,7 +120,8 @@ int main(void)
 	
 	setInputInterruptForDecoder();
 	
-	//TWI_SlaveAddress = readAddress();
+	uint8_t TWI_SlaveAddress;
+	//TWI_SlaveAddress = readTWIAddress();
 	TWI_SlaveAddress = 0x30;
 	
 	// Initialize TWI module for slave operation. Include address and/or enable General Call.
@@ -149,6 +148,15 @@ int main(void)
 						break;
 					case 1:
 						setEncodersValue(&encodersValue,32767);
+						break;
+					case 2: // change I2c address
+						if(messageBuf[1] == messageBuf[2]){
+							setTWIAddress(messageBuf[1]);
+							messageBuf[0] = 0;
+						}else{
+							messageBuf[0] = 1; // received address not match
+						}
+						TWI_Start_Transceiver_With_Data(messageBuf,1);
 						break;
 					case 10: // send encoder data
 					{

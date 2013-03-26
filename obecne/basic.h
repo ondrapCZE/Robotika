@@ -29,8 +29,7 @@ struct position{
 struct state : public position {
 	double angle;
 
-	state(double X = 0, double Y = 0, double Angle = 0) : position(X,Y)
-	{angle = Angle;};
+	state(double X = 0, double Y = 0, double Angle = 0) : position(X,Y), angle(Angle){};
 };
 
 namespace basic_robotic_fce{
