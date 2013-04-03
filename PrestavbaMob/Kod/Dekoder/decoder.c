@@ -148,29 +148,41 @@ int main(void)
 	TWI_Start_Transceiver();
 	
 	// Never ending loop witch read from I2C and response on command.
-	while(1){
-		if (!TWI_Transceiver_Busy()){
-			if(TWI_statusReg.RxDataInBuf){
-				// get command code
-				PORTD ^= (1 << PD7);
-				TWI_Get_Data_From_Transceiver(&messageBuf, 1);				
+	while(TRUE){
+		if(!TWI_Transceiver_Busy()){
+			if(TWI_statusReg.lastTransOK){
+				if(TWI_statusReg.RxDataInBuf){
+					// get command code
+					PORTB ^= (1 << PB2);
+					TWI_Get_Data_From_Transceiver(messageBuf, 1);
+					PORTB ^= (1 << PB2);
 				
-				struct encoders tempEncodersState;
-				ATOMIC_BLOCK(ATOMIC_FORCEON){
-					tempEncodersState = encodersState;
+					switch(messageBuf[0]){
+						case SEND_ENCODERS:{
+							PORTD ^= (1 << PD7);
+							struct encoders tempEncodersState;
+							ATOMIC_BLOCK(ATOMIC_FORCEON){
+								tempEncodersState = encodersState;
+							}
+						
+							messageBuf[0] = tempEncodersState.left.bytes[0];
+							messageBuf[1] = tempEncodersState.left.bytes[1];
+							messageBuf[2] = tempEncodersState.right.bytes[0];
+							messageBuf[3] = tempEncodersState.right.bytes[1];
+						
+							TWI_Start_Transceiver_With_Data(messageBuf, 4);
+							PORTD ^= (1 << PD7);
+							break;
+						}
+						default:
+							break;
+					}				
 				}
-				
-				messageBuf[0] = tempEncodersState.left.bytes[0];
-				messageBuf[1] = tempEncodersState.left.bytes[1];
-				messageBuf[2] = tempEncodersState.right.bytes[0];
-				messageBuf[3] = tempEncodersState.right.bytes[1];
-				
-				TWI_Start_Transceiver_With_Data(&messageBuf, 4);
-				
-				PORTD ^= (1 << PD7);
-			}
-		}
-		
-		asm volatile ("NOP"::);  // Do something else while waiting
+			}else{
+				TWI_Start_Transceiver();
+			}			
+		}else{
+			asm volatile ("NOP"::);  // Do something else while waiting
+		}			
 	}
 }
