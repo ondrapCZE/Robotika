@@ -175,12 +175,12 @@ int main(void)
 							break;
 						}
 						default:
-							//TWI_Start_Transceiver();
+							TWI_Start_Transceiver();
 							break;
 					}				
 				}
 			}else{
-				//TWI_Start_Transceiver();
+				TWI_Start_Transceiver();
 			}			
 		}else{
 			asm volatile ("NOP"::);  // Do something else while waiting
