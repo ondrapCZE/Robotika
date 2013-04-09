@@ -3,24 +3,28 @@
 
 #include <stdint.h>
 #include "../../../obecne/basic.h"
-#include "../Dekoder/decoder.h"
 
 /*!
  * struct Speed serve for storage speed on the left and right wheels.
  */
 struct Speed{
-	uint8_t left;
-	uint8_t right;
+	double left;
+	double right;
 };
 
 /*!
  * struct DifferencialChassisParameters serve for setting basic parameters.
  */
 struct DifferencialChassisParameters{
-	unsigned int wheelbase;
-	unsigned int wheelRadius;
+	double wheelbase;
+	double wheelRadius;
 	unsigned int wheelTics;
 };
+
+struct Encoders{
+	unsigned int left;
+	unsigned int right;
+}; 
 
 /*!
  * struct DifferencialChassis is virtual class which is necessary to define.
@@ -41,12 +45,12 @@ public:
     /*!
 		\return actual state of the chassis
 	*/
-	virtual state getState()=0;
+	virtual State getState()=0;
 	//! A pure virtual member.
     /*!
 		\return actual state of encoders
     */
-	virtual encoders getEncoders()=0;
+	virtual Encoders getEncoders()=0;
 };
 
 #endif

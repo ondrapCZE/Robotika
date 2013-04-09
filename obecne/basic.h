@@ -15,21 +15,21 @@
 	\struct position
 	\brief Position structure for robot or object in 2D world.
 */
-struct position{
+struct Position{
 	double x;
 	double y;
 
-	position(double X = 0, double Y = 0){x = X; y = Y;};
+	Position(double X = 0, double Y = 0){x = X; y = Y;};
 };
 
 /*!
 	\struct state
 	\brief State for robot. Inherit x,y from position structure.
 */
-struct state : public position {
+struct State : public Position {
 	double angle;
 
-	state(double X = 0, double Y = 0, double Angle = 0) : position(X,Y), angle(Angle){};
+	State(double X = 0, double Y = 0, double Angle = 0) : Position(X,Y), angle(Angle){};
 };
 
 namespace basic_robotic_fce{

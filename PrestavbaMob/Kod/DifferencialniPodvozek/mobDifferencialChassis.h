@@ -2,31 +2,57 @@
 #define DIFFERENCIAL_CHASSIS_H
 
 #include "basicDifferencialChassis.h"
+#include <string>
 
-class MobDifferencialChasis : public BasicDifferencialChassis{
+/*!
+ * struct Speed serve for storage speed on the left and right wheels.
+ */
+struct SpeedMotors{
+	uint8_t left;
+	uint8_t right;
+};
+
+class MobDifferencialChassis : public BasicDifferencialChassis{
 private:
+	// I2C description for comunication
+	int file;
+	int decoderAddress;
+	int motorsAddress;
+
+	Encoders encodersValue;	
+
+	DifferencialChassisParameters chassisParam;
+
+	State robotState;
+
+	int setI2CSlaveToDecoder();
+	int setI2CSlaveToMotors();
+
 	
 public:
-	//! A pure virtual member.
+	MobDifferencialChassis(std::string I2CName, int decoderAddress, int motorsAddress, DifferencialChassisParameters chassisParam);
+	//! 
     /*!
 		\param differencialChassisParameters an struct DifferencialChassisParameters argument.
-    */
-	virtual void setDifferencialChassisParameters(DifferencialChassisParameters differencialChassisParameters);
-	//! A pure virtual member.
+	*/
+	void setDifferencialChassisParameters(DifferencialChassisParameters differencialChassisParameters);
+	//! 
     /*!
 		\param speed an struct Speed argument.
     */
-	virtual void setSpeed(Speed speed);
-	//! A pure virtual member.
+	void setSpeed(Speed speed);
+	//! 
     /*!
 		\return actual state of the chassis
 	*/
-	virtual state getState();
-	//! A pure virtual member.
+	State getState();
+	//! 
     /*!
 		\return actual state of encoders
     */
-	virtual encoders getEncoders();
+	Encoders getEncoders();
+
+	~MobDifferencialChassis();
 };
 
 #endif
