@@ -38,6 +38,7 @@ private:
 	int setI2CSlaveToDecoder();
 	int setI2CSlaveToMotors();
 	Encoders getEncodersFromDecoder();
+	Encoders getEncodersDifference(Encoders* lastEncodersState, Encoders* newEncodersState);
 
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:

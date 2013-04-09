@@ -24,6 +24,8 @@ struct DifferencialChassisParameters{
 struct Encoders{
 	unsigned int left;
 	unsigned int right;
+
+	Encoders(unsigned int left = 0, unsigned int right = 0) : left(left), right(right) {};
 }; 
 
 /*!

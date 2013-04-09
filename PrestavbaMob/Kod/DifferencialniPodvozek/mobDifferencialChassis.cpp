@@ -24,7 +24,7 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 		exit(1);
 	}
 	
-	encodersAcquireTime = 1000;
+	encodersAcquireTime = 50;
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
@@ -52,8 +52,8 @@ Encoders MobDifferencialChassis::getEncodersFromDecoder(){
 		if(read(file,buffer,4) != 4){
 			printf("Failed to read from the i2c bus. \n\r");
 		}else{
-			encodersState.left = buffer[0] | (buffer[1] << 8);
-			encodersState.right = buffer[2] | (buffer[3] << 8);
+			encodersState.right = buffer[0] | (buffer[1] << 8);
+			encodersState.left = buffer[2] | (buffer[3] << 8);
 		}
 	}	
 
@@ -62,15 +62,34 @@ Encoders MobDifferencialChassis::getEncodersFromDecoder(){
 	return encodersState;
 }
 
+Encoders MobDifferencialChassis::getEncodersDifference(Encoders* lastEncodersState, Encoders* newEncodersState){
+	Encoders differenceEncoders;
+	differenceEncoders.left = newEncodersState->left - lastEncodersState->left;
+	differenceEncoders.right = newEncodersState->right - lastEncodersState->right;
+
+	// TODO: test overflow
+
+	return differenceEncoders;
+}
+
 void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 	timeval timer[2];
 	MobDifferencialChassis* This = (MobDifferencialChassis *) ThisPointer;
 	printf("Sleep time: %i \n\r", This->encodersAcquireTime);
+	Encoders lastEncodersState = This->getEncodersFromDecoder();
 
 	while(true){
 		gettimeofday(&timer[0], NULL);
 		
 		Encoders encodersState = This->getEncodersFromDecoder();
+		
+		Encoders differenceEncoders = This->getEncodersDifference(&lastEncodersState,&encodersState);
+		pthread_mutex_lock(&This->encodersMutex);
+		This->encodersValue.left += differenceEncoders.left;	
+		This->encodersValue.right += differenceEncoders.right;
+		pthread_mutex_unlock(&This->encodersMutex);
+
+		lastEncodersState = encodersState;
 		printf("Encoders left: %i right: %i \n\r", encodersState.left, encodersState.right);
 
 		gettimeofday(&timer[1], NULL);
@@ -126,7 +145,11 @@ int main(){
 
 	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,0xb0,chassisParam);
 
-	while(true);
+	while(true){
+		//Encoders encoders = mobChassis.getEncoders();
+		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
+		usleep(500000);
+	}
 	
 	return 0;
 }
