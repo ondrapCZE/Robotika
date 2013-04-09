@@ -3,6 +3,9 @@
 
 #include "basicDifferencialChassis.h"
 #include <string>
+#include <pthread.h>
+
+#define BUFFER_SIZE 10
 
 /*!
  * struct Speed serve for storage speed on the left and right wheels.
@@ -18,6 +21,7 @@ private:
 	int file;
 	int decoderAddress;
 	int motorsAddress;
+	int encodersAcquireTime;
 
 	Encoders encodersValue;	
 
@@ -25,10 +29,17 @@ private:
 
 	State robotState;
 
+	pthread_t updateEncodersThreadHandler;
+
+	pthread_mutex_t i2cBusMutex;
+	pthread_mutex_t encodersMutex;
+	pthread_mutex_t stateMutex;
+
 	int setI2CSlaveToDecoder();
 	int setI2CSlaveToMotors();
+	Encoders getEncodersFromDecoder();
 
-	
+	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
 	MobDifferencialChassis(std::string I2CName, int decoderAddress, int motorsAddress, DifferencialChassisParameters chassisParam);
 	//! 

@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-c -Wall
-LDFLAGS=
+CFLAGS=-c -Wall -std=c++0x -O3 -lpthread
+LDFLAGS= -lpthread
 SOURCES= basicDifferencialChassis.h mobDifferencialChassis.cpp mobDifferencialChassis.h
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=mobDifferencialChasis
+EXECUTABLE=mobDifferencialChassis
 
 all: $(SOURCES) $(EXECUTABLE)
 	
