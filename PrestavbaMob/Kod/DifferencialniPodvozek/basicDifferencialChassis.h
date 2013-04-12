@@ -10,6 +10,13 @@
 struct Speed{
 	double left;
 	double right;
+
+	Speed(double left=0, double right=0) : left(left), right(right){};
+
+	Speed operator-(Speed ob2){
+		Speed temp(left - ob2.left, right - ob2.right);
+		return temp;
+	};
 };
 
 /*!
@@ -26,7 +33,27 @@ struct Encoders{
 	unsigned int right;
 
 	Encoders(unsigned int left = 0, unsigned int right = 0) : left(left), right(right) {};
+
+	Encoders operator+(Encoders ob2){
+		Encoders temp(left + ob2.left, right + ob2.right);
+		return temp;
+	};
+	
+	Encoders operator-(Encoders ob2){
+		Encoders temp(left - ob2.left, right - ob2.right);
+		return temp;
+	};
 }; 
+
+struct PIValue{
+	int P;
+	int I;
+
+	double integralPartLeft;
+	double integralPartRight;
+
+	PIValue(int P=80, int I=1): P(P), I(I), integralPartLeft(0), integralPartRight(0)  {};
+};
 
 /*!
  * struct DifferencialChassis is virtual class which is necessary to define.
