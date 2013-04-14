@@ -13,3 +13,4 @@ $(EXECUTABLE): $(OBJECTS)
 .cpp.o:
 	$(CC) $(CFLAGS) $< -o $@
 
+mobDifferencialChassi.cpp: basicDifferencialChassis.h mobDifferencialChassis.h

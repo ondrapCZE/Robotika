@@ -27,8 +27,11 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	}
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (double) chassisParam.wheelTics;
+
+	// TEST
+	sendMotorPower(SpeedMotors(0,0));
 	
-	encodersAcquireTime = 10; // every 10ms
+	encodersAcquireTime = 20; // every 20ms
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
@@ -108,6 +111,19 @@ int MobDifferencialChassis::setDefaultMotorMode(){
 	return 0;
 }
 
+double MobDifferencialChassis::speedInBoundaries(double speed, double boundaries){
+	if(speed < boundaries){
+		if(speed > -boundaries){
+			return speed;
+		}
+		else{
+			return -boundaries;
+		}
+	}else{
+		return boundaries;
+	}
+}
+
 int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
 	char buffer[BUFFER_SIZE];
 
@@ -147,6 +163,10 @@ SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireS
 	speedMotors.left = PIRegulatorValue.P*speedDifference.left + PIRegulatorValue.I*PIRegulatorValue.integralPartLeft;
 	speedMotors.right = PIRegulatorValue.P*speedDifference.right + PIRegulatorValue.I*PIRegulatorValue.integralPartRight;
 
+	// set in boundaries
+	speedMotors.left = speedInBoundaries(speedMotors.left, MAX_MOTOR_SPEED);
+	speedMotors.right = speedInBoundaries(speedMotors.right, MAX_MOTOR_SPEED);
+
 	return speedMotors;
 }
 
@@ -163,24 +183,25 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 
 		// Get encoders and compute distance
 		Encoders encodersState = This->getEncodersFromDecoder();
-		Encoders differenceEncoders = lastEncodersState - encodersState;
+		Encoders differenceEncoders = encodersState - lastEncodersState;
 
 		pthread_mutex_lock(&This->encodersMutex);
 		This->encodersValue = This->encodersValue + differenceEncoders;	
 		pthread_mutex_unlock(&This->encodersMutex);
 		
 		lastEncodersState = encodersState;
-		printf("Encoders left: %i right: %i \n\r", encodersState.left, encodersState.right);
+		//printf("Encoders left: %li right: %li \n\r", encodersState.left, encodersState.right);
 
 		// Compute actual speed and use PID
 		double time = (microStart - lastMicroTime) / 1000000.0f; // time in sec
 		Distance distance = This->computeDistance(differenceEncoders);
 		Speed actualSpeed = This->computeSpeed(distance, time);
-		printf("Actual speed left: %f  right: %f", actualSpeed.left, actualSpeed.right);
+		printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 	
 		pthread_mutex_lock(&This->speedMutex);
 		SpeedMotors valueMotors = This->PIRegulator(actualSpeed, This->desireSpeed);
 		pthread_mutex_unlock(&This->speedMutex);
+		printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
 
 		This->sendMotorPower(valueMotors);			
 	
@@ -189,7 +210,7 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 		long int sleepMicro = This->encodersAcquireTime*1000 - (microStop - microStart);
 		lastMicroTime = microStart;
 		
-		printf("Usleep time: %li \n\r", sleepMicro);
+		//printf("Usleep time: %li \n\r", sleepMicro);
 		usleep(sleepMicro);
 	}
 
@@ -199,10 +220,14 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 
 void MobDifferencialChassis::setDifferencialChassisParameters(DifferencialChassisParameters differencialChassisParameters){
 	chassisParam = differencialChassisParameters;
+	metersPerTick = (2*M_PI*differencialChassisParameters.wheelRadius) / (double) differencialChassisParameters.wheelTics;
 }
 
 // TODO:
 void MobDifferencialChassis::setSpeed(Speed speed){
+	speed.left = speedInBoundaries(speed.left, MAX_SPEED);
+	speed.right = speedInBoundaries(speed.right, MAX_SPEED);	
+
 	pthread_mutex_lock(&speedMutex);
 	desireSpeed = speed;
 	pthread_mutex_unlock(&speedMutex);
@@ -241,7 +266,13 @@ int main(){
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
 		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		usleep(500000);
+		Speed desire(0.05,0.05);
+		mobChassis.setSpeed(desire);
+		sleep(2);
+
+		Speed stop(0,0);
+		mobChassis.setSpeed(stop);		
+		sleep(2);
 	}
 	
 	return 0;

@@ -29,10 +29,10 @@ struct DifferencialChassisParameters{
 };
 
 struct Encoders{
-	unsigned int left;
-	unsigned int right;
+	long int left;
+	long int right;
 
-	Encoders(unsigned int left = 0, unsigned int right = 0) : left(left), right(right) {};
+	Encoders(long int left = 0, long  int right = 0) : left(left), right(right) {};
 
 	Encoders operator+(Encoders ob2){
 		Encoders temp(left + ob2.left, right + ob2.right);
@@ -52,7 +52,7 @@ struct PIValue{
 	double integralPartLeft;
 	double integralPartRight;
 
-	PIValue(int P=80, int I=1): P(P), I(I), integralPartLeft(0), integralPartRight(0)  {};
+	PIValue(int P=150, int I=0): P(P), I(I), integralPartLeft(0), integralPartRight(0)  {};
 };
 
 /*!

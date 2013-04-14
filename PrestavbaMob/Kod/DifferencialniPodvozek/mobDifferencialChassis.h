@@ -6,6 +6,8 @@
 #include <pthread.h>
 
 #define BUFFER_SIZE 10
+#define MAX_SPEED 0.15f
+#define MAX_MOTOR_SPEED 127
 
 /*!
  * struct Speed serve for storage speed on the left and right wheels.
@@ -57,6 +59,7 @@ private:
 	Encoders getEncodersFromDecoder();
 
 	int setDefaultMotorMode();
+	double speedInBoundaries(double speed, double boudaries);
 	int sendMotorPower(struct SpeedMotors speedMotors);
 	SpeedMotors PIRegulator(Speed actualSpeed, Speed desireSpeed);
 
