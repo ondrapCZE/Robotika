@@ -6,8 +6,10 @@
 #include <pthread.h>
 
 #define BUFFER_SIZE 10
-#define MAX_SPEED 0.15f
+#define MAX_SPEED 1.0f
 #define MAX_MOTOR_SPEED 127
+#define MAX_DIFFERENCE (MAX_UINT16 / 2)
+#define MAX_UINT16 65535
 
 /*!
  * struct Speed serve for storage speed on the left and right wheels.
@@ -34,7 +36,7 @@ private:
 	int motorsAddress;
 	int encodersAcquireTime;
 
-	Encoders encodersValue;	
+	Encoders encodersLastState;
 
 	DifferencialChassisParameters chassisParam;
 	double metersPerTick;
@@ -47,7 +49,6 @@ private:
 	pthread_t updateEncodersThreadHandler;
 
 	pthread_mutex_t i2cBusMutex;
-	pthread_mutex_t encodersMutex;
 	pthread_mutex_t stateMutex;
 	pthread_mutex_t speedMutex;
 
@@ -56,7 +57,10 @@ private:
 
 	Distance computeDistance(Encoders distance);
 	Speed computeSpeed(Distance distance, double time); // distance in m and time in sec
+
 	Encoders getEncodersFromDecoder();
+	Encoders getChangeOfEncoders();
+	int dealWithEncoderOverflow(int oldValue, int newValue);
 
 	int setDefaultMotorMode();
 	double speedInBoundaries(double speed, double boudaries);
@@ -81,11 +85,6 @@ public:
 		\return actual state of the chassis
 	*/
 	State getState();
-	//! 
-    /*!
-		\return actual state of encoders
-    */
-	Encoders getEncoders();
 
 	~MobDifferencialChassis();
 };

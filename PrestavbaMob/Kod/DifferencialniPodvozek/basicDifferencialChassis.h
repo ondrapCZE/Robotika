@@ -52,7 +52,7 @@ struct PIValue{
 	double integralPartLeft;
 	double integralPartRight;
 
-	PIValue(int P=150, int I=0): P(P), I(I), integralPartLeft(0), integralPartRight(0)  {};
+	PIValue(int P=90, int I=0): P(P), I(I), integralPartLeft(0), integralPartRight(0)  {};
 };
 
 /*!
@@ -75,11 +75,6 @@ public:
 		\return actual state of the chassis
 	*/
 	virtual State getState()=0;
-	//! A pure virtual member.
-    /*!
-		\return actual state of encoders
-    */
-	virtual Encoders getEncoders()=0;
 };
 
 #endif
