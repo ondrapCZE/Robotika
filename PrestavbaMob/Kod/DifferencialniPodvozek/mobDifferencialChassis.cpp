@@ -38,7 +38,7 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	// END TEST
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 50;
+	PIRegulatorValue.P = 80;
 	PIRegulatorValue.I = 1;
 	
 	encodersAcquireTime = 50; // every x ms
@@ -73,15 +73,14 @@ Speed MobDifferencialChassis::computeSpeed(Distance distance, double time){
 
 Encoders MobDifferencialChassis::getEncodersFromDecoder(){	
 	char buffer[BUFFER_SIZE];
-
-	pthread_mutex_lock(&i2cBusMutex);
-
-	if(setI2CSlaveToDecoder()){
-		printf("Cannot set i2c slave address to decoder module");
-		return 1;
-	}	
-	
 	Encoders encodersState;	
+	
+	pthread_mutex_lock(&i2cBusMutex);
+	if(setI2CSlaveToDecoder()){
+		printf("Cannot set i2c slave address to decoder module \n\r");
+		goto unlock;
+	}	
+
 	buffer[0] = 10; // send command for reading encoders value from decoder
 	if(write(i2cDevice,buffer,1) != 1){
 		printf("Failed to write to the i2c bus. \n\r");
@@ -95,7 +94,7 @@ Encoders MobDifferencialChassis::getEncodersFromDecoder(){
 		}
 	}	
 
-	pthread_mutex_unlock(&i2cBusMutex);
+	unlock: pthread_mutex_unlock(&i2cBusMutex);
 
 	return encodersState;
 }
@@ -126,25 +125,26 @@ int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
 }
 
 int MobDifferencialChassis::setDefaultMotorMode(){	
-char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
+	int returnState = 0;
+	pthread_mutex_lock(&i2cBusMutex);
 
-pthread_mutex_lock(&i2cBusMutex);
+	if(setI2CSlaveToMotors()){
+		printf("Cannot set i2c slave address to motor module \n\r");
+		returnState = 1;
+		goto unlock;
+	}	
 
-if(setI2CSlaveToMotors()){
-	printf("Cannot set i2c slave address to motor module");
-	return 1;
-}	
+	buffer[0] = 0;
+	buffer[1] = 1;
 
-buffer[0] = 0;
-buffer[1] = 1;
+	if(write(i2cDevice,buffer,2) != 2){
+		printf("Cannot write to motor module \n\r");
+		returnState = 1; // error state
+	}
 
-if(write(i2cDevice,buffer,2) != 2){
-	printf("Cannot write to motor module");
-	return 1; // error state
-}
-
-pthread_mutex_unlock(&i2cBusMutex);
-return 0;
+	unlock: pthread_mutex_unlock(&i2cBusMutex);
+	return returnState;
 }
 
 double MobDifferencialChassis::speedInBoundaries(double speed, double boundaries){
@@ -161,33 +161,36 @@ if(speed < boundaries){
 }
 
 int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
-char buffer[BUFFER_SIZE];
+	char buffer[BUFFER_SIZE];
+	int returnState = 0;
 
-pthread_mutex_lock(&i2cBusMutex);
+	pthread_mutex_lock(&i2cBusMutex);
 
 	if(setI2CSlaveToMotors()){
-		printf("Cannot set i2c slave address to motor module");
-		return 1;
+		printf("Cannot set i2c slave address to motor module \n\r");
+		returnState = 1;
+		goto unlock;
 	}
 	
 	buffer[0] = 1;
 	buffer[1] = speedMotors.left;
 
 	if(write(i2cDevice,buffer,2) != 2){
-		printf("Cannot write to motor module");
-		return 1; // error state
+		printf("Cannot write to motor module \n\r");
+		returnState = 1; // error state
+		goto unlock;
 	}	
 
 	buffer[0] = 2;
 	buffer[1] = speedMotors.right;
 
 	if(write(i2cDevice,buffer,2) != 2){
-		printf("Cannot write to motor module");
-		return 1; // error state
+		printf("Cannot write to motor module \n\r");
+		returnState = 1; // error state
 	}
 
-	pthread_mutex_unlock(&i2cBusMutex);
-	return 0;
+	unlock: pthread_mutex_unlock(&i2cBusMutex);
+	return returnState;
 }
 
 SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireSpeed){
@@ -278,14 +281,14 @@ int main(){
 	DifferencialChassisParameters chassisParam;
 	chassisParam.wheelbase = 0.23f;
 	chassisParam.wheelRadius = 0.05f;
-	chassisParam.wheelTics = 9200;
+	chassisParam.wheelTics = 9180;
 
 	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,0x58,chassisParam);
 
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
 		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		Speed desire(-0.2f,-0.2f);
+		Speed desire(0.2f,0.2f);
 		mobChassis.setSpeed(desire);
 		usleep(500000);
 
