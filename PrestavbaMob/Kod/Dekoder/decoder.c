@@ -5,6 +5,7 @@
  *  Author: Ondrap
  */ 
 
+#define F_CPU 20000000UL  // 20 MHz
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
@@ -35,6 +36,7 @@ volatile struct encoders encodersState;
 //last quadrature state
 uint8_t lastLeftState;
 uint8_t lastRightState;
+unsigned char messageBuf[TWI_BUFFER_SIZE];
 
 // Update I2C address in internal eeprom memory
 void setTWIAddress(uint8_t Address){
@@ -76,18 +78,29 @@ void setInputInterruptForDecoder(){
 	PCMSK2 = (1 << PCINT17) | (1 << PCINT16); // enable interrupt on PCINT16,17
 }
 
-ISR(PCINT1_vect){
+void sendEncoders(){
+	ATOMIC_BLOCK(ATOMIC_FORCEON){	
+		messageBuf[0] = encodersState.left.bytes[0];
+		messageBuf[1] = encodersState.left.bytes[1];
+		messageBuf[2] = encodersState.right.bytes[0];
+		messageBuf[3] = encodersState.right.bytes[1];
+	}	
+	
+	TWI_Start_Transceiver_With_Data(messageBuf, 4);
+}
+
+ISR(PCINT1_vect, ISR_NOBLOCK){
 	uint8_t leftState = PINC & 3;
 	
 	if(encoderStateTable[lastLeftState][1] == leftState){ // Left wheel had switch second part of array because had opposite direction
 		encodersState.left.value = encodersState.left.value + 1;
 		//TEST
-		PORTD ^=  (1 << PD5);
+		//PORTD ^=  (1 << PD5);
 	}else{
 		if(encoderStateTable[lastLeftState][0] == leftState){
 			encodersState.left.value = encodersState.left.value - 1;
 			//TEST
-			PORTD ^=  (1 << PD6);
+			//PORTD ^=  (1 << PD6);
 		}
 		//else{
 			//PORTD ^= (1 << PD7); // TODO: error 
@@ -97,19 +110,19 @@ ISR(PCINT1_vect){
 	lastLeftState = leftState;
 }
 
-ISR(PCINT2_vect){
+ISR(PCINT2_vect, ISR_NOBLOCK){
 	uint8_t rightState = PIND & 3;
 	
 	if(encoderStateTable[lastRightState][0] == rightState){
 		encodersState.right.value = encodersState.right.value + 1;
 		//TEST
-		PORTB ^=  (1 << PB0);
+		//PORTB ^=  (1 << PB0);
 	}		
 	else{
 		if(encoderStateTable[lastRightState][1] == rightState){
 			encodersState.right.value = encodersState.right.value - 1;
 			//TEST
-			PORTB ^=  (1 << PB1);
+			//PORTB ^=  (1 << PB1);
 		}
 		//else{
 			//PORTB ^= (1 << PB2); 
@@ -122,15 +135,14 @@ ISR(PCINT2_vect){
 
 int main(void)
 {
-	unsigned char messageBuf[TWI_BUFFER_SIZE];
-	//setEncodersValue(32767);
-	setEncodersValue(127);
+	setEncodersValue(32767);
+	//setEncodersValue(127);
 	
 	// set output ports for diodes
 	DDRD |= (1 << PD5) | (1 << PD6) | (1 << PD7);
-	PORTD |= (1 << PD5) | (1 << PD6);
+	//PORTD |= (1 << PD5) | (1 << PD6);
 	DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
-	PORTB |= (1 << PB0) | (1 << PB1);
+	//PORTB |= (1 << PB0) | (1 << PB1);
 	
 	setInputInterruptForDecoder();
 	
@@ -139,7 +151,8 @@ int main(void)
 	TWI_SlaveAddress = DEFAULT_ADDRESS;
 	
 	// Initialize TWI module for slave operation. Include address and/or enable General Call.
-	TWI_Slave_Initialise( (TWI_SlaveAddress<<TWI_ADR_BITS) | (TRUE<<TWI_GEN_BIT));
+	//TWI_Slave_Initialise( (TWI_SlaveAddress<<TWI_ADR_BITS) | (TRUE<<TWI_GEN_BIT));
+	TWI_Slave_Initialise((TWI_SlaveAddress<<TWI_ADR_BITS));
 	
 	// Enable interrupt
 	sei();
@@ -150,40 +163,21 @@ int main(void)
 	// Never ending loop witch read from I2C and response on command.
 	while(TRUE){
 		if(!TWI_Transceiver_Busy()){
-			if(TWI_statusReg.lastTransOK){
-				if(TWI_statusReg.RxDataInBuf){
-					// get command code
-					PORTB ^= (1 << PB2);
-					TWI_Get_Data_From_Transceiver(messageBuf, 1);
-					PORTB ^= (1 << PB2);
+			if(TWI_statusReg.RxDataInBuf){
+				// get command code
+				TWI_Get_Data_From_Transceiver(messageBuf, 1);
 				
-					switch(messageBuf[0]){
-						case SEND_ENCODERS:{
-							PORTD ^= (1 << PD7);
-							struct encoders tempEncodersState;
-							ATOMIC_BLOCK(ATOMIC_FORCEON){
-								tempEncodersState = encodersState;
-							}
-						
-							messageBuf[0] = tempEncodersState.left.bytes[0];
-							messageBuf[1] = tempEncodersState.left.bytes[1];
-							messageBuf[2] = tempEncodersState.right.bytes[0];
-							messageBuf[3] = tempEncodersState.right.bytes[1];
-						
-							TWI_Start_Transceiver_With_Data(messageBuf, 4);
-							PORTD ^= (1 << PD7);
-							break;
-						}
-						default:
-							TWI_Start_Transceiver();
-							break;
-					}				
-				}
-			}else{
-				TWI_Start_Transceiver();
-			}			
-		}else{
-			asm volatile ("NOP"::);  // Do something else while waiting
-		}			
+				switch(messageBuf[0]){
+					case SEND_ENCODERS:
+						sendEncoders();
+						break;
+					default:
+						//TWI_Start_Transceiver();
+						break;
+				}	
+			}							
+		}
+		
+		asm volatile ("NOP"::);  // Do something else while waiting			
 	}
 }
