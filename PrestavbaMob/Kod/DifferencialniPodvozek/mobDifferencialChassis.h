@@ -62,6 +62,8 @@ private:
 	Encoders getChangeOfEncoders();
 	int dealWithEncoderOverflow(int oldValue, int newValue);
 
+	State getChangeOfState(Distance change);
+
 	int setDefaultMotorMode();
 	double speedInBoundaries(double speed, double boudaries);
 	int sendMotorPower(struct SpeedMotors speedMotors);

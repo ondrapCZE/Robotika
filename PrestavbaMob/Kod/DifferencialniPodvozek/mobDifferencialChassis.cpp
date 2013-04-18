@@ -124,6 +124,12 @@ int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
 	}
 }
 
+State MobDifferencialChassis::getChangeOfState(Distance change){
+	State changeOfState;
+
+	// TODO: implement change of state
+}
+
 int MobDifferencialChassis::setDefaultMotorMode(){	
 	char buffer[BUFFER_SIZE];
 	int returnState = 0;
