@@ -62,7 +62,7 @@ private:
 	Encoders getChangeOfEncoders();
 	int dealWithEncoderOverflow(int oldValue, int newValue);
 
-	State getChangeOfState(Distance change);
+	void changeRobotState(Distance change);
 
 	int setDefaultMotorMode();
 	double speedInBoundaries(double speed, double boudaries);
@@ -71,7 +71,7 @@ private:
 
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
-	MobDifferencialChassis(std::string I2CName, int decoderAddress, int motorsAddress, DifferencialChassisParameters chassisParam);
+	MobDifferencialChassis(std::string I2CName = "/dev/i2c-1", int decoderAddress = 0x30, int motorsAddress = 0x58);
 	//! 
     /*!
 		\param differencialChassisParameters an struct DifferencialChassisParameters argument.

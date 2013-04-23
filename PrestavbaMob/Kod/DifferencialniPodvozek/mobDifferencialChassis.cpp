@@ -12,8 +12,8 @@
 #include <linux/i2c-dev.h>
 
 
-MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderAddress, int motorsAddress, DifferencialChassisParameters chassisParam)
- : decoderAddress(decoderAddress), motorsAddress(motorsAddress), chassisParam(chassisParam){
+MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderAddress, int motorsAddress)
+ : decoderAddress(decoderAddress), motorsAddress(motorsAddress){
 	
 	stateMutex = PTHREAD_MUTEX_INITIALIZER;
 	speedMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -24,6 +24,11 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 		printf("Failed to open bus");
 		exit(1);
 	}
+
+	// Default value for Mob
+	chassisParam.wheelbase = 0.23f;
+	chassisParam.wheelRadius = 0.05f;
+	chassisParam.wheelTics = 9180;
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (double) chassisParam.wheelTics;
 
@@ -121,10 +126,16 @@ int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
 	}
 }
 
-State MobDifferencialChassis::getChangeOfState(Distance change){
-	State changeOfState;
+void MobDifferencialChassis::changeRobotState(Distance change){
+	double angleChange = (change.right - change.left) / chassisParam.wheelbase;
+	double distanceChange = (change.right + change.left)/2;
 
-	// TODO: implement change of state
+	pthread_mutex_lock(&stateMutex);
+	robotState.x += distanceChange*cos(robotState.angle + (angleChange/2.0f));
+	robotState.y += distanceChange*sin(robotState.angle + (angleChange/2.0f));
+	robotState.angle += angleChange;
+	//printf("State [%f,%f,%f] \n\r", robotState.x, robotState.y, robotState.angle);
+	pthread_mutex_unlock(&stateMutex);
 }
 
 int MobDifferencialChassis::setDefaultMotorMode(){	
@@ -230,13 +241,14 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 		double time = (microStart - lastMicroTime) / 1000000.0f; // time in sec
 		Distance distance = This->computeDistance(differenceEncoders);
 		Speed actualSpeed = This->computeSpeed(distance, time);
-		printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
+		This->changeRobotState(distance);
+		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 	
 		pthread_mutex_lock(&This->speedMutex);
 		SpeedMotors valueMotors = This->PIRegulator(actualSpeed, This->desireSpeed);
-		printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
+		//printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
 		pthread_mutex_unlock(&This->speedMutex);
-		printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
+		//printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
 
 		This->sendMotorPower(valueMotors);			
 	
@@ -245,7 +257,7 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 		long int sleepMicro = This->encodersAcquireTime*1000 - (microStop - microStart);
 		lastMicroTime = microStart;
 		
-		printf("Usleep time: %li \n\r", sleepMicro);
+		//printf("Usleep time: %li \n\r", sleepMicro);
 		usleep(sleepMicro);
 	}
 
@@ -258,7 +270,6 @@ void MobDifferencialChassis::setDifferencialChassisParameters(DifferencialChassi
 	metersPerTick = (2*M_PI*differencialChassisParameters.wheelRadius) / (double) differencialChassisParameters.wheelTics;
 }
 
-// TODO:
 void MobDifferencialChassis::setSpeed(Speed speed){
 	speed.left = speedInBoundaries(speed.left, MAX_SPEED);
 	speed.right = speedInBoundaries(speed.right, MAX_SPEED);	
@@ -282,19 +293,21 @@ MobDifferencialChassis::~MobDifferencialChassis(){
 }
 
 int main(){
-	DifferencialChassisParameters chassisParam;
-	chassisParam.wheelbase = 0.23f;
-	chassisParam.wheelRadius = 0.05f;
-	chassisParam.wheelTics = 9180;
-
-	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,0x58,chassisParam);
+	MobDifferencialChassis mobChassis;
 
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
 		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		Speed desire(-0.7f,0.7f);
+		Speed stop(0,0);
+		mobChassis.setSpeed(stop);
+		sleep(4);
+		Speed desire(0.2f,0.2f);
 		mobChassis.setSpeed(desire);
-		usleep(500000);
+		sleep(5);
+		Speed back(-0.2f,-0.2f);
+		mobChassis.setSpeed(back);
+		sleep(5);
+		//usleep(500000);
 
 		//Speed stop(0,0);
 		//mobChassis.setSpeed(stop);		
