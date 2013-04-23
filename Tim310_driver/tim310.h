@@ -1,7 +1,7 @@
 #ifndef TIM310_H
 #define TIM310_H
 
-#include <libusb.h>
+#include <libusb-1.0/libusb.h>
 #include <vector>
 
 class Tim310_CLASS{

@@ -30,18 +30,15 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	// Set motors mode for receive signed value
 	setDefaultMotorMode();
 
-	//Test
-	sendMotorPower(SpeedMotors(40,40));
-	sleep(2);
 	sendMotorPower(SpeedMotors(0,0));
 	sleep(2);
 	// END TEST
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 80;
-	PIRegulatorValue.I = 1;
+	PIRegulatorValue.P = 280;
+	PIRegulatorValue.I = 20;
 	
-	encodersAcquireTime = 50; // every x ms
+	encodersAcquireTime = 20; // every x ms
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
@@ -211,7 +208,7 @@ SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireS
 	SpeedMotors speedMotors;
 	speedMotors.left = (int8_t) speedInBoundaries(speedLeft, MAX_MOTOR_SPEED);
 	speedMotors.right = (int8_t) speedInBoundaries(speedRight, MAX_MOTOR_SPEED);
-
+	
 	return speedMotors;
 }
 
@@ -237,6 +234,7 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 	
 		pthread_mutex_lock(&This->speedMutex);
 		SpeedMotors valueMotors = This->PIRegulator(actualSpeed, This->desireSpeed);
+		printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
 		pthread_mutex_unlock(&This->speedMutex);
 		printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
 
@@ -294,7 +292,7 @@ int main(){
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
 		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		Speed desire(0.2f,0.2f);
+		Speed desire(-0.7f,0.7f);
 		mobChassis.setSpeed(desire);
 		usleep(500000);
 
