@@ -89,6 +89,11 @@ void sendEncoders(){
 	TWI_Start_Transceiver_With_Data(messageBuf, 4);
 }
 
+void writeLedError(uint8_t errorValue){
+	PORTB = (PINB & (~7)) | ((errorValue >> 3 ) & 7);
+	PORTD = (PIND & ~(7 << 5)) | (errorValue << 5);
+}
+
 ISR(PCINT1_vect, ISR_NOBLOCK){
 	uint8_t leftState = PINC & 3;
 	
@@ -144,6 +149,7 @@ int main(void)
 	DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
 	//PORTB |= (1 << PB0) | (1 << PB1);
 	
+	writeLedError(63);
 	setInputInterruptForDecoder();
 	
 	uint8_t TWI_SlaveAddress;
@@ -163,15 +169,19 @@ int main(void)
 	// Never ending loop witch read from I2C and response on command.
 	while(TRUE){
 		if(!TWI_Transceiver_Busy()){
+			writeLedError(1);
 			if(TWI_statusReg.RxDataInBuf){
 				// get command code
+				writeLedError(2);
 				TWI_Get_Data_From_Transceiver(messageBuf, 1);
-				
+				writeLedError(3);
 				switch(messageBuf[0]){
 					case SEND_ENCODERS:
+						writeLedError(4);
 						sendEncoders();
 						break;
 					default:
+						writeLedError(5);
 						//TWI_Start_Transceiver();
 						break;
 				}	
