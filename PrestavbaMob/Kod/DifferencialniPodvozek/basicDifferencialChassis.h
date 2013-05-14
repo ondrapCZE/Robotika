@@ -8,10 +8,10 @@
  * struct Speed serve for storage speed on the left and right wheels.
  */
 struct Speed{
-	double left;
-	double right;
+	float left;
+	float right;
 
-	Speed(double left=0, double right=0) : left(left), right(right){};
+	Speed(float left=0, float right=0) : left(left), right(right){};
 
 	Speed operator-(Speed ob2){
 		Speed temp(left - ob2.left, right - ob2.right);
@@ -23,8 +23,8 @@ struct Speed{
  * struct DifferencialChassisParameters serve for setting basic parameters.
  */
 struct DifferencialChassisParameters{
-	double wheelbase;
-	double wheelRadius;
+	float wheelbase;
+	float wheelRadius;
 	unsigned int wheelTics;
 };
 
@@ -49,10 +49,17 @@ struct PIValue{
 	int P;
 	int I;
 
-	double integralPartLeft;
-	double integralPartRight;
+	float integralPartLeft;
+	float integralPartRight;
 
 	PIValue(int P=90, int I=0): P(P), I(I), integralPartLeft(0), integralPartRight(0)  {};
+};
+
+struct WheelDistance{
+	float left;
+	float right;
+
+	WheelDistance(float left = 0, float right = 0) : left(left), right(right) {};
 };
 
 /*!
@@ -75,6 +82,13 @@ public:
 		\return actual state of the chassis
 	*/
 	virtual State getState()=0;
+
+	//! A pure virtual member
+
+	/*!
+	 	\return actual distance on both wheels
+	 */
+	virtual WheelDistance getWheelDistance()=0;
 };
 
 #endif

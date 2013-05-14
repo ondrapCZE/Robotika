@@ -38,14 +38,16 @@ namespace basic_robotic_fce{
 		\param Angle an double argument.
 		\return normalized input angle
 	*/
-	double normAngle(double Angle);
+	//double normAngle(double Angle);
 	//!	Function for random number witch use normal distribution.
 	/*!
 		\param Mu an double argument. Mu is center of normal distribution.
 		\param Sigma an double argument. Sigma describe dispersion.
 		\return Random number with normal distribution with center Mu and Sigma.
 	*/
-	double randn_notrig(double Mu=0.0, double Sigma=1.0);
+	//double randn_notrig(double Mu=0.0, double Sigma=1.0);
+
+	float valueInRange(float value, float range);
 }
 
 #endif

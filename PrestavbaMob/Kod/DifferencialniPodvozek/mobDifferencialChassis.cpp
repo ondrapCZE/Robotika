@@ -30,20 +30,15 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	chassisParam.wheelRadius = 0.05f;
 	chassisParam.wheelTics = 9180;
 	
-	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (double) chassisParam.wheelTics;
-
-	// Set motors mode for receive signed value
-	setDefaultMotorMode();
-
+	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
+	
 	sendMotorPower(SpeedMotors(0,0));
-	sleep(2);
-	// END TEST
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 280;
+	PIRegulatorValue.P = 480;
 	PIRegulatorValue.I = 20;
 	
-	encodersAcquireTime = 20; // every x ms
+	encodersAcquireTime = 10; // every x ms
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
@@ -57,15 +52,15 @@ int MobDifferencialChassis::setI2CSlaveToMotors(){
 	return ioctl(i2cDevice,I2C_SLAVE,motorsAddress);	
 }
 
-Distance MobDifferencialChassis::computeDistance(Encoders distance){
-	Distance distanceInMeters;
+WheelDistance MobDifferencialChassis::computeDistance(Encoders distance){
+	WheelDistance distanceInMeters;
 	distanceInMeters.left = distance.left * metersPerTick;
 	distanceInMeters.right = distance.right * metersPerTick;
 
 	return distanceInMeters;
 }
 
-Speed MobDifferencialChassis::computeSpeed(Distance distance, double time){
+Speed MobDifferencialChassis::computeSpeed(WheelDistance distance, float time){
 	Speed speed;
 	speed.left = distance.left / time;
 	speed.right = distance.right / time;
@@ -126,11 +121,14 @@ int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
 	}
 }
 
-void MobDifferencialChassis::changeRobotState(Distance change){
+void MobDifferencialChassis::changeRobotState(WheelDistance change){
 	double angleChange = (change.right - change.left) / chassisParam.wheelbase;
 	double distanceChange = (change.right + change.left)/2;
 
 	pthread_mutex_lock(&stateMutex);
+	wheelDistance.left += change.left;
+	wheelDistance.right += change.right;	
+
 	robotState.x += distanceChange*cos(robotState.angle + (angleChange/2.0f));
 	robotState.y += distanceChange*sin(robotState.angle + (angleChange/2.0f));
 	robotState.angle += angleChange;
@@ -161,23 +159,23 @@ int MobDifferencialChassis::setDefaultMotorMode(){
 	return returnState;
 }
 
-double MobDifferencialChassis::speedInBoundaries(double speed, double boundaries){
-if(speed < boundaries){
-	if(speed > -boundaries){
-		return speed;
+float MobDifferencialChassis::speedInBoundaries(float speed, float boundaries){
+	if(speed < boundaries){
+		if(speed > -boundaries){
+			return speed;
+		}
+		else{
+			return -boundaries;
+		}
+	}else{
+		return boundaries;
 	}
-	else{
-		return -boundaries;
-	}
-}else{
-	return boundaries;
-}
 }
 
 int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
-	char buffer[BUFFER_SIZE];
+	unsigned char buffer[BUFFER_SIZE];
 	int returnState = 0;
-
+	
 	pthread_mutex_lock(&i2cBusMutex);
 
 	if(setI2CSlaveToMotors()){
@@ -187,7 +185,7 @@ int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
 	}
 	
 	buffer[0] = 1;
-	buffer[1] = speedMotors.left;
+	buffer[1] = speedMotors.left + MAX_MOTOR_SPEED;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
@@ -196,7 +194,7 @@ int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
 	}	
 
 	buffer[0] = 2;
-	buffer[1] = speedMotors.right;
+	buffer[1] = speedMotors.right + MAX_MOTOR_SPEED;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
@@ -212,8 +210,8 @@ SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireS
 	PIRegulatorValue.integralPartLeft += speedDifference.left;
 	PIRegulatorValue.integralPartRight += speedDifference.right;
 
-	double speedLeft = PIRegulatorValue.P*speedDifference.left + PIRegulatorValue.I*PIRegulatorValue.integralPartLeft;
-	double speedRight = PIRegulatorValue.P*speedDifference.right + PIRegulatorValue.I*PIRegulatorValue.integralPartRight;
+	float speedLeft = PIRegulatorValue.P*speedDifference.left + PIRegulatorValue.I*PIRegulatorValue.integralPartLeft;
+	float speedRight = PIRegulatorValue.P*speedDifference.right + PIRegulatorValue.I*PIRegulatorValue.integralPartRight;
 
 	// set in boundaries
 	SpeedMotors speedMotors;
@@ -226,7 +224,7 @@ SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireS
 void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 	timeval timer[2];
 	MobDifferencialChassis* This = (MobDifferencialChassis *) ThisPointer;
-	printf("Sleep time: %i \n\r", This->encodersAcquireTime);
+	//printf("Sleep time: %i \n\r", This->encodersAcquireTime);
 	This->encodersLastState = This->getEncodersFromDecoder();
 
 	long int lastMicroTime = 1;
@@ -238,8 +236,8 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 		Encoders differenceEncoders = This->getChangeOfEncoders();
 
 		// Compute actual speed and use PID
-		double time = (microStart - lastMicroTime) / 1000000.0f; // time in sec
-		Distance distance = This->computeDistance(differenceEncoders);
+		float time = (microStart - lastMicroTime) / 1000000.0f; // time in sec
+		WheelDistance distance = This->computeDistance(differenceEncoders);
 		Speed actualSpeed = This->computeSpeed(distance, time);
 		This->changeRobotState(distance);
 		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
@@ -288,31 +286,39 @@ State MobDifferencialChassis::getState(){
 	return copyState;
 }
 
+WheelDistance MobDifferencialChassis::getWheelDistance(){
+	pthread_mutex_lock(&stateMutex);
+	WheelDistance copyWheelDistance = wheelDistance;
+	pthread_mutex_unlock(&stateMutex);
+
+	return copyWheelDistance;
+}
+
 MobDifferencialChassis::~MobDifferencialChassis(){
 	close(i2cDevice);
 }
 
-int main(){
-	MobDifferencialChassis mobChassis;
-
-	while(true){
-		//Encoders encoders = mobChassis.getEncoders();
-		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		Speed stop(0,0);
-		mobChassis.setSpeed(stop);
-		sleep(4);
-		Speed desire(0.2f,0.2f);
-		mobChassis.setSpeed(desire);
-		sleep(5);
-		Speed back(-0.2f,-0.2f);
-		mobChassis.setSpeed(back);
-		sleep(5);
-		//usleep(500000);
-
-		//Speed stop(0,0);
-		//mobChassis.setSpeed(stop);		
-		//sleep(5);
-	}
-	
-	return 0;
-}
+//int main(){
+//	MobDifferencialChassis mobChassis;
+//
+//	while(true){
+//		//Encoders encoders = mobChassis.getEncoders();
+//		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
+//		Speed stop(0,0);
+//		mobChassis.setSpeed(stop);
+//		sleep(4);
+//		Speed desire(0.2f,0.2f);
+//		mobChassis.setSpeed(desire);
+//		sleep(5);
+//		Speed back(-0.2f,-0.2f);
+//		mobChassis.setSpeed(back);
+//		sleep(5);
+//		//usleep(500000);
+//
+//		//Speed stop(0,0);
+//		//mobChassis.setSpeed(stop);		
+//		//sleep(5);
+//	}
+//	
+//	return 0;
+//}

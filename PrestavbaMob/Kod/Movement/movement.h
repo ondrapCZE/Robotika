@@ -10,8 +10,8 @@ private:
 public:
 	Movement(BasicDifferencialChassis* chassis);
 
-	bool moveStraight(double meter);
-	bool rotate(double angle);
+	void moveStraight(float meter);
+	void rotate(float angle);
 };
 
 #endif

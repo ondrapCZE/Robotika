@@ -44,6 +44,7 @@ private:
 	PIValue PIRegulatorValue;
 
 	State robotState;
+	WheelDistance wheelDistance;
 	Speed desireSpeed;
 
 	pthread_t updateEncodersThreadHandler;
@@ -55,17 +56,17 @@ private:
 	int setI2CSlaveToDecoder();
 	int setI2CSlaveToMotors();
 
-	Distance computeDistance(Encoders distance);
-	Speed computeSpeed(Distance distance, double time); // distance in m and time in sec
+	WheelDistance computeDistance(Encoders distance);
+	Speed computeSpeed(WheelDistance distance, float time); // distance in m and time in sec
 
 	Encoders getEncodersFromDecoder();
 	Encoders getChangeOfEncoders();
 	int dealWithEncoderOverflow(int oldValue, int newValue);
 
-	void changeRobotState(Distance change);
+	void changeRobotState(WheelDistance change);
 
 	int setDefaultMotorMode();
-	double speedInBoundaries(double speed, double boudaries);
+	float speedInBoundaries(float speed, float boudaries);
 	int sendMotorPower(struct SpeedMotors speedMotors);
 	SpeedMotors PIRegulator(Speed actualSpeed, Speed desireSpeed);
 
@@ -87,6 +88,8 @@ public:
 		\return actual state of the chassis
 	*/
 	State getState();
+
+	WheelDistance getWheelDistance();
 
 	~MobDifferencialChassis();
 };
