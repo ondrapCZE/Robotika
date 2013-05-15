@@ -27,7 +27,7 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 
 	// Default value for Mob
 	chassisParam.wheelbase = 0.23f;
-	chassisParam.wheelRadius = 0.05f;
+	chassisParam.wheelRadius = 0.053f;
 	chassisParam.wheelTics = 9180;
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
