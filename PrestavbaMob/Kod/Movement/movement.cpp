@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <sys/time.h>
+#include <pthread.h>
 
 static const float EPSILON_ANGLE = M_PI / 360.0f;
 static const float EPSILON_DISTANCE = 0.01f;
@@ -42,14 +43,13 @@ void Movement::moveStraight(float meter){
 		WheelDistance wheelDistance = chassis->getWheelDistance();
 		differenceLeft = finalWheelDistance.left - wheelDistance.left;
 		differenceRight = finalWheelDistance.right - wheelDistance.right;
+		float meanDifference = (differenceLeft + differenceRight) / 2.0f;
 
-		float speedLeft = basic_robotic_fce::valueInRange(differenceLeft * MAX_SPEED * 10, MAX_SPEED - 0.05f);
-		float speedRight = basic_robotic_fce::valueInRange(differenceRight * MAX_SPEED * 10, MAX_SPEED - 0.05f);
+		float speed = basic_robotic_fce::valueInRange(meanDifference * MAX_SPEED * 10, MAX_SPEED - 0.05f);
 
 		// slow down whell with greater distance and speed up wheel with smaller distance
-		float meanDifference = (differenceLeft + differenceRight) / 2.0f;
-		speedLeft += (differenceLeft - meanDifference) / (SLEEP_TIME / 1000000.0f);
-		speedRight += (differenceRight - meanDifference) / (SLEEP_TIME / 1000000.0f); 
+		float speedLeft = speed + (differenceLeft - meanDifference) / (SLEEP_TIME / 1000000.0f);
+		float speedRight = speed + (differenceRight - meanDifference) / (SLEEP_TIME / 1000000.0f); 
 
 		chassis->setSpeed(Speed(speedLeft, speedRight));
 
@@ -58,15 +58,29 @@ void Movement::moveStraight(float meter){
 	}
 }
 
+void* createRecord(void* chassisPointer){
+	BasicDifferencialChassis* chassis = (BasicDifferencialChassis*) chassisPointer;	
+	unsigned int index = 0;
+	while(true){
+		State state = chassis->getState();
+		printf("state %f %f %f \n", state.x, state.y, state.angle);
+		usleep(20000);
+	}
+
+	return 0;
+}
+
 int main(){
 	MobDifferencialChassis mobChassis;
 	mobChassis.setSpeed(Speed(0,0));
 	Movement test(&mobChassis);
 	sleep(5);
-	printf("Move straight 1m \n");
+
+	pthread_t thread;
+	pthread_create(&thread,NULL,&createRecord, (void*) &mobChassis);
+	
 	test.moveStraight(1.0f);
-	printf("Rotate 360 degree \n");
-	test.rotate(2*M_PI);
+	//test.rotate(2*M_PI);
 
 	//for(int i=0; i < 4; ++i){		
 	//	test.moveStraight(0.70f);
@@ -77,8 +91,6 @@ int main(){
 		
 
 	mobChassis.setSpeed(Speed(0,0));
-	State robot = mobChassis.getState();
-	printf("Robot state [%f,%f,%f]  [x,y,angle]\n", robot.x, robot.y, robot.angle);		
 	sleep(2);	
 	return 0;
 }
