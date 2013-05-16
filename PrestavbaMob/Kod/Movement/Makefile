@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -Wall -std=c++0x -O3 -lpthread
-LDFLAGS= -lpthread
-SOURCES= ../../../obecne/basic.cpp ../DifferencialniPodvozek/basicDifferencialChassis.h ../DifferencialniPodvozek/mobDifferencialChassis.cpp ../DifferencialniPodvozek/mobDifferencialChassis.h movement.cpp movement.h
+LDFLAGS= -lpthread -lusb-1.0
+SOURCES= ../../../obecne/basic.cpp ../../../Tim310_driver/tim310.cpp  ../DifferencialniPodvozek/mobDifferencialChassis.cpp  movement.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=movement
 

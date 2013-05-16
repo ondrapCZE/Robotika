@@ -1,6 +1,9 @@
 #include "movement.h"
 #include "../../../obecne/basic.h"
+#include "../../../Tim310_driver/tim310.h"
+
 #include <cmath>
+#include <vector>
 
 #include <sys/time.h>
 #include <pthread.h>
@@ -61,9 +64,27 @@ void Movement::moveStraight(float meter){
 void* createRecord(void* chassisPointer){
 	BasicDifferencialChassis* chassis = (BasicDifferencialChassis*) chassisPointer;	
 	unsigned int index = 0;
+	
+	Tim310_CLASS tim;
+	if(!tim.open()){
+		printf("Cannot connect tim310\n");
+		return  0;
+	}
+
 	while(true){
 		State state = chassis->getState();
 		printf("state %f %f %f \n", state.x, state.y, state.angle);
+		if((index%10) == 0){ // write laser scan
+			std::vector<uint16_t> laserData = tim.readData();
+			printf("laser %d", laserData.size());
+			for(unsigned int index = 0; index < laserData.size(); ++index){
+				printf(" %d",laserData[index]);
+			}
+
+			printf("\n");
+		}
+		index++;
+
 		usleep(20000);
 	}
 
