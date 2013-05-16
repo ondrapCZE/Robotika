@@ -100,9 +100,14 @@ int main(){
 	pthread_t thread;
 	pthread_create(&thread,NULL,&createRecord, (void*) &mobChassis);
 	
-	test.moveStraight(1.0f);
-	//test.rotate(2*M_PI);
-
+	test.moveStraight(0.70f);
+	test.rotate(-M_PI/2.0f);
+	test.moveStraight(0.43f);
+	test.rotate(-M_PI/2.0f);
+	test.moveStraight(0.40f);
+	test.rotate(M_PI/2.0f);
+	test.moveStraight(0.5f);
+	test.rotate(M_PI/2.0f);
 	//for(int i=0; i < 4; ++i){		
 	//	test.moveStraight(0.70f);
 	//	test.rotate(M_PI / 2.0f);
