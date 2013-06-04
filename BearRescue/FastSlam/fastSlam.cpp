@@ -141,7 +141,12 @@ void FastSLAM_CLASS::move(state_STR State){
 		move(State.angle - lastState.angle,(State.angle - lastState.angle)/100.0);	
 	}else{
 		double gama = asin(shiftY/length);
-		uint8_t test = (shiftY < 0) << 1 | (shiftX < 0);
+
+		if(shiftX < 0){
+			gama = M_PI - gama;
+		}
+
+		/*uint8_t test = (shiftY < 0) << 1 | (shiftX < 0);
 
 		switch(test){
 			case 1:
@@ -155,7 +160,7 @@ void FastSLAM_CLASS::move(state_STR State){
 				break;
 			default:
 				break;
-		}
+		}*/
 		
 		double alpha = gama - lastState.angle;
 		double beta =  State.angle - gama;
