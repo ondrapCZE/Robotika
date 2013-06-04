@@ -35,15 +35,16 @@ bool readDataFromFile_CLASS::startReadFromFile(string File){
 					file >> distanceInMM;
 					laserScan.push_back(distanceInMM / 1000);
 				}
+
+				display.writeMap(mcl->getVectorMap());
+				display.writeParticle(mcl->getParticles());
+				display.writeMostProbState(mcl->getMostProbabilisticState());
+				display.writeLaserScan(laserScan,mcl->getMostProbabilisticState());
+				display.displayMap();
 			}else{
 				//error
 			}
 		}
-
-		display.writeMap(mcl->getVectorMap());
-		display.writeParticle(mcl->getParticles());
-		display.writeMostProbState(mcl->getMostProbabilisticState());
-		display.displayMap();
 	}
 	
 	file.close();

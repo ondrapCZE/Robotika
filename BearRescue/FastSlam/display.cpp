@@ -7,9 +7,9 @@ display_CLASS::display_CLASS(){
 
 	//dislay
 	windowName = "oknoZobrazeni";
-	zoom = 100;
-	shiftX = 0;
-	shiftY = 0;
+	zoom = 200;
+	shiftX = -20;
+	shiftY = -20;
 
 	MULTI_STEP = (float) 1;
 	SHIFT_X_STEP = 10;
@@ -84,12 +84,31 @@ void display_CLASS::writeMostProbState(const state_STR &State){
 	int pointX = (State.position.x)*zoom - shiftX;
 	int pointY = fixHeight(HEIGHT,(State.position.y)*zoom - shiftY);
 	Point particle(pointX,pointY);
-	circle(map,particle,2,Scalar(0,0,255));
+	circle(map,particle,0.14*zoom,Scalar(0,0,255));
 
 	int pointNarrowX = pointX + 5*cos(State.angle);
 	int pointNarrowY = fixHeight(HEIGHT,(State.position.y)*zoom - shiftY + 5*sin(State.angle));
 	Point narrow(pointNarrowX,pointNarrowY);
 	line(map,particle,narrow,Scalar(0,0,255));
+}
+
+void display_CLASS::writeLaserScan(std::vector<double> laserScan, const state_STR &State){
+	position_STR sickPosition(State.position);
+	// TODO: udelat prevod pro posun pozice sicka
+	sickPosition.x += 0.11;
+	sickPosition.y += 0.10;
+	double angle = State.angle + M_PI_4 ;
+	for(std::vector<double>::iterator measure = laserScan.begin(); measure != laserScan.end(); ++measure){
+		int pointX = sickPosition.x * zoom - shiftX;
+		int pointY = fixHeight(HEIGHT, sickPosition.y * zoom - shiftY);
+		Point begin(pointX,pointY);
+		pointX += cos(angle)*(*measure) * zoom;
+		pointY += sin(angle)*(*measure) * zoom;
+		Point end(pointX,pointY);
+		line(map,begin,end,Scalar(0,0,255));
+
+		angle += M_PI / 180.0;
+	}
 }
 
 void display_CLASS::writeParticle(const vector<struct particle_STR> &Particles){

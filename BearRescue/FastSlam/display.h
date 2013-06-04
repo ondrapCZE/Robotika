@@ -31,6 +31,7 @@ public:
 	void display_CLASS::writeMap(vm::VectorMap* VectorMap);
 	void writeParticle(const std::vector< particle_STR > &Particles);
 	void writeMostProbState(const state_STR &State);
+	void writeLaserScan(std::vector<double> laserScan, const state_STR &State);
 	void displayMap();
 };
 
