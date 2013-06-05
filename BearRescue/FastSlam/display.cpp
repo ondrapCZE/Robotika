@@ -35,7 +35,7 @@ void display_CLASS::displayMap(){
 	cvNamedWindow(windowName.c_str(),CV_WINDOW_AUTOSIZE);
 
 	imshow(windowName.c_str(),map);
-	int key = waitKey(80);
+	int key = waitKey(-1);
 	if(key == -1)
 		return;
 
@@ -95,19 +95,25 @@ void display_CLASS::writeMostProbState(const state_STR &State){
 void display_CLASS::writeLaserScan(std::vector<double> laserScan, const state_STR &State){
 	position_STR sickPosition(State.position);
 	// TODO: udelat prevod pro posun pozice sicka
-	sickPosition.x += 0.11;
-	sickPosition.y += 0.10;
-	double angle = State.angle + M_PI_4 ;
+	sickPosition.x += 0.1487*cos(State.angle - 0.738);
+	sickPosition.y += 0.1487*sin(State.angle - 0.738);
+	double angle = State.angle + M_PI_2 + M_PI_4;
 	for(std::vector<double>::iterator measure = laserScan.begin(); measure != laserScan.end(); ++measure){
 		int pointX = sickPosition.x * zoom - shiftX;
 		int pointY = fixHeight(HEIGHT, sickPosition.y * zoom - shiftY);
 		Point begin(pointX,pointY);
 		pointX += cos(angle)*(*measure) * zoom;
-		pointY += sin(angle)*(*measure) * zoom;
-		Point end(pointX,pointY);
-		line(map,begin,end,Scalar(0,0,255));
 
-		angle += M_PI / 180.0;
+		#ifdef _MSC_VER
+			pointY -= sin(angle)*(*measure) * zoom;
+		#else
+			pointY += sin(angle)*(*measure) * zoom;
+		#endif
+
+		Point end(pointX,pointY);
+		line(map,begin,end,Scalar(0,200,0));
+
+		angle -= M_PI / 180.0;
 	}
 }
 

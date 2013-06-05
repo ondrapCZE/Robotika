@@ -33,13 +33,13 @@ bool readDataFromFile_CLASS::startReadFromFile(string File){
 
 				for(int i=0; i < 272; ++i){
 					file >> distanceInMM;
-					laserScan.push_back(distanceInMM / 1000);
+					laserScan.push_back(distanceInMM / 1000.0);
 				}
 
 				display.writeMap(mcl->getVectorMap());
+				display.writeLaserScan(laserScan,mcl->getMostProbabilisticState());
 				display.writeParticle(mcl->getParticles());
 				display.writeMostProbState(mcl->getMostProbabilisticState());
-				display.writeLaserScan(laserScan,mcl->getMostProbabilisticState());
 				display.displayMap();
 			}else{
 				//error
