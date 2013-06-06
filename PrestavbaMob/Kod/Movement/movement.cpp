@@ -98,11 +98,11 @@ int main(){
 	sleep(5);
 
 	pthread_t thread;
-	pthread_create(&thread,NULL,&createRecord, (void*) &mobChassis);
+	//pthread_create(&thread,NULL,&createRecord, (void*) &mobChassis);
 	
 	test.moveStraight(0.70f);
 	test.rotate(-M_PI/2.0f);
-	test.moveStraight(0.43f);
+	test.moveStraight(0.42f);
 	test.rotate(-M_PI/2.0f);
 	test.moveStraight(0.40f);
 	test.rotate(M_PI/2.0f);
