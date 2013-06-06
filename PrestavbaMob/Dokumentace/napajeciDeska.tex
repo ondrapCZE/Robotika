@@ -16,7 +16,7 @@ Napájecí deska má ochranu proti pod vybití baterií, která odpojí baterie 
 
 \subsection{Specifikace}
 
-Ochrana proti pod vybití baterií je tvořena dvěma tranzistory, tlačítkem a zenerovou diodou 10V. Při připojení napájení k obvodu je obvod stále uzavřen. Až stisknutím tlačítka jsou otevřeny oba tranzistory což vede k otevření obvodu. Po uvolnění tlačítka jsou tranzistory udržovány v otevřeném stavu přes zenerovou diodu pokud je napětí v obvodu větší než 10.7V. Pokud napětí klesne pod tuto hranici zenerova dioda se uzavře. S ní i tranzistory a celý obvod.
+Ochrana proti pod vybití baterií je tvořena dvěma tranzistory, tlačítkem a zenerovou diodou 10V. Při připojení napájení k obvodu je obvod stále otevřen. Až stisknutím tlačítka jsou otevřeny oba tranzistory což vede k uzavření obvodu. Po uvolnění tlačítka jsou tranzistory udržovány v otevřeném stavu přes zenerovou diodu pokud je napětí v obvodu větší než 10.7V. Pokud napětí klesne pod tuto hranici zenerova dioda se uzavře. S ní i tranzistory a celý obvod se otevře.
 
 Ochranný obvod a následně napájecí větve jsou připojeny k bateriím a svorkovnici pro napájení přes ochranou pojistku proti zkratu.
 \\
@@ -36,6 +36,7 @@ Parametry desky:
 			\item 4x svorkovnice pro přímé připojení napájení 5V modulů
 		\end{itemize}
 	\item Velikost desky 3.3 x 1.8 palců
+	\item Rozteč děr je 3 x 1.5 palců a průměr díry je 3.2mm.
 \end{itemize}
 
 \newpage
@@ -48,19 +49,28 @@ Parametry desky:
 	\caption{Napájecí deska s označením důležitých částí}
 \end{figure}
 
+\begin{enumerate}
+	\item svorkovnice pro připojení 12V baterií. 
+	\item svorkovnice pro připojení napájecího konektoru k bateriím.
+	\item svorkovnice pro připojení hlavního vypínače.
+	\item svorkovnice pro připojení tlačítka pro sepnutí ochrany proti pod vybití a zároveň připojení baterií k napájecím větvím.
+	\item svorkovnice pro připojení napájení 5V modulů.
+	\item spínaný zdroj RECOM R-785.0.1.0 pro převod vstupního napětí 12V na výstupní 5V.
+	\item svorkovnice pro zapojení vypínače a napájení 12V modulu.
+	\item svorkovnice pro zapojení vypínače a napájení 12V modulu.
+	\item součástky ochrany proti pod vybití baterií.
+	\item ochranná pojistka proti zkratu oddělující baterie od napájecích větví.
+	\item dioda indikující zapnutí napájení modulů.
+\end{enumerate}
 
-\begin{itemize}
-	\item Číslo 1. jsou svorkovnice pro připojení 12V baterií. 
-	\item Číslo 2. je svorkovnice pro připojení napájecího konektoru k bateriím.
-	\item Číslo 3. je svorkovnice pro připojení hlavního vypínače.
-	\item Číslo 4. je svorkovnice pro připojení tlačítka pro sepnutí ochrany proti pod vybití a zároveň připojení baterií k napájecím větvím.
-	\item Číslo 5. jsou svorkovnice pro připojení napájení 5V modulů.
-	\item Číslo 6. je spínaný zdroj RECOM R-785.0.1.0 pro převod vstupního napětí 12V na výstupní 5V.
-	\item Číslo 7. jsou svorkovnice pro zapojení vypínače a napájení 12V modulu.
-	\item Číslo 8. jsou svorkovnice pro zapojení vypínače a napájení 12V modulu.
-	\item Číslo 9. jsou součástky ochrany proti pod vybití baterií.
-	\item Číslo 10. je ochranná pojistka proti zkratu oddělující baterie od napájecích větví.
-	\item Číslo 11. je dioda indikující zapnutí napájení modulů.
-\end{itemize}
+\newpage
+\subsection{Schéma desky}
+\begin{figure}[ht]
+	\centering
+		\includegraphics[scale=0.65]{napajeniMobSchema.png}
+	\caption{Schéma zapojení napájecí desky}
+	\label{fig:napajeniMobSchema}
+\end{figure}
+
 
 \end{document}

@@ -34,8 +34,9 @@ Pro testování a ladění má deska k mikrokontroléru připojeno 6 led diod.
 	\item 2 konektory pro připojení napájení a signálů kvadraturních enkodérů
 	\item 6 pinový standardní konektor ISP pro možnost nahrání nového kódu do mikrokontroléru
 	\item 6 diod pro indikaci stavu mikrokontroléru připojených k zemi 
-	(svítí při vysoké úrovni na pinech PB0 - PB2 a PD5 - PD7).
+	(svítí při vysoké úrovni na pinech PB0 - PB2 a PD5 - PD7)
 	\item Velikost desky 2.25 x 1.35 palců
+	\item Rozteč děr je 2.05 x 1.15 palců s a průměr díry 3mm
 \end{itemize}
 
 \newpage
@@ -49,22 +50,22 @@ Pro testování a ladění má deska k mikrokontroléru připojeno 6 led diod.
 \end{figure}
 
 
-\begin{itemize}
-	\item Číslo 1. je zámkoví konektor pro připojení signálů a napájení enkodérů.
-	\item Číslo 2. je zámkoví konektor pro připojení 5V napájení a 5V signálů I2C.
-	\item Číslo 3. je zámkoví konektor pro připojení 3.3V napájení a 3.3V signálů I2C.
-	\item Číslo 4. je zámkoví konektor pro připojení signálů a napájení enkodérů.
-	\item Číslo 5. je 6 pinový konektor ISP pro nahrávání nového programu do mikrokontroléru.
-	\item Číslo 6. je mikrokontrolér Atmega48pa.
-	\item Číslo 7. jsou diody pro indikaci stavu mikrokontroléru a jsou zapojeny na piny PB0-PB2 a PD5 - PD7.
-\end{itemize}
+\begin{enumerate}
+	\item zámkový konektor pro připojení signálů a napájení enkodérů.
+	\item zámkový konektor pro připojení 5V napájení a 5V signálů I2C.
+	\item zámkový konektor pro připojení 3.3V napájení a 3.3V signálů I2C.
+	\item zámkový konektor pro připojení signálů a napájení enkodérů.
+	\item 6 pinový konektor ISP pro nahrávání nového programu do mikrokontroléru.
+	\item mikrokontrolér Atmega48pa.
+	\item diody pro indikaci stavu mikrokontroléru a jsou zapojeny na piny PB0-PB2 a PD5 - PD7.
+\end{enumerate}
 
 \newpage
 \subsection{Konektory}
 Deska má 2 konektory pro připojení kvadraturních enkodérů, 2 konektory pro komunikaci po I2C s 5V či 3.3V logikou a konektor ISP pro nahrávání nového kódu do mikrokontroleru.
 
 \subsubsection{I2C konektor}
-4 pinový zámkoví konektor pro připojení na sběrnici I2C a napájení. Na desce jsou dva takovéto konektory s různým napětím logické 1. Jeden s 5V úrovněmi kde napájení a I2C sběrnice jsou přímo připojený na mikrokontrolér a~jeden s~3.3V úrovněmi, který je pomocí převodníku napěťových úrovní na signálech I2C připojen k 5V I2C sběrnici mikrokontroléru. U tohoto konektoru se napájecí piny používají pouze pro převodník úrovní. Zapojení jednotlivých pinů je znázorněno na obrázku \ref{fig:KonektorI2C}.
+4 pinový zámkový konektor pro připojení na sběrnici I2C a napájení. Na desce jsou dva takovéto konektory s různým napětím logické 1. Jeden s 5V úrovněmi kde napájení a I2C sběrnice jsou přímo připojený na mikrokontrolér a~jeden s~3.3V úrovněmi, který je pomocí převodníku napěťových úrovní na signálech I2C připojen k 5V I2C sběrnici mikrokontroléru. U tohoto konektoru se napájecí piny používají pouze pro převodník úrovní. Zapojení jednotlivých pinů je znázorněno na obrázku \ref{fig:KonektorI2C}.
 	
 \begin{figure}[htbp]
 	\centering
@@ -85,7 +86,7 @@ Deska má 2 konektory pro připojení kvadraturních enkodérů, 2 konektory pro
 	\end{figure}
 
 \subsubsection{Konektor pro připojení enkodérů}
-4 pinový zámkoví konektor pro připojení signálů z kvadraturních enkodérů a jejich napájení. Signální piny jsou spojeny s I/O piny mikrokontroléru a napájení enkodérů je propojeno s napájením desky.
+4 pinový zámkový konektor pro připojení signálů z kvadraturních enkodérů a jejich napájení. Signální piny jsou spojeny s I/O piny mikrokontroléru a napájení enkodérů je propojeno s napájením desky.
 
 \begin{figure}[htbp]
 		\centering
@@ -93,5 +94,17 @@ Deska má 2 konektory pro připojení kvadraturních enkodérů, 2 konektory pro
 		\caption{Zapojeni konektoru pro připojení enkodérů.}
 		\label{fig:KonektorEnkoder}
 	\end{figure}
+
+\newpage
+\subsection{Schéma desky}
+\begin{figure}[h]
+	\centering
+		\includegraphics[scale=0.8]{dekoderySchema.png}
+	\caption{Schéma dekodérové desky}
+	\label{fig:dekoderySchema}
+\end{figure}
+
+\newpage
+\subsection{Appendix A.}
 
 \end{document}
