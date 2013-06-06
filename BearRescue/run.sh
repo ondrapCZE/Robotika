@@ -10,3 +10,4 @@ do
 	sleep 0.1
 done
 echo Start bear rescue
+./Plan/BearRescue

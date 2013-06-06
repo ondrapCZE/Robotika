@@ -31,7 +31,8 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	chassisParam.wheelTics = 9180;
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
-	
+
+	setDefaultMotorMode();		
 	sendMotorPower(SpeedMotors(0,0));
 
 	// Set PIRegulator
@@ -148,7 +149,7 @@ int MobDifferencialChassis::setDefaultMotorMode(){
 	}	
 
 	buffer[0] = 0;
-	buffer[1] = 1;
+	buffer[1] = 0;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
