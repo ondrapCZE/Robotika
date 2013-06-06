@@ -48,17 +48,22 @@ void* createRecord(void* chassisPointer){
 	}
 
 	while(true){
-		State state = chassis->getState();
-		printf("state %f %f %f \n", state.x, state.y, state.angle);
+		State state
+
 		if((index%10) == 0){ // write laser scan
 			std::vector<uint16_t> laserData = tim.readData();
+			state = chassis->getState();
 			printf("laser %d", laserData.size());
 			for(unsigned int index = 0; index < laserData.size(); ++index){
 				printf(" %d",laserData[index]);
 			}
 
 			printf("\n");
+		}else{
+			state = chassis->getState();
 		}
+
+		printf("state %f %f %f \n", state.x, state.y, state.angle);
 		index++;
 
 		usleep(20000);
