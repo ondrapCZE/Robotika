@@ -94,7 +94,6 @@ void display_CLASS::writeMostProbState(const state_STR &State){
 
 void display_CLASS::writeLaserScan(std::vector<double> laserScan, const state_STR &State){
 	position_STR sickPosition(State.position);
-	// TODO: udelat prevod pro posun pozice sicka
 	sickPosition.x += 0.1487*cos(State.angle - 0.738);
 	sickPosition.y += 0.1487*sin(State.angle - 0.738);
 	double angle = State.angle + M_PI_2 + M_PI_4;
@@ -114,6 +113,24 @@ void display_CLASS::writeLaserScan(std::vector<double> laserScan, const state_ST
 		line(map,begin,end,Scalar(0,200,0));
 
 		angle -= M_PI / 180.0;
+	}
+}
+
+void display_CLASS::writeIntersection(vm::VectorMap* vectorMap, const state_STR &state){
+	State sickPosition(state.position.x,state.position.y,state.angle);
+	sickPosition.x += 0.1487*cos(state.angle - 0.738);
+	sickPosition.y += 0.1487*sin(state.angle - 0.738);
+	sickPosition.angle += M_PI_2 + M_PI_4;
+
+	for(int i=0; i<272 ;++i){
+		for(vm::wallIt wall = vectorMap->getWallsItBegin(); wall != vectorMap->getWallsItEnd(); ++wall){
+			vm::Point intersection = vectorMap->getIntersection((*wall),sickPosition);
+			//printf("Intersection [%f,%f]\n", intersection.x, intersection.y);
+			intersection.x = intersection.x * zoom - shiftX;
+			intersection.y = fixHeight(HEIGHT, intersection.y * zoom - shiftY);
+			line(map,cv::Point(intersection.x,intersection.y),cv::Point(intersection.x+1,intersection.y+1),cv::Scalar(255,0,0),1);
+		}
+		sickPosition.angle -= M_PI / 180.0;
 	}
 }
 

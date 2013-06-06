@@ -40,6 +40,7 @@ bool readDataFromFile_CLASS::startReadFromFile(string File){
 				display.writeLaserScan(laserScan,mcl->getMostProbabilisticState());
 				display.writeParticle(mcl->getParticles());
 				display.writeMostProbState(mcl->getMostProbabilisticState());
+				display.writeIntersection(mcl->getVectorMap(),mcl->getMostProbabilisticState());
 				display.displayMap();
 			}else{
 				//error
