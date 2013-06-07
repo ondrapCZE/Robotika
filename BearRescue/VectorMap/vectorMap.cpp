@@ -65,9 +65,8 @@ void VectorMap::addWall(Wall wall){
 	walls.push_back(wall);
 }
 
-Point VectorMap::getNereastDistToWalls(State state){
+double VectorMap::getNereastDistToWalls(State state){
 	double nearestDistToWall = std::numeric_limits<double>::max();
-	Point nearestIntersection;
 	for(wallIt wall = getWallsItBegin(); wall != getWallsItEnd(); wall++){
 		Point intersection = getIntersection((*wall),state);
 		if(intersection.x == std::numeric_limits<double>::max())
@@ -91,12 +90,10 @@ Point VectorMap::getNereastDistToWalls(State state){
 
 		if(distance < nearestDistToWall){
 				nearestDistToWall = distance;
-				nearestIntersection = intersection;
 		}
 	}
 
-	//return nearestDistToWall;
-	return nearestIntersection;
+	return nearestDistToWall;
 }
 
 wallIt VectorMap::getWallsItBegin(){

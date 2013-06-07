@@ -124,16 +124,16 @@ void display_CLASS::writeIntersection(vm::VectorMap* vectorMap, const State &sta
 
 	Point begin(sickPosition.x * zoom - shiftX,fixHeight(HEIGHT, sickPosition.y * zoom - shiftY));
 	for(int i=0; i<272 ;++i){
-		/*double distance = vectorMap->getNereastDistToWalls(sickPosition);
-		printf("Distance %f\n", distance);
-		Point end(0,0);
-		end.x = (cos(sickPosition.angle) * distance) * zoom - shiftX;
-		end.y = fixHeight(HEIGHT,(sin(sickPosition.angle) * distance) * zoom - shiftY);*/
+		double distance = vectorMap->getNereastDistToWalls(sickPosition);
+		//printf("Distance %f\n", distance);
+		Point end;
+		end.x = (sickPosition.x + cos(sickPosition.angle) * distance) * zoom - shiftX;
+		end.y = fixHeight(HEIGHT,(sickPosition.y + sin(sickPosition.angle) * distance) * zoom - shiftY);
 			
-		vm::Point intersection = vectorMap->getNereastDistToWalls(sickPosition);
-		intersection.x = intersection.x * zoom - shiftX;
-		intersection.y = fixHeight(HEIGHT,intersection.y * zoom - shiftY);
-		Point end(intersection.x, intersection.y);
+		//vm::Point intersection = vectorMap->getNereastDistToWalls(sickPosition);
+		//intersection.x = intersection.x * zoom - shiftX;
+		//intersection.y = fixHeight(HEIGHT,intersection.y * zoom - shiftY);
+		//Point end(intersection.x, intersection.y);
 
 		//line(map,Point(end.x + 1, end.y + 1),end,Scalar(255,0,0));
 		line(map,begin,end,Scalar(255,0,0));

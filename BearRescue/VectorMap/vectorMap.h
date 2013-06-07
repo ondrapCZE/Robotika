@@ -28,7 +28,7 @@ class VectorMap{
 	Point getIntersection(Wall wall, State state);
 public:
 	void addWall(Wall wall);
-	Point getNereastDistToWalls(State state);
+	double getNereastDistToWalls(State state);
 	wallIt getWallsItBegin();
 	wallIt getWallsItEnd();
 };
