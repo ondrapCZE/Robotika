@@ -1,6 +1,7 @@
 #include "../../PrestavbaMob/Kod/Movement/movement.h"
 #include "../../obecne/basic.h"
 #include "../../Tim310_driver/tim310.h"
+#include "../FastSlam/fastSlam.h"
 
 #include <cmath>
 #include <vector>
@@ -10,7 +11,7 @@
 #include <pthread.h>
 
 
-void moveToPosition(State start, State end, Movement *movement){
+void moveToPositionEndRotate(State start, State end, Movement *movement){
 
 	double shiftX = end.x - start.x;
 	double shiftY = end.y - start.y;
@@ -29,10 +30,33 @@ void moveToPosition(State start, State end, Movement *movement){
 		double alpha = gama - start.angle;
 		double beta =  end.angle - gama;
 
-		std::cout << "a: " << alpha << " l: " << length << " b: " << beta << std::endl;
 		movement->rotate(alpha);
 		movement->moveStraight(length);
 		movement->rotate(beta);
+	}
+
+}
+
+void moveToPosition(State start, State end, Movement *movement){
+
+	double shiftX = end.x - start.x;
+	double shiftY = end.y - start.y;
+	double length = hypot(shiftX,shiftY);
+
+	if(length == 0){
+		// TODO use shorter anglewit
+		movement->rotate(end.angle - start.angle);
+	}else{
+		double gama = asin(shiftY/length);
+
+		if(shiftX < 0){
+			gama = M_PI - gama;
+		}
+
+		double alpha = gama - start.angle;
+
+		movement->rotate(alpha);
+		movement->moveStraight(length);
 	}
 
 }
@@ -48,9 +72,9 @@ void* createRecord(void* chassisPointer){
 	}
 
 	while(true){
-		State state
+		State state;
 
-		if((index%10) == 0){ // write laser scan
+		if((index%10) == 9){ // write laser scan
 			std::vector<uint16_t> laserData = tim.readData();
 			state = chassis->getState();
 			printf("laser %d", laserData.size());
@@ -72,20 +96,52 @@ void* createRecord(void* chassisPointer){
 	return 0;
 }
 
+struct MclChassis{
+	BasicDifferencialChassis* chassis;
+	FastSLAM_CLASS*  mcl;
+};
+
+void* mclUpdate(void* mclChassisPointer){
+	MclChassis* mclChassis = (MclChassis*) mclChassisPointer;
+
+	int count = 0;
+
+	while(true){
+		State state = mclChassis->chassis->getState();
+		mclChassis->mcl->move(state);
+		usleep(10000);
+		if((count % 20) == 0){
+			State state = mclChassis->mcl->getMostProbabilisticState();
+			printf("State [%f,%f,%f]\n", state.x, state.y, state.angle);
+		}
+	}
+
+	return 0;
+}
+
 int main(){
 	MobDifferencialChassis mobChassis;
 	mobChassis.setSpeed(Speed(0,0));
 	Movement test(&mobChassis);
 	sleep(1);
 
+	FastSLAM_CLASS mcl;
+	mcl.init(50);
+	MclChassis mclChassis;
+	mclChassis.mcl = &mcl;
+	mclChassis.chassis = &mobChassis;	
+
 	pthread_t thread;
+	//printf("Create thread\n");
+	pthread_create(&thread,NULL,&mclUpdate, (void*) &mclChassis);
 	//pthread_create(&thread,NULL,&createRecord, (void*) &mobChassis);
 
+//	printf("Move \n");
 	State end(1.0,0,0);
-	moveToPosition(mobChassis.getState(),end,&test);
+	moveToPosition(mcl.getMostProbabilisticState(),end,&test);
 
 	end.angle = M_PI;
-	moveToPosition(mobChassis.getState(),end,&test);
+	moveToPosition(mcl.getMostProbabilisticState(),end,&test);
 
 	
 	//test.moveStraight(0.70f);

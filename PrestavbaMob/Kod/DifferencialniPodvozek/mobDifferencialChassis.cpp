@@ -36,8 +36,8 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	sendMotorPower(SpeedMotors(0,0));
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 480;
-	PIRegulatorValue.I = 20;
+	PIRegulatorValue.P = 580; // 480
+	PIRegulatorValue.I = 10; // 20 
 	
 	encodersAcquireTime = 10; // every x ms
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
@@ -176,7 +176,9 @@ float MobDifferencialChassis::speedInBoundaries(float speed, float boundaries){
 int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
 	unsigned char buffer[BUFFER_SIZE];
 	int returnState = 0;
-	
+
+//	printf("Send motor power [%i,%i] \n", speedMotors.left + 128, speedMotors.right + 128);
+		
 	pthread_mutex_lock(&i2cBusMutex);
 
 	if(setI2CSlaveToMotors()){
@@ -186,7 +188,7 @@ int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
 	}
 	
 	buffer[0] = 1;
-	buffer[1] = speedMotors.left + MAX_MOTOR_SPEED;
+	buffer[1] = speedMotors.left + 128;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
@@ -195,7 +197,7 @@ int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
 	}	
 
 	buffer[0] = 2;
-	buffer[1] = speedMotors.right + MAX_MOTOR_SPEED;
+	buffer[1] = speedMotors.right + 128;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");

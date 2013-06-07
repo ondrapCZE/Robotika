@@ -1,17 +1,28 @@
 #include "fastSlam.h"
-#include "display.h"
 
-#include "readFile.h"
+#ifdef DEBUG
+	#include "display.h"
+	#include "readFile.h"
+#endif
+
 #include <stdint.h>
 #include <limits>
 
+using namespace std;
 
 static const double EPSILON = 1.0e-14;
 
 FastSLAM_CLASS::FastSLAM_CLASS(){
-	init(20);
+	stateUpdate = PTHREAD_MUTEX_INITIALIZER;
 	lastState.x = numeric_limits<double>::max();
-	probState = getMostProbabilisticState();
+
+	vectorMap.addWall(vm::Wall(vm::Point(0,0), vm::Point(1.4,0)));
+	vectorMap.addWall(vm::Wall(vm::Point(0,0), vm::Point(0,2.8)));
+	vectorMap.addWall(vm::Wall(vm::Point(0,2.8), vm::Point(1.4,2.8)));
+	vectorMap.addWall(vm::Wall(vm::Point(1.4,0), vm::Point(1.4,2.8)));
+	vectorMap.addWall(vm::Wall(vm::Point(0,1.4), vm::Point(0.9,1.4)));
+	vectorMap.addWall(vm::Wall(vm::Point(0.9,0.7), vm::Point(0.9,1.4)));
+	vectorMap.addWall(vm::Wall(vm::Point(0.4,0), vm::Point(0.4,0.7)));
 }
 
 double FastSLAM_CLASS::normAngle(double Angle){
@@ -95,8 +106,10 @@ double FastSLAM_CLASS::resample(int Count){
 	}
 
 	particles = newParticles;
-	// TODO: linux lock
+	
+	pthread_mutex_lock(&stateUpdate);
 	probState = calculateMostProbabilisticState();
+	pthread_mutex_unlock(&stateUpdate);
 
 	return sume/(double)particles.size();
 }
@@ -122,11 +135,16 @@ void FastSLAM_CLASS::weightParticlesFromSick(std::vector<double> data){
 void FastSLAM_CLASS::init(int Count){
 	particles.clear();
 	for(int i = 0; i < Count; ++i){	
-		State state(randn_notrig(0.2,0.01),randn_notrig(0.2,0.01),randn_notrig(M_PI/2.0,0.01));
+		State state(0.2,0.2,M_PI/2.0);
+		//State state(randn_notrig(0.2,0.01),randn_notrig(0.2,0.01),randn_notrig(M_PI/2.0,0.01));
 		particle_STR particle(state);
 
 		particles.push_back(particle);		
 	}
+	
+	pthread_mutex_lock(&stateUpdate);
+	probState = calculateMostProbabilisticState();
+	pthread_mutex_unlock(&stateUpdate);
 }
 
 State FastSLAM_CLASS::calculateMostProbabilisticState(){
@@ -145,14 +163,16 @@ State FastSLAM_CLASS::calculateMostProbabilisticState(){
 	probPosition.y /= weight;
 	probPosition.angle = normAngle(probPosition.angle/weight);
 
-	printf("ProbState [%f,%f,%f] \n",probPosition.x,probPosition.y,probPosition.angle );
+//	printf("ProbState [%f,%f,%f] \n",probPosition.x,probPosition.y,probPosition.angle );
 
 	return probPosition;
 }
 
 State FastSLAM_CLASS::getMostProbabilisticState(){
-	// TODO: linux lock
-	return probState;
+	pthread_mutex_lock(&stateUpdate);
+	State temp = probState;
+	pthread_mutex_unlock(&stateUpdate);
+	return temp;
 }
 
 void FastSLAM_CLASS::move(State State){
@@ -163,7 +183,7 @@ void FastSLAM_CLASS::move(State State){
 
 	double shiftX = State.x - lastState.x;
 	double shiftY = State.y - lastState.y;
-	double length = _hypot(shiftX,shiftY);
+	double length = hypot(shiftX,shiftY);
 
 	if(length == 0){
 		move(State.angle - lastState.angle,(State.angle - lastState.angle)/100.0);	
@@ -193,9 +213,8 @@ void FastSLAM_CLASS::move(State State){
 		double alpha = gama - lastState.angle;
 		double beta =  State.angle - gama;
 
-		cout << "a: " << alpha << " l: " << length << " b: " << beta << endl;
-		//move(alpha, 0, length, 0, beta, 0);
-		move(alpha, alpha / 100.0, length, length / 100.0, beta, beta / 100.0);
+		move(alpha, 0, length, 0, beta, 0);
+		//move(alpha, alpha / 100.0, length, length / 100.0, beta, beta / 100.0);
 	}
 
 	lastState = State;
@@ -212,10 +231,12 @@ void FastSLAM_CLASS::move(double Alpha, double AlphaVar, double Length, double L
 		particle->state.angle = normAngle(particle->state.angle);
 	}
 
-	// TODO: linux lock
+	pthread_mutex_lock(&stateUpdate);
 	probState = calculateMostProbabilisticState();
+	pthread_mutex_unlock(&stateUpdate);
 }
 
+#ifdef DEBUG
 int main(){
 	
 	
@@ -223,16 +244,17 @@ int main(){
 	vm::VectorMap* map = fastSlam.getVectorMap();
 
 	// add wall to map
-	map->addWall(vm::Wall(vm::Point(0,0), vm::Point(1.4,0)));
-	map->addWall(vm::Wall(vm::Point(0,0), vm::Point(0,2.8)));
-	map->addWall(vm::Wall(vm::Point(0,2.8), vm::Point(1.4,2.8)));
-	map->addWall(vm::Wall(vm::Point(1.4,0), vm::Point(1.4,2.8)));
-	map->addWall(vm::Wall(vm::Point(0,1.4), vm::Point(0.9,1.4)));
-	map->addWall(vm::Wall(vm::Point(0.9,0.7), vm::Point(0.9,1.4)));
-	map->addWall(vm::Wall(vm::Point(0.4,0), vm::Point(0.4,0.7)));
+//	map->addWall(vm::Wall(vm::Point(0,0), vm::Point(1.4,0)));
+//	map->addWall(vm::Wall(vm::Point(0,0), vm::Point(0,2.8)));
+//	map->addWall(vm::Wall(vm::Point(0,2.8), vm::Point(1.4,2.8)));
+//	map->addWall(vm::Wall(vm::Point(1.4,0), vm::Point(1.4,2.8)));
+//	map->addWall(vm::Wall(vm::Point(0,1.4), vm::Point(0.9,1.4)));
+//	map->addWall(vm::Wall(vm::Point(0.9,0.7), vm::Point(0.9,1.4)));
+//	map->addWall(vm::Wall(vm::Point(0.4,0), vm::Point(0.4,0.7)));
 	
 	readDataFromFile_CLASS test(&fastSlam);
 	test.startReadFromFile("log3.out");
 
 	return 0;
 }
+#endif

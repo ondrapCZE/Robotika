@@ -2,13 +2,14 @@
 
 #define _USE_MATH_DEFINES
 
-#include <math.h>
+#include <cmath>
 #include <limits>
+
 using namespace vm;
+using namespace std;
 
 static const double EPSILON = 1.0e-10;
 
-// TODO: blbne dava divny vysledky
 bool VectorMap::isInWall(Wall wall,Point point){
 	if(isInRange(wall.begin.x, wall.end.x, point.x) && isInRange(wall.begin.y, wall.end.y, point.y)){
 		return true;

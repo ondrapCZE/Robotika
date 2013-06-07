@@ -6,8 +6,9 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <pthread.h>
 
-#include "vectorMap.h"
+#include "../VectorMap/vectorMap.h"
 #include "../../obecne/basic.h"
 
 #define NUM_SAMPLE 270
@@ -27,10 +28,10 @@ class FastSLAM_CLASS{
 
 	State lastState;
 	State probState;
+	pthread_mutex_t stateUpdate;
 
 	double weightSlow;
 
-	void init(int Count);
 	double normAngle(double Angle);
 	double randn_notrig(double mu=0.0, double sigma=1.0);
 	double gausianDistribution(double Diference, double Dispersion);
@@ -38,6 +39,7 @@ class FastSLAM_CLASS{
 	State calculateMostProbabilisticState();
 public:
 	FastSLAM_CLASS();
+	void init(int Count);
 	vm::VectorMap* getVectorMap(){return &vectorMap;};
 	const std::vector<struct particle_STR> getParticles(){return particles;};
 	void move(State State);
