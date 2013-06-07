@@ -6,6 +6,8 @@
 #include <limits>
 
 
+static const double EPSILON = 1.0e-14;
+
 FastSLAM_CLASS::FastSLAM_CLASS(){
 	init(20);
 	lastState.x = numeric_limits<double>::max();
@@ -99,20 +101,28 @@ double FastSLAM_CLASS::resample(int Count){
 	return sume/(double)particles.size();
 }
 
-void FastSLAM_CLASS::weightParticlesFromSick(double StartAngle, double MaxScanLength, std::vector<double> data){
+void FastSLAM_CLASS::weightParticlesFromSick(std::vector<double> data){
 	for(vector<particle_STR>::iterator particle = particles.begin(); particle != particles.end(); ++particle){
-		double angle = StartAngle;
-		for(int i=0; i<data.size(); ++i){
-
-			angle -= M_PI / 180.0;
+		State absolutSick = particle->state;
+		absolutSick.x += 0.1487*cos(absolutSick.angle - 0.738);
+		absolutSick.y += 0.1487*sin(absolutSick.angle - 0.738);
+		for(int i=136; i<data.size(); ++i){
+			double diference = abs(data[i] - vectorMap.getNereastDistToWalls(absolutSick));
+			//printf("difference %f \n",diference);
+			particle->weight *= gausianDistribution(diference,0.01);
+			if(particle->weight < EPSILON)
+				particle->weight = EPSILON;
+			absolutSick.angle -= M_PI / 180.0;
 		}
+
+		printf("Weight %f \n",particle->weight);
 	}
 }
 
 void FastSLAM_CLASS::init(int Count){
 	particles.clear();
 	for(int i = 0; i < Count; ++i){	
-		State state(0.2,0.2,M_PI/2.0);
+		State state(randn_notrig(0.2,0.01),randn_notrig(0.2,0.01),randn_notrig(M_PI/2.0,0.01));
 		particle_STR particle(state);
 
 		particles.push_back(particle);		
@@ -184,8 +194,8 @@ void FastSLAM_CLASS::move(State State){
 		double beta =  State.angle - gama;
 
 		cout << "a: " << alpha << " l: " << length << " b: " << beta << endl;
-		move(alpha, 0, length, 0, beta, 0);
-		//move(alpha, alpha / 100.0, length, length / 100.0, beta, beta / 100.0);
+		//move(alpha, 0, length, 0, beta, 0);
+		move(alpha, alpha / 100.0, length, length / 100.0, beta, beta / 100.0);
 	}
 
 	lastState = State;
@@ -222,7 +232,7 @@ int main(){
 	map->addWall(vm::Wall(vm::Point(0.4,0), vm::Point(0.4,0.7)));
 	
 	readDataFromFile_CLASS test(&fastSlam);
-	test.startReadFromFile("log1.out");
+	test.startReadFromFile("log3.out");
 
 	return 0;
 }

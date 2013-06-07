@@ -41,7 +41,7 @@ public:
 	vm::VectorMap* getVectorMap(){return &vectorMap;};
 	const std::vector<struct particle_STR> getParticles(){return particles;};
 	void move(State State);
-	void weightParticlesFromSick(double StartAngle, double MaxScanLength, std::vector<double> data);
+	void weightParticlesFromSick(std::vector<double> data);
 	double resample(int Count);
 	State getMostProbabilisticState();	
 };

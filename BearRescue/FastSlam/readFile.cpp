@@ -35,11 +35,14 @@ bool readDataFromFile_CLASS::startReadFromFile(string File){
 					laserScan.push_back(distanceInMM / 1000.0);
 				}
 
+				mcl->weightParticlesFromSick(laserScan);
+				mcl->resample(50);
+
 				display.writeMap(mcl->getVectorMap());
 				display.writeLaserScan(laserScan,mcl->getMostProbabilisticState());
 				display.writeParticle(mcl->getParticles());
 				display.writeMostProbState(mcl->getMostProbabilisticState());
-				display.writeIntersection(mcl->getVectorMap(),mcl->getMostProbabilisticState());
+				//display.writeIntersection(mcl->getVectorMap(),mcl->getMostProbabilisticState());
 				display.displayMap();
 			}else{
 				//error
