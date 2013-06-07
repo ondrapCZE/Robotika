@@ -80,31 +80,31 @@ void display_CLASS::displayMap(){
 	//video << map;
 }
 
-void display_CLASS::writeMostProbState(const state_STR &State){
-	int pointX = (State.position.x)*zoom - shiftX;
-	int pointY = fixHeight(HEIGHT,(State.position.y)*zoom - shiftY);
+void display_CLASS::writeMostProbState(const State &state){
+	int pointX = (state.x)*zoom - shiftX;
+	int pointY = fixHeight(HEIGHT,(state.y)*zoom - shiftY);
 	Point particle(pointX,pointY);
 	circle(map,particle,0.14*zoom,Scalar(0,0,255));
 
-	int pointNarrowX = pointX + 5*cos(State.angle);
-	int pointNarrowY = fixHeight(HEIGHT,(State.position.y)*zoom - shiftY + 5*sin(State.angle));
+	int pointNarrowX = pointX + 5*cos(state.angle);
+	int pointNarrowY = fixHeight(HEIGHT,(state.y)*zoom - shiftY + 5*sin(state.angle));
 	Point narrow(pointNarrowX,pointNarrowY);
 	line(map,particle,narrow,Scalar(0,0,255));
 }
 
-void display_CLASS::writeLaserScan(std::vector<double> laserScan, const state_STR &State){
-	position_STR sickPosition(State.position);
-	sickPosition.x += 0.1487*cos(State.angle - 0.738);
-	sickPosition.y += 0.1487*sin(State.angle - 0.738);
-	double angle = State.angle + M_PI_2 + M_PI_4;
+void display_CLASS::writeLaserScan(std::vector<double> laserScan, const State &state){
+	State sickPosition = state;
+	sickPosition.x += 0.1487*cos(state.angle - 0.738);
+	sickPosition.y += 0.1487*sin(state.angle - 0.738);
+	sickPosition.angle += M_PI_2 + M_PI_4;
 	for(std::vector<double>::iterator measure = laserScan.begin(); measure != laserScan.end(); ++measure){
 		int pointX = sickPosition.x * zoom - shiftX;
 		int pointY = fixHeight(HEIGHT, sickPosition.y * zoom - shiftY);
 		Point begin(pointX,pointY);
-		pointX += cos(angle)*(*measure) * zoom;
+		pointX += cos(sickPosition.angle)*(*measure) * zoom;
 
 		#ifdef _MSC_VER
-			pointY -= sin(angle)*(*measure) * zoom;
+			pointY -= sin(sickPosition.angle)*(*measure) * zoom;
 		#else
 			pointY += sin(angle)*(*measure) * zoom;
 		#endif
@@ -112,12 +112,12 @@ void display_CLASS::writeLaserScan(std::vector<double> laserScan, const state_ST
 		Point end(pointX,pointY);
 		line(map,begin,end,Scalar(0,200,0));
 
-		angle -= M_PI / 180.0;
+		sickPosition.angle -= M_PI / 180.0;
 	}
 }
 
-void display_CLASS::writeIntersection(vm::VectorMap* vectorMap, const state_STR &state){
-	State sickPosition(state.position.x,state.position.y,state.angle);
+void display_CLASS::writeIntersection(vm::VectorMap* vectorMap, const State &state){
+	State sickPosition(state.x,state.y,state.angle);
 	sickPosition.x += 0.1487*cos(state.angle - 0.738);
 	sickPosition.y += 0.1487*sin(state.angle - 0.738);
 	sickPosition.angle += M_PI_2 + M_PI_4;
@@ -144,13 +144,13 @@ void display_CLASS::writeIntersection(vm::VectorMap* vectorMap, const state_STR 
 
 void display_CLASS::writeParticle(const vector<struct particle_STR> &Particles){
 	for(vector<struct particle_STR>::const_iterator particle = Particles.begin(); particle < Particles.end(); ++particle){
-		int pointX = (particle->state.position.x)*zoom - shiftX;
-		int pointY = fixHeight(HEIGHT,(particle->state.position.y)*zoom - shiftY);
+		int pointX = (particle->state.x)*zoom - shiftX;
+		int pointY = fixHeight(HEIGHT,(particle->state.y)*zoom - shiftY);
 		Point particlePoint(pointX,pointY);
 
 		circle(map,particlePoint,2,Scalar(255,0,0));
 		int pointNarrowX = pointX + 5*cos(particle->state.angle);
-		int pointNarrowY = fixHeight(HEIGHT,(particle->state.position.y)*zoom - shiftY + 5*sin(particle->state.angle));
+		int pointNarrowY = fixHeight(HEIGHT,(particle->state.y)*zoom - shiftY + 5*sin(particle->state.angle));
 		Point narrow(pointNarrowX,pointNarrowY);
 
 		line(map,particlePoint,narrow,Scalar(255,0,0));

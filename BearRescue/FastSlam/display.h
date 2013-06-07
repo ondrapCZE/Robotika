@@ -30,9 +30,9 @@ public:
 	display_CLASS();
 	void display_CLASS::writeMap(vm::VectorMap* VectorMap);
 	void writeParticle(const std::vector< particle_STR > &Particles);
-	void writeMostProbState(const state_STR &State);
-	void writeLaserScan(std::vector<double> laserScan, const state_STR &State);
-	void writeIntersection(vm::VectorMap* vectorMap, const state_STR &state);
+	void writeMostProbState(const State &state);
+	void writeLaserScan(std::vector<double> laserScan, const State &state);
+	void writeIntersection(vm::VectorMap* vectorMap, const State &state);
 	void displayMap();
 };
 

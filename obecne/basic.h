@@ -28,7 +28,6 @@ struct Position{
 */
 struct State : public Position {
 	double angle;
-
 	State(double X = 0, double Y = 0, double Angle = 0) : Position(X,Y), angle(Angle){};
 };
 

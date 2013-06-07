@@ -8,7 +8,7 @@
 
 FastSLAM_CLASS::FastSLAM_CLASS(){
 	init(20);
-	lastState.position.x = numeric_limits<double>::max();
+	lastState.x = numeric_limits<double>::max();
 	probState = getMostProbabilisticState();
 }
 
@@ -99,51 +99,60 @@ double FastSLAM_CLASS::resample(int Count){
 	return sume/(double)particles.size();
 }
 
+void FastSLAM_CLASS::weightParticlesFromSick(double StartAngle, double MaxScanLength, std::vector<double> data){
+	for(vector<particle_STR>::iterator particle = particles.begin(); particle != particles.end(); ++particle){
+		double angle = StartAngle;
+		for(int i=0; i<data.size(); ++i){
+
+			angle -= M_PI / 180.0;
+		}
+	}
+}
+
 void FastSLAM_CLASS::init(int Count){
 	particles.clear();
 	for(int i = 0; i < Count; ++i){	
-		position_STR position(0.2,0.2);
-		state_STR state(position,M_PI/2.0);
+		State state(0.2,0.2,M_PI/2.0);
 		particle_STR particle(state);
 
 		particles.push_back(particle);		
 	}
 }
 
-state_STR FastSLAM_CLASS::calculateMostProbabilisticState(){
-	state_STR probPosition(position_STR(0,0),0);
+State FastSLAM_CLASS::calculateMostProbabilisticState(){
+	State probPosition(0,0,0);
 	double weight = 0;
 
 	for(vector<struct particle_STR>::const_iterator particle = particles.begin(); particle < particles.end(); ++particle){
-		probPosition.position.x += particle->weight * particle->state.position.x;
-		probPosition.position.y += particle->weight * particle->state.position.y;
+		probPosition.x += particle->weight * particle->state.x;
+		probPosition.y += particle->weight * particle->state.y;
 		probPosition.angle += particle->weight * particle->state.angle;
 
 		weight += particle->weight;
 	}
 	
-	probPosition.position.x /= weight;
-	probPosition.position.y /= weight;
+	probPosition.x /= weight;
+	probPosition.y /= weight;
 	probPosition.angle = normAngle(probPosition.angle/weight);
 
-	printf("ProbState [%f,%f,%f] \n",probPosition.position.x,probPosition.position.y,probPosition.angle );
+	printf("ProbState [%f,%f,%f] \n",probPosition.x,probPosition.y,probPosition.angle );
 
 	return probPosition;
 }
 
-state_STR FastSLAM_CLASS::getMostProbabilisticState(){
+State FastSLAM_CLASS::getMostProbabilisticState(){
 	// TODO: linux lock
 	return probState;
 }
 
-void FastSLAM_CLASS::move(state_STR State){
-	if(lastState.position.x == numeric_limits<double>::max()){
+void FastSLAM_CLASS::move(State State){
+	if(lastState.x == numeric_limits<double>::max()){
 		lastState = State;
 		return;
 	}
 
-	double shiftX = State.position.x - lastState.position.x;
-	double shiftY = State.position.y - lastState.position.y;
+	double shiftX = State.x - lastState.x;
+	double shiftY = State.y - lastState.y;
 	double length = _hypot(shiftX,shiftY);
 
 	if(length == 0){
@@ -185,7 +194,9 @@ void FastSLAM_CLASS::move(state_STR State){
 void FastSLAM_CLASS::move(double Alpha, double AlphaVar, double Length, double LengthVar, double Beta, double BetaVar){
 	for(vector<particle_STR>::iterator particle = particles.begin(); particle != particles.end(); ++particle){
 		particle->state.angle += randn_notrig(Alpha, AlphaVar);
-		particle->state.position.move(randn_notrig(Length,LengthVar),particle->state.angle);
+		double length = randn_notrig(Length,LengthVar);
+		particle->state.x += cos(particle->state.angle)*length;
+		particle->state.y += sin(particle->state.angle)*length;
 		particle->state.angle += randn_notrig(Beta, BetaVar);
 
 		particle->state.angle = normAngle(particle->state.angle);

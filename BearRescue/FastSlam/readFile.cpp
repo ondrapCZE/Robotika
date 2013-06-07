@@ -18,13 +18,12 @@ bool readDataFromFile_CLASS::startReadFromFile(string File){
 		file >> descriptor;
 
 		if(descriptor == "state"){
-			position_STR position;
-			file >> position.x;
-			file >> position.y;
-			state_STR state(position);
+			State state;
+			file >> state.x;
+			file >> state.y;
 			file >> state.angle;
 
-			printf("State [%f,%f,%f] \n", state.position.x,state.position.y,state.angle);
+			printf("State [%f,%f,%f] \n", state.x,state.y,state.angle);
 			mcl->move(state);
 		}else{
 			if(descriptor == "laser" ){
