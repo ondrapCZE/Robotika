@@ -137,14 +137,32 @@ int main(){
 	//pthread_create(&thread,NULL,&createRecord, (void*) &mobChassis);
 
 //	printf("Move \n");
-	State end(1.0,0,0);
-	moveToPosition(mcl.getMostProbabilisticState(),end,&test);
-
-	end.angle = M_PI;
-	moveToPosition(mcl.getMostProbabilisticState(),end,&test);
-
+	State position(0.2,0.7,0);
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
 	
-	//test.moveStraight(0.70f);
+	position.x = 0.4;
+	position.y = 1.0;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+	position.x = 0.65;
+	position.y = 0.7;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+	position.x = 0.9;
+	position.y = 0.3;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+
+	position.x = 1.1;
+	position.y = 0.7;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+	position.x = 1.1;
+	position.y = 1.4;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+
+//test.moveStraight(0.70f);
 	//test.rotate(-M_PI/2.0f);
 	//test.moveStraight(0.42f);
 	//test.rotate(-M_PI/2.0f);
