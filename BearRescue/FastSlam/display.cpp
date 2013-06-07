@@ -8,8 +8,8 @@ display_CLASS::display_CLASS(){
 	//dislay
 	windowName = "oknoZobrazeni";
 	zoom = 200;
-	shiftX = -20;
-	shiftY = -20;
+	shiftX = -100;
+	shiftY = -40;
 
 	MULTI_STEP = (float) 1;
 	SHIFT_X_STEP = 10;
@@ -122,14 +122,22 @@ void display_CLASS::writeIntersection(vm::VectorMap* vectorMap, const state_STR 
 	sickPosition.y += 0.1487*sin(state.angle - 0.738);
 	sickPosition.angle += M_PI_2 + M_PI_4;
 
+	Point begin(sickPosition.x * zoom - shiftX,fixHeight(HEIGHT, sickPosition.y * zoom - shiftY));
 	for(int i=0; i<272 ;++i){
-		for(vm::wallIt wall = vectorMap->getWallsItBegin(); wall != vectorMap->getWallsItEnd(); ++wall){
-			vm::Point intersection = vectorMap->getIntersection((*wall),sickPosition);
-			//printf("Intersection [%f,%f]\n", intersection.x, intersection.y);
-			intersection.x = intersection.x * zoom - shiftX;
-			intersection.y = fixHeight(HEIGHT, intersection.y * zoom - shiftY);
-			line(map,cv::Point(intersection.x,intersection.y),cv::Point(intersection.x+1,intersection.y+1),cv::Scalar(255,0,0),1);
-		}
+		/*double distance = vectorMap->getNereastDistToWalls(sickPosition);
+		printf("Distance %f\n", distance);
+		Point end(0,0);
+		end.x = (cos(sickPosition.angle) * distance) * zoom - shiftX;
+		end.y = fixHeight(HEIGHT,(sin(sickPosition.angle) * distance) * zoom - shiftY);*/
+			
+		vm::Point intersection = vectorMap->getNereastDistToWalls(sickPosition);
+		intersection.x = intersection.x * zoom - shiftX;
+		intersection.y = fixHeight(HEIGHT,intersection.y * zoom - shiftY);
+		Point end(intersection.x, intersection.y);
+
+		//line(map,Point(end.x + 1, end.y + 1),end,Scalar(255,0,0));
+		line(map,begin,end,Scalar(255,0,0));
+
 		sickPosition.angle -= M_PI / 180.0;
 	}
 }

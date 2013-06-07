@@ -9,6 +9,7 @@
 FastSLAM_CLASS::FastSLAM_CLASS(){
 	init(20);
 	lastState.position.x = numeric_limits<double>::max();
+	probState = getMostProbabilisticState();
 }
 
 double FastSLAM_CLASS::normAngle(double Angle){
@@ -92,6 +93,9 @@ double FastSLAM_CLASS::resample(int Count){
 	}
 
 	particles = newParticles;
+	// TODO: linux lock
+	probState = calculateMostProbabilisticState();
+
 	return sume/(double)particles.size();
 }
 
@@ -106,7 +110,7 @@ void FastSLAM_CLASS::init(int Count){
 	}
 }
 
-state_STR FastSLAM_CLASS::getMostProbabilisticState(){
+state_STR FastSLAM_CLASS::calculateMostProbabilisticState(){
 	state_STR probPosition(position_STR(0,0),0);
 	double weight = 0;
 
@@ -125,6 +129,11 @@ state_STR FastSLAM_CLASS::getMostProbabilisticState(){
 	printf("ProbState [%f,%f,%f] \n",probPosition.position.x,probPosition.position.y,probPosition.angle );
 
 	return probPosition;
+}
+
+state_STR FastSLAM_CLASS::getMostProbabilisticState(){
+	// TODO: linux lock
+	return probState;
 }
 
 void FastSLAM_CLASS::move(state_STR State){
@@ -181,6 +190,9 @@ void FastSLAM_CLASS::move(double Alpha, double AlphaVar, double Length, double L
 
 		particle->state.angle = normAngle(particle->state.angle);
 	}
+
+	// TODO: linux lock
+	probState = calculateMostProbabilisticState();
 }
 
 int main(){

@@ -22,11 +22,13 @@ typedef std::vector<Wall>::iterator wallIt ;
 
 class VectorMap{
 	std::vector<Wall> walls;
+	bool isInWall(Wall wall,Point point);
+	bool isInRange(double s, double e, double value);
+	double getDistance(Point begin, Point end);
+	Point getIntersection(Wall wall, State state);
 public:
 	void addWall(Wall wall);
-	bool isInWall(Wall wall,Point point);
-	Point getIntersection(Wall wall, State state);
-	double getNereastDistToWall(Point point, double angle);
+	Point getNereastDistToWalls(State state);
 	wallIt getWallsItBegin();
 	wallIt getWallsItEnd();
 };

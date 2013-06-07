@@ -6,92 +6,97 @@
 #include <limits>
 using namespace vm;
 
+static const double EPSILON = 1.0e-10;
+
+// TODO: blbne dava divny vysledky
 bool VectorMap::isInWall(Wall wall,Point point){
-	if((std::min(wall.begin.x, wall.end.x) <= point.x) && (point.x <= std::max(wall.begin.x,wall.end.x))){
-		if((std::min(wall.begin.y, wall.end.y) <= point.y) && (point.y <= std::max(wall.begin.y,wall.end.y))){
-			return true;
-		}
+	if(isInRange(wall.begin.x, wall.end.x, point.x) && isInRange(wall.begin.y, wall.end.y, point.y)){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+bool VectorMap::isInRange(double s, double e, double value){
+	if(s > e){
+		double c = s;
+		s = e;
+		e = c;
 	}
 
-	return false;
+	s -= EPSILON;
+	e += EPSILON;
+
+	if(s <= value && value <= e){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+double VectorMap::getDistance(Point begin, Point end){
+	return hypot(begin.x - end.x,begin.y - end.y);
 }
 
 Point VectorMap::getIntersection(Wall wall, State state){
-	unsigned int lineState = 0;
+	double a_wall = wall.end.y - wall.begin.y;
+	double b_wall = wall.begin.x - wall.end.x;
+	double c_wall = - a_wall*wall.begin.x - b_wall*wall.begin.y;
 
-	// TODO: change 
-	//lineState |= (abs(abs(state.angle  M_PI) - M_PI_2) < std::numeric_limits<double>::epsilon()); // atan isn´t define for this value
-	lineState |= (abs(wall.begin.x - wall.end.x) < std::numeric_limits<double>::epsilon()) << 1; // wall is only in x direction
-		
-	Point intersection;
-	switch(lineState){
-	case 0:{
-		double alpha_1 = tan(state.angle);
-		double alpha_2 = (wall.begin.y - wall.end.y) / (wall.begin.x - wall.end.x) ;
+	double a_state = sin(state.angle);
+	double b_state = -cos(state.angle);
+	double c_state = - a_state*state.x - b_state*state.y;
 
-		double alphaDiff = alpha_1 - alpha_2;
+	double orthogonal = a_wall * b_state - (-b_wall)*a_state;
 
-		if(abs(alphaDiff) < std::numeric_limits<double>::epsilon()){
-			// infinite
-			goto infinite;
+	if(abs(orthogonal) > std::numeric_limits<double>::epsilon() ){ // lines have intersection
+		Point intersection;
+		intersection.y = (a_wall*c_state - a_state*c_wall)/(a_state* b_wall - a_wall * b_state);
+		intersection.x = (intersection.y*(b_wall - b_state) + c_wall - c_state)/(a_state - a_wall);
+		if(isInWall(wall,intersection)){
+			return intersection;
 		}
-
-		double b_1 = state.y - alpha_1*state.x;
-		double b_2 = wall.begin.y - alpha_2*wall.begin.x;
-
-		intersection.x = (b_2 - b_1) / alphaDiff;
-		intersection.y = (alpha_1*b_2 - alpha_2*b_1) / alphaDiff;
-
-		break;
-			}
-	case 1:{
-		double alpha_2 = (wall.begin.y - wall.end.y) / (wall.begin.x - wall.end.x) ;
-		double b_2 = wall.begin.y - alpha_2*wall.begin.x;
-
-		intersection.x = state.x;
-		intersection.y = alpha_2*state.x + b_2;
-
-		break;
-		   }
-	case 2:{
-
-		double alpha_1 = tan(state.angle);
-		double b_1 = state.y - alpha_1*state.x;
-
-		intersection.x = wall.begin.x;
-		intersection.y = alpha_1*wall.begin.x + b_1;
-
-		break;
-		   }
-	case 3:{
-
-infinite:
-		intersection.x = std::numeric_limits<double>::max();
-		intersection.y = std::numeric_limits<double>::max();
-
-		break;
-		   }
 	}
-
-	if(!isInWall(wall,intersection)){
-		intersection.x = std::numeric_limits<double>::max();
-		intersection.y = std::numeric_limits<double>::max();
-	}
-
-	return intersection;
+	
+	return Point(std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
 }
 
 void VectorMap::addWall(Wall wall){
 	walls.push_back(wall);
 }
 
-double VectorMap::getNereastDistToWall(Point point, double angle){
-	double nearestDistToWall = -1;
+Point VectorMap::getNereastDistToWalls(State state){
+	double nearestDistToWall = std::numeric_limits<double>::max();
+	Point nearestIntersection;
 	for(wallIt wall = getWallsItBegin(); wall != getWallsItEnd(); wall++){
-		
+		Point intersection = getIntersection((*wall),state);
+		if(intersection.x == std::numeric_limits<double>::max())
+			continue;
+
+		double distance = std::numeric_limits<double>::max();
+
+		unsigned int cond = 0;
+		cond = basic_robotic_fce::normAngle(state.angle) > 0;
+		cond |= (intersection.y > state.y) << 1;
+
+		switch(cond){
+		case 0: 
+		case 3: 
+			distance = getDistance(Point(state.x,state.y),intersection);
+			break;
+		default:
+			break;
+	
+		}
+
+		if(distance < nearestDistToWall){
+				nearestDistToWall = distance;
+				nearestIntersection = intersection;
+		}
 	}
 
-	return nearestDistToWall;
+	//return nearestDistToWall;
+	return nearestIntersection;
 }
 
 wallIt VectorMap::getWallsItBegin(){

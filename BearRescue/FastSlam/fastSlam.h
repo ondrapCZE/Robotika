@@ -40,6 +40,7 @@ class FastSLAM_CLASS{
 	vm::VectorMap vectorMap;
 
 	state_STR lastState;
+	state_STR probState;
 
 	double weightSlow;
 
@@ -48,6 +49,7 @@ class FastSLAM_CLASS{
 	double gausianDistribution(double Diference, double Dispersion);
 	void move(double Alpha = 0.0, double AlphaVar = 0.0, double Length = 0.0, double LengthVar = 0.0, double Beta = 0.0, double BetaVar = 0.0);
 	void weightParticlesFromSick(state_STR RelativeSickState, double IntervalAngle, double StartAngle,double MaxScanLength, double* Data, int Length);
+	state_STR calculateMostProbabilisticState();
 public:
 	FastSLAM_CLASS();
 	vm::VectorMap* getVectorMap(){return &vectorMap;};
