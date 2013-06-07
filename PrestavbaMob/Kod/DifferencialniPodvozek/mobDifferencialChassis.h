@@ -6,7 +6,7 @@
 #include <pthread.h>
 
 #define BUFFER_SIZE 10
-#define MAX_SPEED 0.5f
+#define MAX_SPEED 0.3f
 #define MAX_MOTOR_SPEED 127
 #define MAX_DIFFERENCE (MAX_UINT16 / 2)
 #define MAX_UINT16 65535

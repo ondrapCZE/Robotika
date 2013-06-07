@@ -11,7 +11,7 @@
 static const float EPSILON_ANGLE = M_PI / 360.0f;
 static const float EPSILON_DISTANCE = 0.01f;
 static const int SLEEP_TIME = 20000; // us
-static const float SPEED_STEP = 0.03f;
+static const float SPEED_STEP = 0.05f;
 
 Movement::Movement(BasicDifferencialChassis* chassis) : chassis(chassis) {
 

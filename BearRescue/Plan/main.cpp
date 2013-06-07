@@ -27,8 +27,8 @@ void moveToPositionEndRotate(State start, State end, Movement *movement){
 			gama = M_PI - gama;
 		}
 
-		double alpha = gama - start.angle;
-		double beta =  end.angle - gama;
+		double alpha = basic_robotic_fce::normAngle(gama - start.angle);
+		double beta =  basic_robotic_fce::normAngle(end.angle - gama);
 
 		movement->rotate(alpha);
 		movement->moveStraight(length);
@@ -53,7 +53,7 @@ void moveToPosition(State start, State end, Movement *movement){
 			gama = M_PI - gama;
 		}
 
-		double alpha = gama - start.angle;
+		double alpha = basic_robotic_fce::normAngle(gama - start.angle);
 
 		movement->rotate(alpha);
 		movement->moveStraight(length);
@@ -149,7 +149,7 @@ int main(){
 	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
 
 	position.x = 0.9;
-	position.y = 0.3;
+	position.y = 0.4;
 	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
 
 
@@ -161,6 +161,59 @@ int main(){
 	position.y = 1.4;
 	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
 
+// TODO: find bear
+
+//	test.rotate(M_PI);
+//	position.x = 1.1;
+//	position.y = 1.4;
+//	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+// Round around 
+
+
+	position.x = 1.1;
+	position.y = 2.4;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+
+	position.x = 0.4;
+	position.y = 2.4;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+
+	position.x = 0.4;
+	position.y = 1.8;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+
+	position.x = 1.1;
+	position.y = 1.8;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+
+
+// Go home
+
+
+	position.x = 1.1;
+	position.y = 0.7;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+	position.x = 0.9;
+	position.y = 0.3;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+
+	position.x = 0.65;
+	position.y = 0.7;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+	
+	position.x = 0.4;
+	position.y = 1.0;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
+	
+	position.x = 0.2;
+	position.y = 0.3;
+	moveToPosition(mcl.getMostProbabilisticState(),position,&test);
 
 //test.moveStraight(0.70f);
 	//test.rotate(-M_PI/2.0f);

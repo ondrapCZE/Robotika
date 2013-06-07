@@ -36,7 +36,7 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	sendMotorPower(SpeedMotors(0,0));
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 580; // 480
+	PIRegulatorValue.P = 480; // 480
 	PIRegulatorValue.I = 10; // 20 
 	
 	encodersAcquireTime = 10; // every x ms
