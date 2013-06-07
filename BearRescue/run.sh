@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo chmod 0666 /dev/bus/usb/001/004
 gpio mode 0 up
 STATE=$(gpio read 0)
 echo $STATE
@@ -10,4 +11,4 @@ do
 	sleep 0.1
 done
 echo Start bear rescue
-./Plan/BearRescue
+./Plan/BearRescue > logRun
