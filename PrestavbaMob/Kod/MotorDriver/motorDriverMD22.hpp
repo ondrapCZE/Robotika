@@ -3,8 +3,6 @@
 #define BUFFER_SIZE 2
 // int motorsAddress = 0x58 for mob md22
 
-#include <string>
-
 #include "motorDriver.hpp"
 
 class motorDriverMD22 : public motorDriver{
