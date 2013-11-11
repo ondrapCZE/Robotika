@@ -232,9 +232,10 @@ MobDifferencialChassis::~MobDifferencialChassis(){
 	close(i2cDevice);
 }
 
+/*
 int main(){
 	MobDifferencialChassis mobChassis;
-
+        
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
 		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
@@ -253,6 +254,8 @@ int main(){
 		//mobChassis.setSpeed(stop);		
 		//sleep(5);
 	}
-	
+
+        
 	return 0;
 }
+*/
