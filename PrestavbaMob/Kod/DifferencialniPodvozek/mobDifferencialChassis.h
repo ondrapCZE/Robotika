@@ -2,6 +2,8 @@
 #define DIFFERENCIAL_CHASSIS_H
 
 #include "basicDifferencialChassis.h"
+#include "../MotorDriver/motorDriver.hpp"
+
 #include <string>
 #include <pthread.h>
 
@@ -10,16 +12,6 @@
 #define MAX_MOTOR_SPEED 127
 #define MAX_DIFFERENCE (MAX_UINT16 / 2)
 #define MAX_UINT16 65535
-
-/*!
- * struct Speed serve for storage speed on the left and right wheels.
- */
-struct SpeedMotors{
-	int8_t left;
-	int8_t right;
-	
-	SpeedMotors(int8_t left = 0, int8_t right = 0) : left(left), right(right) {};
-};
 
 struct Distance{
 	double left;
@@ -32,8 +24,6 @@ class MobDifferencialChassis : public BasicDifferencialChassis{
 private:
 	// I2C description for comunication
 	int i2cDevice;
-	int decoderAddress;
-	int motorsAddress;
 	int encodersAcquireTime;
 
 	Encoders encodersLastState;
@@ -49,12 +39,8 @@ private:
 
 	pthread_t updateEncodersThreadHandler;
 
-	pthread_mutex_t i2cBusMutex;
 	pthread_mutex_t stateMutex;
 	pthread_mutex_t speedMutex;
-
-	int setI2CSlaveToDecoder();
-	int setI2CSlaveToMotors();
 
 	WheelDistance computeDistance(Encoders distance);
 	Speed computeSpeed(WheelDistance distance, float time); // distance in m and time in sec
@@ -65,14 +51,13 @@ private:
 
 	void changeRobotState(WheelDistance change);
 
-	int setDefaultMotorMode();
 	float speedInBoundaries(float speed, float boudaries);
 	int sendMotorPower(struct SpeedMotors speedMotors);
 	SpeedMotors PIRegulator(Speed actualSpeed, Speed desireSpeed);
 
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
-	MobDifferencialChassis(std::string I2CName = "/dev/i2c-1", int decoderAddress = 0x30, int motorsAddress = 0x58);
+	MobDifferencialChassis(std::string I2CName = "/dev/i2c-1", int decoderAddress = 0x30);
 	//! 
     /*!
 		\param differencialChassisParameters an struct DifferencialChassisParameters argument.
