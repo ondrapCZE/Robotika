@@ -29,6 +29,7 @@ private:
 	Encoders encodersLastState;
 
 	DifferencialChassisParameters chassisParam;
+        motorDriver* driver;
 	double metersPerTick;
 
 	PIValue PIRegulatorValue;
@@ -57,7 +58,7 @@ private:
 
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
-	MobDifferencialChassis(std::string I2CName = "/dev/i2c-1", int decoderAddress = 0x30);
+	MobDifferencialChassis(std::string I2CName = "/dev/i2c-1", int decoderAddress = 0x30, motorDriver* driver = NULL);
 	//! 
     /*!
 		\param differencialChassisParameters an struct DifferencialChassisParameters argument.

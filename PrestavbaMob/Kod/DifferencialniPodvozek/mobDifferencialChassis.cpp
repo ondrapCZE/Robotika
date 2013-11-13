@@ -1,5 +1,3 @@
-#include "mobDifferencialChassis.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
@@ -11,8 +9,10 @@
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 
+#include "mobDifferencialChassis.h"
+#include "../MotorDriver/motorDriverSabertooth.hpp"
 
-MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderAddress){
+MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderAddress, motorDriver* driver) : driver(driver){
 	
 	stateMutex = PTHREAD_MUTEX_INITIALIZER;
 	speedMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -134,9 +134,9 @@ float MobDifferencialChassis::speedInBoundaries(float speed, float boundaries){
 	}
 }
 
-// TODO: prepsat pomoci nove tridy pro drivery
+
 int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
-	
+    return driver->setMotorPower(speedMotors);
 }
 
 SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireSpeed){
@@ -232,9 +232,10 @@ MobDifferencialChassis::~MobDifferencialChassis(){
 	close(i2cDevice);
 }
 
-/*
+
 int main(){
-	MobDifferencialChassis mobChassis;
+    motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
+	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
         
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
@@ -242,10 +243,10 @@ int main(){
 		Speed stop(0,0);
 		mobChassis.setSpeed(stop);
 		sleep(4);
-		Speed desire(0.2f,0.2f);
+		Speed desire(0.1f,0.1f);
 		mobChassis.setSpeed(desire);
 		sleep(5);
-		Speed back(-0.2f,-0.2f);
+		Speed back(-0.1f,-0.1f);
 		mobChassis.setSpeed(back);
 		sleep(5);
 		//usleep(500000);
@@ -258,4 +259,3 @@ int main(){
         
 	return 0;
 }
-*/

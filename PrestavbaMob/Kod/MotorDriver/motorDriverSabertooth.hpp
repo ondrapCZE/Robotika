@@ -6,7 +6,7 @@
 #define BUFFER_SIZE 10
 #define BAUDRATE_SET B38400
 
-class motorDriverSabertooth{
+class motorDriverSabertooth : public motorDriver{
     int serialDevice;
     unsigned char buffer[BUFFER_SIZE];
 public:
