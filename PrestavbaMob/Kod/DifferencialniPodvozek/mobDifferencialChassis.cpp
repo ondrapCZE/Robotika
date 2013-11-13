@@ -31,15 +31,15 @@ MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderA
 	// Default value for Mob
 	chassisParam.wheelbase = 0.23f;
 	chassisParam.wheelRadius = 0.053f;
-	chassisParam.wheelTics = 9180;
+	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
 	
 	sendMotorPower(SpeedMotors(0,0));
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 480; // 480
-	PIRegulatorValue.I = 10; // 20 
+	PIRegulatorValue.P = 370; // 740 oscillate value 
+	PIRegulatorValue.I = 25;  
 	
 	encodersAcquireTime = 10; // every x ms
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
@@ -234,26 +234,37 @@ MobDifferencialChassis::~MobDifferencialChassis(){
 
 
 int main(){
-    motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
+        motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
 	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
+        
+        Speed stop(0,0);
+	mobChassis.setSpeed(stop);
+	sleep(2);
+        bool increase = true;
+        float speed = 0.0f;
+        float step = 0.01f;
         
 	while(true){
 		//Encoders encoders = mobChassis.getEncoders();
 		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		Speed stop(0,0);
-		mobChassis.setSpeed(stop);
-		sleep(4);
-		Speed desire(0.1f,0.1f);
+		
+		Speed desire(speed,speed);
 		mobChassis.setSpeed(desire);
-		sleep(5);
-		Speed back(-0.1f,-0.1f);
-		mobChassis.setSpeed(back);
-		sleep(5);
-		//usleep(500000);
-
-		//Speed stop(0,0);
-		//mobChassis.setSpeed(stop);		
-		//sleep(5);
+                
+                if(speed > 0.5f){
+                    increase = false;
+                }else{
+                    if(speed <= 0.0f){
+                        increase = true;
+                    }
+                }
+                
+                if(increase){
+                        speed += step;
+                }else{
+                        speed -= step;
+                }
+                usleep(200000);
 	}
 
         

@@ -73,9 +73,10 @@ int motorDriverSabertooth::stop(){
 /*
 int main(){
         motorDriverSabertooth driver("/dev/ttyAMA0");
-        int8_t left = -128;
+        int8_t left = 0;
+        int8_t right = 0;
         while(true){
-            driver.setMotorPower(left++,0);
+            driver.setMotorPower(left,right);
             usleep(200000);
         }
 }
