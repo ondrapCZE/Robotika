@@ -46,11 +46,12 @@ int motorDriverSabertooth::setMotorPower(SpeedMotors speed){
             speed.left = -126;
         }
         
-        uint8_t left = (speed.left + 128)/2;
-        uint8_t right = (speed.right + 128)/2 + 128;
+        uint8_t left = (speed.left/2) + 64;
+        uint8_t right = (speed.right/2) + 192;
         
-        buffer[0] = left | right;
-        if(write(serialDevice,buffer,1) != 1){
+        buffer[0] = left;
+        buffer[1] = right;
+        if(write(serialDevice,buffer,2) != 1){
 		printf("Cannot write to motor module \n\r");
 		returnState = 1; // error state
         }
@@ -69,12 +70,12 @@ int motorDriverSabertooth::stop(){
         return returnState;
 }
 
+/*
 int main(){
         motorDriverSabertooth driver("/dev/ttyAMA0");
-        int8_t left = -128;
-        int8_t right = -128;
         while(true){
             driver.setMotorPower(left++,right++);
             usleep(200000);
         }
 }
+*/
