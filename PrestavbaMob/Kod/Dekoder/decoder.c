@@ -2,7 +2,7 @@
  *  decoder.c
  *
  *  Created: 2/13/2013 9:58:26 AM
- *  Author: Ondrap
+ *  Author: Ondrap, ondrap.cz
  */ 
 
 #define F_CPU 20000000UL  // 20 MHz
@@ -11,6 +11,7 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #include <util/atomic.h>
+#include <util/crc16.h>
 
 #include "TWI_slave.h"
 #include "decoder.h"
@@ -85,8 +86,15 @@ void sendEncoders(){
 		messageBuf[2] = encodersState.right.bytes[0];
 		messageBuf[3] = encodersState.right.bytes[1];
 	}	
+
+	uint8_t crc = 0 , i;
+	for(i=0; i<4; ++i){
+		_crc_ibutton_update(crc, messageBuf[i]);
+	}
+
+	messageBuf[4] = crc;
 	
-	TWI_Start_Transceiver_With_Data(messageBuf, 4);
+	TWI_Start_Transceiver_With_Data(messageBuf, 5);
 }
 
 void writeLedError(uint8_t errorValue){
@@ -100,12 +108,12 @@ ISR(PCINT1_vect, ISR_NOBLOCK){
 	if(encoderStateTable[lastLeftState][1] == leftState){ // Left wheel had switch second part of array because had opposite direction
 		encodersState.left.value = encodersState.left.value + 1;
 		//TEST
-		//PORTD ^=  (1 << PD5);
+		PORTD ^=  (1 << PD5);
 	}else{
 		if(encoderStateTable[lastLeftState][0] == leftState){
 			encodersState.left.value = encodersState.left.value - 1;
 			//TEST
-			//PORTD ^=  (1 << PD6);
+			PORTD ^=  (1 << PD6);
 		}
 		//else{
 			//PORTD ^= (1 << PD7); // TODO: error 
@@ -121,13 +129,13 @@ ISR(PCINT2_vect, ISR_NOBLOCK){
 	if(encoderStateTable[lastRightState][0] == rightState){
 		encodersState.right.value = encodersState.right.value + 1;
 		//TEST
-		//PORTB ^=  (1 << PB0);
+		PORTB ^=  (1 << PB0);
 	}		
 	else{
 		if(encoderStateTable[lastRightState][1] == rightState){
 			encodersState.right.value = encodersState.right.value - 1;
 			//TEST
-			//PORTB ^=  (1 << PB1);
+			PORTB ^=  (1 << PB1);
 		}
 		//else{
 			//PORTB ^= (1 << PB2); 
@@ -149,7 +157,7 @@ int main(void)
 	DDRB |= (1 << PB0) | (1 << PB1) | (1 << PB2);
 	//PORTB |= (1 << PB0) | (1 << PB1);
 	
-	writeLedError(63);
+	//writeLedError(63);
 	setInputInterruptForDecoder();
 	
 	uint8_t TWI_SlaveAddress;
@@ -169,19 +177,20 @@ int main(void)
 	// Never ending loop witch read from I2C and response on command.
 	while(TRUE){
 		if(!TWI_Transceiver_Busy()){
-			writeLedError(1);
+			//writeLedError(1);
 			if(TWI_statusReg.RxDataInBuf){
 				// get command code
-				writeLedError(2);
+				//writeLedError(2);
 				TWI_Get_Data_From_Transceiver(messageBuf, 1);
-				writeLedError(3);
+				//writeLedError(3);
 				switch(messageBuf[0]){
 					case SEND_ENCODERS:
-						writeLedError(4);
+						//writeLedError(4);
+						PORTD ^=  (1 << PD7);
 						sendEncoders();
 						break;
 					default:
-						writeLedError(5);
+						//writeLedError(5);
 						//TWI_Start_Transceiver();
 						break;
 				}	
