@@ -78,6 +78,7 @@ Encoders MobDifferencialChassis::getEncodersFromDecoder(){
 		}
 	}	
 
+        printf("Encoders [%i,%i] \n\r", encodersState.left, encodersState.right);
 	return encodersState;
 }
 
@@ -98,6 +99,7 @@ int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
 	if(abs(difference) < MAX_DIFFERENCE){ // overflow test
 		return difference;
 	}else{ // overflow
+            printf("Overflow old %i new %i \n\r", oldValue, newValue);
 		if(difference < 0){ // top overflow
 			return MAX_UINT16 + difference;
 		}else{ // bottom overflow
@@ -232,7 +234,7 @@ MobDifferencialChassis::~MobDifferencialChassis(){
 	close(i2cDevice);
 }
 
-
+/*
 int main(){
         motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
 	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
@@ -240,33 +242,16 @@ int main(){
         Speed stop(0,0);
 	mobChassis.setSpeed(stop);
 	sleep(2);
-        bool increase = true;
-        float speed = 0.0f;
-        float step = 0.01f;
         
-	while(true){
-		//Encoders encoders = mobChassis.getEncoders();
-		//printf("Main encoders left: %i right: %i \n\r", encoders.left, encoders.right);
-		
-		Speed desire(speed,speed);
-		mobChassis.setSpeed(desire);
-                
-                if(speed > 0.5f){
-                    increase = false;
-                }else{
-                    if(speed <= 0.0f){
-                        increase = true;
-                    }
-                }
-                
-                if(increase){
-                        speed += step;
-                }else{
-                        speed -= step;
-                }
-                usleep(200000);
-	}
-
+        Speed desire(0.2f,0.2f);
+	mobChassis.setSpeed(desire);
+        sleep(5);
+        Speed back(-0.2f,-0.2f);
+        mobChassis.setSpeed(back);
+        sleep(5);
+        mobChassis.setSpeed(stop);
+        sleep(1);
         
 	return 0;
 }
+*/

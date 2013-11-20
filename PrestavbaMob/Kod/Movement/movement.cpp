@@ -1,6 +1,11 @@
 #include "movement.h"
 #include "../../../obecne/basic.h"
-#include "../../../Tim310_driver/tim310.h"
+// remove only for testing
+#include "../MotorDriver/motorDriverSabertooth.hpp"
+#include "../DifferencialniPodvozek/mobDifferencialChassis.h"
+// end remove
+
+#include <stdio.h>
 
 #include <cmath>
 #include <vector>
@@ -11,7 +16,7 @@
 static const float EPSILON_ANGLE = M_PI / 360.0f;
 static const float EPSILON_DISTANCE = 0.01f;
 static const int SLEEP_TIME = 20000; // us
-static const float SPEED_STEP = 0.05f;
+static const float SPEED_STEP = 0.01f;
 
 Movement::Movement(BasicDifferencialChassis* chassis) : chassis(chassis) {
 
@@ -28,7 +33,7 @@ void Movement::rotate(float angle){
 	while(std::abs(angleDifference) > EPSILON_ANGLE){
 		float motorSpeed = basic_robotic_fce::valueInRange(MAX_SPEED * angleDifference, maxSpeed);
 		
-		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
+		printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setSpeed(Speed(motorSpeed , -motorSpeed));
 
 		chassisState = chassis->getState();
@@ -72,9 +77,26 @@ void Movement::moveStraight(float meter){
 			maxSpeed = MAX_SPEED - 0.05f;
 		}
 	
-		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
+		printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
 		usleep(SLEEP_TIME);
 	}
 }
 
+int main(){
+        motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
+	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
+        Movement basic(&mobChassis);
+        
+        for(int i=0; i<4; ++i){
+                printf("Move forward \n\r\n\r");
+                basic.moveStraight(1.0f);
+                printf("Rotate \n\r\n\r");
+                basic.rotate(M_PI_2);
+        }
+        
+        mobChassis.setSpeed(Speed(0,0));
+        usleep(100000);
+        
+	return 0;
+}
 
