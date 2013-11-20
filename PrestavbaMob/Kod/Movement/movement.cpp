@@ -13,7 +13,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-static const float EPSILON_ANGLE = M_PI / 360.0f;
+static const float EPSILON_ANGLE = M_PI / 720.0f;
 static const float EPSILON_DISTANCE = 0.01f;
 static const int SLEEP_TIME = 20000; // us
 static const float SPEED_STEP = 0.01f;
@@ -33,7 +33,7 @@ void Movement::rotate(float angle){
 	while(std::abs(angleDifference) > EPSILON_ANGLE){
 		float motorSpeed = basic_robotic_fce::valueInRange(MAX_SPEED * angleDifference, maxSpeed);
 		
-		printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
+		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setSpeed(Speed(motorSpeed , -motorSpeed));
 
 		chassisState = chassis->getState();
@@ -77,7 +77,7 @@ void Movement::moveStraight(float meter){
 			maxSpeed = MAX_SPEED - 0.05f;
 		}
 	
-		printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
+		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
 		usleep(SLEEP_TIME);
 	}
 }
@@ -87,10 +87,10 @@ int main(){
 	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
         Movement basic(&mobChassis);
         
-        for(int i=0; i<4; ++i){
-                printf("Move forward \n\r\n\r");
+        for(int i=0; i<8; ++i){
+                //printf("Move forward \n\r\n\r");
                 basic.moveStraight(1.0f);
-                printf("Rotate \n\r\n\r");
+                //printf("Rotate \n\r\n\r");
                 basic.rotate(M_PI_2);
         }
         

@@ -65,20 +65,32 @@ Encoders MobDifferencialChassis::getEncodersFromDecoder(){
 	char buffer[BUFFER_SIZE];
 	Encoders encodersState;		
 
+        restart:
 	buffer[0] = 10; // send command for reading encoders value from decoder
 	if(write(i2cDevice,buffer,1) != 1){
 		printf("Failed to write to the i2c bus. \n\r");
 	}else{
-		if(read(i2cDevice,buffer,4) != 4){
+		if(read(i2cDevice,buffer,5) != 5){
 			printf("Failed to read from the i2c bus. \n\r");
 		}else{
-			encodersState.right = buffer[0] | (buffer[1] << 8);
-			encodersState.left = buffer[2] | (buffer[3] << 8);
+                        //TODO: dirty hack with goto delete it in next iteration
+                        uint8_t crc = 0,i;
+                        for(i = 0; i<4; ++i){
+                            crc = basic_robotic_fce::crc8(crc, buffer[i]);
+                        }
+                        
+                        if(crc == buffer[4]){
+                                encodersState.right = buffer[0] | (buffer[1] << 8);
+                                encodersState.left = buffer[2] | (buffer[3] << 8);
 			//printf("Buffer [%i,%i,%i,%i] \n\r", buffer[0], buffer[1], buffer[2], buffer[3]);
+                        }else{
+                            printf("Bad data transport. Wrong CRC. \n\r");
+                            goto restart;
+                        }
 		}
 	}	
 
-        printf("Encoders [%i,%i] \n\r", encodersState.left, encodersState.right);
+        //printf("Encoders [%i,%i] \n\r", encodersState.left, encodersState.right);
 	return encodersState;
 }
 
@@ -99,7 +111,7 @@ int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
 	if(abs(difference) < MAX_DIFFERENCE){ // overflow test
 		return difference;
 	}else{ // overflow
-            printf("Overflow old %i new %i \n\r", oldValue, newValue);
+            //printf("Overflow old %i new %i \n\r", oldValue, newValue);
 		if(difference < 0){ // top overflow
 			return MAX_UINT16 + difference;
 		}else{ // bottom overflow

@@ -11,6 +11,7 @@
 #ifndef BASIC_H
 #define BASIC_H
 
+#include <stdint.h>
 /*!
 	\struct position
 	\brief Position structure for robot or object in 2D world.
@@ -51,6 +52,8 @@ namespace basic_robotic_fce{
 	double normAngle(double Angle);
 
 	float valueInRange(float value, float range);
+        
+        uint8_t crc8(uint8_t crc, uint8_t data);
 }
 
 #endif
