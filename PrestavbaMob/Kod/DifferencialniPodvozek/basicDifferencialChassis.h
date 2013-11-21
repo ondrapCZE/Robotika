@@ -13,23 +13,6 @@ struct DifferencialChassisParameters{
 	unsigned int wheelTics;
 };
 
-struct Encoders{
-	long int left;
-	long int right;
-
-	Encoders(long int left = 0, long  int right = 0) : left(left), right(right) {};
-
-	Encoders operator+(Encoders ob2){
-		Encoders temp(left + ob2.left, right + ob2.right);
-		return temp;
-	};
-	
-	Encoders operator-(Encoders ob2){
-		Encoders temp(left - ob2.left, right - ob2.right);
-		return temp;
-	};
-}; 
-
 struct PIValue{
 	int P;
 	int I;

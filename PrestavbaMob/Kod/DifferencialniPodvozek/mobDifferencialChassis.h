@@ -1,17 +1,16 @@
 #ifndef DIFFERENCIAL_CHASSIS_H
 #define DIFFERENCIAL_CHASSIS_H
 
-#include "basicDifferencialChassis.h"
-#include "../MotorDriver/motorDriver.hpp"
-
 #include <string>
 #include <pthread.h>
+
+#include "basicDifferencialChassis.h"
+#include "../MotorDriver/motorDriver.hpp"
+#include "../Encoder/encoder.hpp"
 
 const unsigned int BUFFER_SIZE = 10;
 const float MAX_SPEED = 0.45f;
 const unsigned int MAX_MOTOR_SPEED = 127;
-const unsigned int MAX_UINT16 = 65535;
-const unsigned int MAX_DIFFERENCE = (MAX_UINT16 / 2);
 
 struct Distance{
 	double left;
@@ -21,15 +20,11 @@ struct Distance{
 };
 
 class MobDifferencialChassis : public BasicDifferencialChassis{
-private:
-	// I2C description for comunication
-	int i2cDevice;
 	int encodersAcquireTime;
-
-	Encoders encodersLastState;
 
 	DifferencialChassisParameters chassisParam;
         motorDriver* driver;
+        encoder* encoderReader;
 	double metersPerTick;
 
 	PIValue PIRegulatorValue;
@@ -46,19 +41,16 @@ private:
 	WheelDistance computeDistance(Encoders distance);
 	Speed computeSpeed(WheelDistance distance, float time); // distance in m and time in sec
 
-	Encoders getEncodersFromDecoder();
-	Encoders getChangeOfEncoders();
-	int dealWithEncoderOverflow(int oldValue, int newValue);
-
 	void changeRobotState(WheelDistance change);
 
 	float speedInBoundaries(float speed, float boudaries);
 	int sendMotorPower(struct SpeedMotors speedMotors);
 	SpeedMotors PIRegulator(Speed actualSpeed, Speed desireSpeed);
-
+        
+        Encoders getChangeOfEncoders();
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
-	MobDifferencialChassis(std::string I2CName = "/dev/i2c-1", int decoderAddress = 0x30, motorDriver* driver = NULL);
+	MobDifferencialChassis(encoder* encoderReader, motorDriver* driver);
 	//! 
     /*!
 		\param differencialChassisParameters an struct DifferencialChassisParameters argument.
@@ -76,8 +68,6 @@ public:
 	State getState();
 
 	WheelDistance getWheelDistance();
-
-	~MobDifferencialChassis();
 };
 
 #endif

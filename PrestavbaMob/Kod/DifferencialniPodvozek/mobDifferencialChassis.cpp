@@ -7,27 +7,15 @@
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <fcntl.h>
-#include <linux/i2c-dev.h>
 
 #include "mobDifferencialChassis.h"
-#include "../MotorDriver/motorDriverSabertooth.hpp"
 
-MobDifferencialChassis::MobDifferencialChassis(std::string I2CName, int decoderAddress, motorDriver* driver) : driver(driver){
+MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriver* driver) : encoderReader(encoderReader), driver(driver){
 	
 	stateMutex = PTHREAD_MUTEX_INITIALIZER;
 	speedMutex = PTHREAD_MUTEX_INITIALIZER;
 
-	// Open I2C bus for read and write operation
-	if((i2cDevice = open(I2CName.c_str(),O_RDWR)) < 0){
-		printf("Failed to open bus");
-		exit(1);
-	}
-
-        if(ioctl(i2cDevice,I2C_SLAVE,decoderAddress) < 0){
-        	printf("Failed to set decoder address bus");
-		exit(1);
-        }
-        
+	
 	// Default value for Mob
 	chassisParam.wheelbase = 0.23f;
 	chassisParam.wheelRadius = 0.053f;
@@ -61,65 +49,6 @@ Speed MobDifferencialChassis::computeSpeed(WheelDistance distance, float time){
 	return speed;
 }
 
-Encoders MobDifferencialChassis::getEncodersFromDecoder(){	
-	char buffer[BUFFER_SIZE];
-	Encoders encodersState;		
-
-        restart:
-	buffer[0] = 10; // send command for reading encoders value from decoder
-	if(write(i2cDevice,buffer,1) != 1){
-		printf("Failed to write to the i2c bus. \n\r");
-	}else{
-		if(read(i2cDevice,buffer,5) != 5){
-			printf("Failed to read from the i2c bus. \n\r");
-		}else{
-                        //TODO: dirty hack with goto delete it in next iteration
-                        uint8_t crc = 0,i;
-                        for(i = 0; i<4; ++i){
-                            crc = basic_robotic_fce::crc8(crc, buffer[i]);
-                        }
-                        
-                        if(crc == buffer[4]){
-                                encodersState.right = buffer[0] | (buffer[1] << 8);
-                                encodersState.left = buffer[2] | (buffer[3] << 8);
-			//printf("Buffer [%i,%i,%i,%i] \n\r", buffer[0], buffer[1], buffer[2], buffer[3]);
-                        }else{
-                            printf("Bad data transport. Wrong CRC. \n\r");
-                            goto restart;
-                        }
-		}
-	}	
-
-        //printf("Encoders [%i,%i] \n\r", encodersState.left, encodersState.right);
-	return encodersState;
-}
-
-Encoders MobDifferencialChassis::getChangeOfEncoders(){
-	Encoders newState = getEncodersFromDecoder();
-	Encoders encodersDifference;
-
-	encodersDifference.left = dealWithEncoderOverflow(encodersLastState.left, newState.left);
-	encodersDifference.right = dealWithEncoderOverflow(encodersLastState.right, newState.right);
-
-	encodersLastState = newState;
-	return encodersDifference;	
-}
-
-int MobDifferencialChassis::dealWithEncoderOverflow(int oldValue, int newValue){
-	int difference = newValue - oldValue;
-
-	if(abs(difference) < MAX_DIFFERENCE){ // overflow test
-		return difference;
-	}else{ // overflow
-            //printf("Overflow old %i new %i \n\r", oldValue, newValue);
-		if(difference < 0){ // top overflow
-			return MAX_UINT16 + difference;
-		}else{ // bottom overflow
-			return difference - MAX_UINT16;
-		}
-	}
-}
-
 void MobDifferencialChassis::changeRobotState(WheelDistance change){
 	double angleChange = (change.right - change.left) / chassisParam.wheelbase;
 	double distanceChange = (change.right + change.left)/2;
@@ -148,6 +77,9 @@ float MobDifferencialChassis::speedInBoundaries(float speed, float boundaries){
 	}
 }
 
+Encoders MobDifferencialChassis::getChangeOfEncoders(){
+    return encoderReader->getChangeOfEncoders();
+} 
 
 int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
     return driver->setMotorPower(speedMotors);
@@ -173,7 +105,6 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 	timeval timer[2];
 	MobDifferencialChassis* This = (MobDifferencialChassis *) ThisPointer;
 	//printf("Sleep time: %i \n\r", This->encodersAcquireTime);
-	This->encodersLastState = This->getEncodersFromDecoder();
 
 	long int lastMicroTime = 1;
 	while(true){
@@ -240,10 +171,6 @@ WheelDistance MobDifferencialChassis::getWheelDistance(){
 	pthread_mutex_unlock(&stateMutex);
 
 	return copyWheelDistance;
-}
-
-MobDifferencialChassis::~MobDifferencialChassis(){
-	close(i2cDevice);
 }
 
 /*

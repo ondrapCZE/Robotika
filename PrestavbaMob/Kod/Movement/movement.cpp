@@ -3,6 +3,7 @@
 // remove only for testing
 #include "../MotorDriver/motorDriverSabertooth.hpp"
 #include "../DifferencialniPodvozek/mobDifferencialChassis.h"
+#include "../Encoder/encoderAtmel.hpp"
 // end remove
 
 #include <stdio.h>
@@ -84,7 +85,8 @@ void Movement::moveStraight(float meter){
 
 int main(){
         motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
-	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
+        encoder* encoderReader = new encoderAtmel("/dev/i2c-1",0x30);
+	MobDifferencialChassis mobChassis(encoderReader,driver);
         Movement basic(&mobChassis);
         
         for(int i=0; i<8; ++i){
