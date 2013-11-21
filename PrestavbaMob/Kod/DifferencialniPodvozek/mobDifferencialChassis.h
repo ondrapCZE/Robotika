@@ -7,11 +7,11 @@
 #include <string>
 #include <pthread.h>
 
-#define BUFFER_SIZE 10
-#define MAX_SPEED 0.45f
-#define MAX_MOTOR_SPEED 127
-#define MAX_DIFFERENCE (MAX_UINT16 / 2)
-#define MAX_UINT16 65535
+const unsigned int BUFFER_SIZE = 10;
+const float MAX_SPEED = 0.45f;
+const unsigned int MAX_MOTOR_SPEED = 127;
+const unsigned int MAX_UINT16 = 65535;
+const unsigned int MAX_DIFFERENCE = (MAX_UINT16 / 2);
 
 struct Distance{
 	double left;

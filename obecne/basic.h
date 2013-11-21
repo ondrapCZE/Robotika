@@ -32,6 +32,21 @@ struct State : public Position {
 	State(double X = 0, double Y = 0, double Angle = 0) : Position(X,Y), angle(Angle){};
 };
 
+/*!
+ * struct Speed serve for storage speed on the left and right wheels.
+ */
+struct Speed{
+	float left;
+	float right;
+
+	Speed(float left=0, float right=0) : left(left), right(right){};
+
+	Speed operator-(Speed ob2){
+		Speed temp(left - ob2.left, right - ob2.right);
+		return temp;
+	};
+};
+
 namespace basic_robotic_fce{
 
 	//!	Function for random number witch use normal distribution.

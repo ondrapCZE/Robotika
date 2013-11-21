@@ -5,21 +5,6 @@
 #include "../../../obecne/basic.h"
 
 /*!
- * struct Speed serve for storage speed on the left and right wheels.
- */
-struct Speed{
-	float left;
-	float right;
-
-	Speed(float left=0, float right=0) : left(left), right(right){};
-
-	Speed operator-(Speed ob2){
-		Speed temp(left - ob2.left, right - ob2.right);
-		return temp;
-	};
-};
-
-/*!
  * struct DifferencialChassisParameters serve for setting basic parameters.
  */
 struct DifferencialChassisParameters{
