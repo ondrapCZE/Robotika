@@ -47,6 +47,8 @@ struct Speed{
 	};
 };
 
+
+
 namespace basic_robotic_fce{
 
 	//!	Function for random number witch use normal distribution.
@@ -62,13 +64,21 @@ namespace basic_robotic_fce{
 		\param Angle an double argument.
 		\return normalized input angle
 	*/
-	//double normAngle(double Angle);
-
 	double normAngle(double Angle);
-
-	float valueInRange(float value, float range);
         
         uint8_t crc8(uint8_t crc, uint8_t data);
+        
+        template <class V> V valueInRange(V value, V range){
+	if(value < range){
+		if(value > -range){
+			return value;
+		}else{
+			return - range;
+		}
+	}else{
+		return range;
+	}
+}
 }
 
 #endif

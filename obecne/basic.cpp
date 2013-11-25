@@ -6,18 +6,6 @@
 //
 //}
 
-float basic_robotic_fce::valueInRange(float value, float range){
-	if(value < range){
-		if(value > -range){
-			return value;
-		}else{
-			return - range;
-		}
-	}else{
-		return range;
-	}
-}
-
 double basic_robotic_fce::normAngle(double Angle){
 	while(Angle > M_PI)
 		Angle -= 2*M_PI;

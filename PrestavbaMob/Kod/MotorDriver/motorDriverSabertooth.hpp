@@ -1,19 +1,23 @@
 #ifndef MOTOR_DRIVER_SABERTOOTH_H
 #define MOTOR_DRIVER_SABERTOOTH_H
 
+#include <termios.h> /* POSIX terminal control definitions */
+
 #include "motorDriver.hpp"
 
-#define BUFFER_SIZE 10
-#define BAUDRATE_SET B38400
-
 class motorDriverSabertooth : public motorDriver{
+    static const unsigned int maxPower = 63;
+    static const unsigned int BUFFER_SIZE = 2;
+    static const unsigned int BAUDRATE_SET = B38400;
+    
     int serialDevice;
     unsigned char buffer[BUFFER_SIZE];
 public:
     motorDriverSabertooth(std::string device);
     std::string getName();
+    unsigned int getMaxPower();
     
-    int setMotorPower(int8_t left, int8_t right);
+    int setMotorPower(int left, int right);
     int setMotorPower(SpeedMotors speed);
     
     int stop();

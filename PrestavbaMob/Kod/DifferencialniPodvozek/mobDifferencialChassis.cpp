@@ -9,6 +9,10 @@
 #include <fcntl.h>
 
 #include "mobDifferencialChassis.h"
+#include "../../../obecne/basic.h"
+
+const unsigned int BUFFER_SIZE = 10;
+const unsigned int MAX_MOTOR_SPEED = 127;
 
 MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriver* driver) : encoderReader(encoderReader), driver(driver){
 	
@@ -17,8 +21,9 @@ MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriv
 
 	
 	// Default value for Mob
-	chassisParam.wheelbase = 0.23f;
-	chassisParam.wheelRadius = 0.053f;
+	chassisParam.wheelbase = 0.233f;
+	chassisParam.wheelRadius = 0.0531f;
+        chassisParam.maxSpeed = 0.4f;
 	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
@@ -64,19 +69,6 @@ void MobDifferencialChassis::changeRobotState(WheelDistance change){
 	pthread_mutex_unlock(&stateMutex);
 }
 
-float MobDifferencialChassis::speedInBoundaries(float speed, float boundaries){
-	if(speed < boundaries){
-		if(speed > -boundaries){
-			return speed;
-		}
-		else{
-			return -boundaries;
-		}
-	}else{
-		return boundaries;
-	}
-}
-
 Encoders MobDifferencialChassis::getChangeOfEncoders(){
     return encoderReader->getChangeOfEncoders();
 } 
@@ -90,13 +82,13 @@ SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireS
 	PIRegulatorValue.integralPartLeft += speedDifference.left;
 	PIRegulatorValue.integralPartRight += speedDifference.right;
 
-	float speedLeft = PIRegulatorValue.P*speedDifference.left + PIRegulatorValue.I*PIRegulatorValue.integralPartLeft;
-	float speedRight = PIRegulatorValue.P*speedDifference.right + PIRegulatorValue.I*PIRegulatorValue.integralPartRight;
+	int speedLeft = PIRegulatorValue.P*speedDifference.left + PIRegulatorValue.I*PIRegulatorValue.integralPartLeft;
+	int speedRight = PIRegulatorValue.P*speedDifference.right + PIRegulatorValue.I*PIRegulatorValue.integralPartRight;
 
 	// set in boundaries
 	SpeedMotors speedMotors;
-	speedMotors.left = (int8_t) speedInBoundaries(speedLeft, MAX_MOTOR_SPEED);
-	speedMotors.right = (int8_t) speedInBoundaries(speedRight, MAX_MOTOR_SPEED);
+	speedMotors.left = basic_robotic_fce::valueInRange<int>(speedLeft, MAX_MOTOR_SPEED);
+	speedMotors.right = basic_robotic_fce::valueInRange<int>(speedRight, MAX_MOTOR_SPEED);
 	
 	return speedMotors;
 }
@@ -147,9 +139,14 @@ void MobDifferencialChassis::setDifferencialChassisParameters(DifferencialChassi
 	metersPerTick = (2*M_PI*differencialChassisParameters.wheelRadius) / (double) differencialChassisParameters.wheelTics;
 }
 
+void MobDifferencialChassis::stop(){
+    setSpeed(Speed(0,0));
+    driver->stop();
+}
+
 void MobDifferencialChassis::setSpeed(Speed speed){
-	speed.left = speedInBoundaries(speed.left, MAX_SPEED);
-	speed.right = speedInBoundaries(speed.right, MAX_SPEED);	
+	speed.left = basic_robotic_fce::valueInRange(speed.left, MAX_SPEED);
+	speed.right = basic_robotic_fce::valueInRange(speed.right, MAX_SPEED);	
 
 	pthread_mutex_lock(&speedMutex);
 	desireSpeed = speed;
@@ -171,6 +168,10 @@ WheelDistance MobDifferencialChassis::getWheelDistance(){
 	pthread_mutex_unlock(&stateMutex);
 
 	return copyWheelDistance;
+}
+
+float MobDifferencialChassis::getMaxSpeed(){
+    return chassisParam.maxSpeed;
 }
 
 /*

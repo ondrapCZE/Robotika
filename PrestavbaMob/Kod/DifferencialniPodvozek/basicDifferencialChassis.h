@@ -10,6 +10,7 @@
 struct DifferencialChassisParameters{
 	float wheelbase;
 	float wheelRadius;
+        float maxSpeed;
 	unsigned int wheelTics;
 };
 
@@ -44,6 +45,7 @@ public:
     /*!
 		\param speed an struct Speed argument.
     */
+        virtual void stop()=0;
 	virtual void setSpeed(Speed speed)=0;
 	//! A pure virtual member.
     /*!
@@ -57,6 +59,8 @@ public:
 	 	\return actual distance on both wheels
 	 */
 	virtual WheelDistance getWheelDistance()=0;
+        
+        virtual float getMaxSpeed()=0;
 };
 
 #endif

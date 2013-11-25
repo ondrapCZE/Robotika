@@ -32,7 +32,7 @@ void Movement::rotate(float angle){
 	float maxSpeed = SPEED_STEP;
 	//printf("Angle difference: %f epsilon: %f \n", angleDifference, EPSILON_ANGLE);
 	while(std::abs(angleDifference) > EPSILON_ANGLE){
-		float motorSpeed = basic_robotic_fce::valueInRange(MAX_SPEED * angleDifference, maxSpeed);
+		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 		
 		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setSpeed(Speed(motorSpeed , -motorSpeed));
@@ -89,15 +89,19 @@ int main(){
 	MobDifferencialChassis mobChassis(encoderReader,driver);
         Movement basic(&mobChassis);
         
+        
         for(int i=0; i<8; ++i){
                 //printf("Move forward \n\r\n\r");
-                basic.moveStraight(1.0f);
+                basic.moveStraight(0.7f);
                 //printf("Rotate \n\r\n\r");
                 basic.rotate(M_PI_2);
         }
         
+        //basic.moveStraight(1.0f);
+        //basic.rotate(2*M_PI);
+        
         mobChassis.setSpeed(Speed(0,0));
-        usleep(100000);
+        usleep(1000000);
         
 	return 0;
 }

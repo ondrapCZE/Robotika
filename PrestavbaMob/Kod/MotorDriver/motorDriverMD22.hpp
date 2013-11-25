@@ -7,13 +7,15 @@
 
 class motorDriverMD22 : public motorDriver{
     int i2cDevice;
+    static const unsigned int maxPower = 127;
     unsigned char buffer[BUFFER_SIZE];
 public:
     motorDriverMD22(std::string deviceI2C,int driverAddress);
     std::string getName();
+    unsigned int getMaxPower();
     
     int setDefaultMotorMode();
-    int setMotorPower(int8_t left, int8_t right);
+    int setMotorPower(int left, int right);
     int setMotorPower(SpeedMotors speed);
     
     int stop();

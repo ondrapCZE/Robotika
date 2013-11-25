@@ -26,6 +26,10 @@ motorDriverMD22::motorDriverMD22(std::string deviceI2C, int driverAddress){
 std::string motorDriverMD22::getName(){
     return "MD22 motor driver over I2C";
 }
+
+unsigned int motorDriverMD22::getMaxPower(){
+    return maxPower;
+}
  
 int motorDriverMD22::setDefaultMotorMode(){	
 	int returnState = 0;	
@@ -41,7 +45,7 @@ int motorDriverMD22::setDefaultMotorMode(){
 	return returnState;
 }
 
-int motorDriverMD22::setMotorPower(int8_t left, int8_t right){
+int motorDriverMD22::setMotorPower(int left, int right){
     SpeedMotors speed(left,right);
     return setMotorPower(speed);
 }

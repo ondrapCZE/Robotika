@@ -35,16 +35,19 @@ motorDriverSabertooth::motorDriverSabertooth(std::string device){
 std::string motorDriverSabertooth::getName(){
     return "Sabertooth 2x5 motor driver over serial line\n\r";
 }
+
+unsigned int motorDriverSabertooth::getMaxPower(){
+    return maxPower;
+}
     
-int motorDriverSabertooth::setMotorPower(int8_t left, int8_t right){
+int motorDriverSabertooth::setMotorPower(int left, int right){
     return setMotorPower(SpeedMotors(left,right));
 }
 
 int motorDriverSabertooth::setMotorPower(SpeedMotors speed){
         int returnState = 0;
-        if(speed.left < -127){
-            speed.left = -126;
-        }
+        
+        //TODO: check whether value is in range of motor power
         
         uint8_t left = (speed.left/2) + 64;
         uint8_t right = (speed.right/2) + 192;

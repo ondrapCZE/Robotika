@@ -8,9 +8,7 @@
 #include "../MotorDriver/motorDriver.hpp"
 #include "../Encoder/encoder.hpp"
 
-const unsigned int BUFFER_SIZE = 10;
 const float MAX_SPEED = 0.45f;
-const unsigned int MAX_MOTOR_SPEED = 127;
 
 struct Distance{
 	double left;
@@ -40,10 +38,9 @@ class MobDifferencialChassis : public BasicDifferencialChassis{
 
 	WheelDistance computeDistance(Encoders distance);
 	Speed computeSpeed(WheelDistance distance, float time); // distance in m and time in sec
-
+	
 	void changeRobotState(WheelDistance change);
 
-	float speedInBoundaries(float speed, float boudaries);
 	int sendMotorPower(struct SpeedMotors speedMotors);
 	SpeedMotors PIRegulator(Speed actualSpeed, Speed desireSpeed);
         
@@ -60,6 +57,8 @@ public:
     /*!
 		\param speed an struct Speed argument.
     */
+        void stop();
+        
 	void setSpeed(Speed speed);
 	//! 
     /*!
@@ -68,6 +67,8 @@ public:
 	State getState();
 
 	WheelDistance getWheelDistance();
+        
+        float getMaxSpeed();
 };
 
 #endif
