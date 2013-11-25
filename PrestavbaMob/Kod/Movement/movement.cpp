@@ -89,18 +89,19 @@ int main(){
 	MobDifferencialChassis mobChassis(encoderReader,driver);
         Movement basic(&mobChassis);
         
-        
+        /*
         for(int i=0; i<8; ++i){
                 //printf("Move forward \n\r\n\r");
-                basic.moveStraight(0.7f);
+                basic.moveStraight(-0.7f);
                 //printf("Rotate \n\r\n\r");
                 basic.rotate(M_PI_2);
         }
+        */ 
         
         //basic.moveStraight(1.0f);
         //basic.rotate(2*M_PI);
         
-        mobChassis.setSpeed(Speed(0,0));
+        mobChassis.stop();
         usleep(1000000);
         
 	return 0;

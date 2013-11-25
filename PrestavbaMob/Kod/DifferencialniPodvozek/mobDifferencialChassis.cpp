@@ -140,6 +140,8 @@ void MobDifferencialChassis::setDifferencialChassisParameters(DifferencialChassi
 }
 
 void MobDifferencialChassis::stop(){
+    PIRegulatorValue.integralPartLeft=0;
+    PIRegulatorValue.integralPartRight=0;
     setSpeed(Speed(0,0));
     driver->stop();
 }
