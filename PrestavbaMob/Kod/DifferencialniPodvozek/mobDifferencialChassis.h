@@ -41,8 +41,8 @@ class MobDifferencialChassis : public BasicDifferencialChassis{
 	
 	void changeRobotState(WheelDistance change);
 
-	int sendMotorPower(struct SpeedMotors speedMotors);
-	SpeedMotors PIRegulator(Speed actualSpeed, Speed desireSpeed);
+	int sendMotorPower(struct motorsPower speedMotors);
+	motorsPower PIRegulator(Speed actualSpeed, Speed desireSpeed);
         
         Encoders getChangeOfEncoders();
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	

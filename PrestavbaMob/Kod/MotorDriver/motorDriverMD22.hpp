@@ -15,8 +15,8 @@ public:
     unsigned int getMaxPower();
     
     int setDefaultMotorMode();
-    int setMotorPower(int left, int right);
-    int setMotorPower(SpeedMotors speed);
+    int setMotorsPower(int left, int right);
+    int setMotorsPower(motorsPower power);
     
     int stop();
     ~motorDriverMD22(){close(i2cDevice);};

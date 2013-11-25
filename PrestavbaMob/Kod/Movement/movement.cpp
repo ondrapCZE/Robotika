@@ -89,14 +89,14 @@ int main(){
 	MobDifferencialChassis mobChassis(encoderReader,driver);
         Movement basic(&mobChassis);
         
-        /*
-        for(int i=0; i<8; ++i){
+        
+        for(int i=0; i<4; ++i){
                 //printf("Move forward \n\r\n\r");
-                basic.moveStraight(-0.7f);
+                basic.moveStraight(0.7f);
                 //printf("Rotate \n\r\n\r");
                 basic.rotate(M_PI_2);
         }
-        */ 
+        
         
         //basic.moveStraight(1.0f);
         //basic.rotate(2*M_PI);

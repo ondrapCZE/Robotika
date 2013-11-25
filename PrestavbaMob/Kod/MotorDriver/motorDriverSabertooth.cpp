@@ -40,11 +40,11 @@ unsigned int motorDriverSabertooth::getMaxPower(){
     return maxPower;
 }
     
-int motorDriverSabertooth::setMotorPower(int left, int right){
-    return setMotorPower(SpeedMotors(left,right));
+int motorDriverSabertooth::setMotorsPower(int left, int right){
+    return setMotorsPower(motorsPower(left,right));
 }
 
-int motorDriverSabertooth::setMotorPower(SpeedMotors speed){
+int motorDriverSabertooth::setMotorsPower(motorsPower speed){
         int returnState = 0;
         
         //TODO: check whether value is in range of motor power

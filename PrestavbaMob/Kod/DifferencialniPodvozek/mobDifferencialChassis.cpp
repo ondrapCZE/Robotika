@@ -28,7 +28,7 @@ MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriv
 	
 	metersPerTick = (2*M_PI*chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
 	
-	sendMotorPower(SpeedMotors(0,0));
+	sendMotorPower(motorsPower(0,0));
 
 	// Set PIRegulator
 	PIRegulatorValue.P = 370; // 740 oscillate value 
@@ -73,11 +73,11 @@ Encoders MobDifferencialChassis::getChangeOfEncoders(){
     return encoderReader->getChangeOfEncoders();
 } 
 
-int MobDifferencialChassis::sendMotorPower(struct SpeedMotors speedMotors){
-    return driver->setMotorPower(speedMotors);
+int MobDifferencialChassis::sendMotorPower(struct motorsPower speedMotors){
+    return driver->setMotorsPower(speedMotors);
 }
 
-SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireSpeed){
+motorsPower MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireSpeed){
 	Speed speedDifference = desireSpeed - actualSpeed;
 	PIRegulatorValue.integralPartLeft += speedDifference.left;
 	PIRegulatorValue.integralPartRight += speedDifference.right;
@@ -86,7 +86,7 @@ SpeedMotors MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireS
 	int speedRight = PIRegulatorValue.P*speedDifference.right + PIRegulatorValue.I*PIRegulatorValue.integralPartRight;
 
 	// set in boundaries
-	SpeedMotors speedMotors;
+	motorsPower speedMotors;
 	speedMotors.left = basic_robotic_fce::valueInRange<int>(speedLeft, MAX_MOTOR_SPEED);
 	speedMotors.right = basic_robotic_fce::valueInRange<int>(speedRight, MAX_MOTOR_SPEED);
 	
@@ -114,7 +114,7 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer){
 		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 	
 		pthread_mutex_lock(&This->speedMutex);
-		SpeedMotors valueMotors = This->PIRegulator(actualSpeed, This->desireSpeed);
+		motorsPower valueMotors = This->PIRegulator(actualSpeed, This->desireSpeed);
 		//printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
 		pthread_mutex_unlock(&This->speedMutex);
 		//printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		

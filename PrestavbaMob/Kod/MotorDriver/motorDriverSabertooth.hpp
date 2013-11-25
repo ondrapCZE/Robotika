@@ -17,8 +17,8 @@ public:
     std::string getName();
     unsigned int getMaxPower();
     
-    int setMotorPower(int left, int right);
-    int setMotorPower(SpeedMotors speed);
+    int setMotorsPower(int left, int right);
+    int setMotorsPower(motorsPower speed);
     
     int stop();
     ~motorDriverSabertooth(){close(serialDevice);};

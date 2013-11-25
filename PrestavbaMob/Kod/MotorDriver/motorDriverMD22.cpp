@@ -45,12 +45,12 @@ int motorDriverMD22::setDefaultMotorMode(){
 	return returnState;
 }
 
-int motorDriverMD22::setMotorPower(int left, int right){
-    SpeedMotors speed(left,right);
-    return setMotorPower(speed);
+int motorDriverMD22::setMotorsPower(int left, int right){
+    motorsPower speed(left,right);
+    return setMotorsPower(speed);
 }
 
-int motorDriverMD22::setMotorPower(SpeedMotors speed){
+int motorDriverMD22::setMotorsPower(motorsPower speed){
 	int returnState = 0;
 
 	buffer[0] = 1;
@@ -74,6 +74,6 @@ int motorDriverMD22::setMotorPower(SpeedMotors speed){
 }
     
 int motorDriverMD22::stop(){
-    SpeedMotors speed(0,0);
-    return setMotorPower(speed);
+    motorsPower speed(0,0);
+    return setMotorsPower(speed);
 }
