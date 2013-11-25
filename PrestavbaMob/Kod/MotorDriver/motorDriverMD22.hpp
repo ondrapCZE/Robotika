@@ -1,13 +1,14 @@
 #ifndef MOTOR_DRIVER_MD22_H
 #define MOTOR_DRIVER_MD22_H
-#define BUFFER_SIZE 2
 // int motorsAddress = 0x58 for mob md22
 
 #include "motorDriver.hpp"
 
 class motorDriverMD22 : public motorDriver{
+    static const unsigned int MAX_POWER = 127;
+    static const unsigned int BUFFER_SIZE = 3;
+    
     int i2cDevice;
-    static const unsigned int maxPower = 127;
     unsigned char buffer[BUFFER_SIZE];
 public:
     motorDriverMD22(std::string deviceI2C,int driverAddress);
@@ -15,8 +16,8 @@ public:
     unsigned int getMaxPower();
     
     int setDefaultMotorMode();
-    int setMotorsPower(int left, int right);
-    int setMotorsPower(motorsPower power);
+    int setMotorsPower(const int left,const int right);
+    int setMotorsPower(const motorsPower power);
     
     int stop();
     ~motorDriverMD22(){close(i2cDevice);};

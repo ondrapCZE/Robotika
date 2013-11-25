@@ -28,7 +28,7 @@ std::string motorDriverMD22::getName(){
 }
 
 unsigned int motorDriverMD22::getMaxPower(){
-    return maxPower;
+    return MAX_POWER;
 }
  
 int motorDriverMD22::setDefaultMotorMode(){	
@@ -50,11 +50,11 @@ int motorDriverMD22::setMotorsPower(int left, int right){
     return setMotorsPower(speed);
 }
 
-int motorDriverMD22::setMotorsPower(motorsPower speed){
+int motorDriverMD22::setMotorsPower(motorsPower power){
 	int returnState = 0;
-
+        
 	buffer[0] = 1;
-	buffer[1] = speed.left + 128;
+	buffer[1] = power.left + 128;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
@@ -62,7 +62,7 @@ int motorDriverMD22::setMotorsPower(motorsPower speed){
 	}else{	
 
                 buffer[0] = 2;
-                buffer[1] = speed.right + 128;
+                buffer[1] = power.right + 128;
 
                 if(write(i2cDevice,buffer,2) != 2){
                         printf("Cannot write to motor module \n\r");

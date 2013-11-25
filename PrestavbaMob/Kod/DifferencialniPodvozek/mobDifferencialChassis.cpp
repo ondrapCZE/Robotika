@@ -12,7 +12,7 @@
 #include "../../../obecne/basic.h"
 
 const unsigned int BUFFER_SIZE = 10;
-const unsigned int MAX_MOTOR_SPEED = 127;
+const unsigned int MAX_MOTOR_SPEED = 63;
 
 MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriver* driver) : encoderReader(encoderReader), driver(driver){
 	
@@ -31,8 +31,8 @@ MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriv
 	sendMotorPower(motorsPower(0,0));
 
 	// Set PIRegulator
-	PIRegulatorValue.P = 370; // 740 oscillate value 
-	PIRegulatorValue.I = 25;  
+	PIRegulatorValue.P = 200; // 740 oscillate value 
+	PIRegulatorValue.I = 12;  
 	
 	encodersAcquireTime = 10; // every x ms
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
