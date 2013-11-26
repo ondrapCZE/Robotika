@@ -16,6 +16,8 @@ class encoderAtmel : public encoder{
     unsigned char buffer[BUFFER_SIZE];
     
     int dealWithEncoderOverflow(const int oldValue,const int newValue);
+    int readEncodersToBuffer();
+    bool checkBufferValidity(const unsigned int size);
 public:
     encoderAtmel(const std::string I2CDevice = "/dev/i2c-1", const int decoderAddress = 0x30);
     unsigned int getEncodersResolution();
