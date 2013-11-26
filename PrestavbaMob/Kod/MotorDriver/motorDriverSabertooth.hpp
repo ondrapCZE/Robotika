@@ -6,14 +6,14 @@
 #include "motorDriver.hpp"
 
 class motorDriverSabertooth : public motorDriver{
-    static const unsigned int maxPower = 63;
+    static const unsigned int MAX_POWER = 63;
     static const unsigned int BUFFER_SIZE = 2;
     static const unsigned int BAUDRATE_SET = B38400;
     
     int serialDevice;
     unsigned char buffer[BUFFER_SIZE];
 public:
-    motorDriverSabertooth(std::string device);
+    motorDriverSabertooth(const std::string device);
     std::string getName();
     unsigned int getMaxPower();
     

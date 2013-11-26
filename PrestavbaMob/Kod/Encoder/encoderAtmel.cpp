@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 #include <cmath>
 
 #include <sys/types.h>
@@ -13,11 +12,7 @@
 #include "encoderAtmel.hpp"
 #include "../../../obecne/basic.h"
 
-const unsigned int BUFFER_SIZE = 5;
-const unsigned int MAX_UINT16 = 65535;
-const unsigned int MAX_DIFFERENCE = (MAX_UINT16 / 2);
-
-int encoderAtmel::dealWithEncoderOverflow(int oldValue, int newValue){
+int encoderAtmel::dealWithEncoderOverflow(const int oldValue,const int newValue){
         int difference = newValue - oldValue;
 
 	if(abs(difference) < MAX_DIFFERENCE){ // overflow test
@@ -31,7 +26,7 @@ int encoderAtmel::dealWithEncoderOverflow(int oldValue, int newValue){
 	}
 }
 
-encoderAtmel::encoderAtmel(std::string I2CDevice, int decoderAddress){
+encoderAtmel::encoderAtmel(const std::string I2CDevice,const int decoderAddress){
         // Open I2C bus for read and write operation
 	if((i2cDevice = open(I2CDevice.c_str(),O_RDWR)) < 0){
 		printf("Failed to open bus");

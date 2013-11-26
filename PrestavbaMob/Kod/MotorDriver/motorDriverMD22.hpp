@@ -16,7 +16,7 @@ public:
     unsigned int getMaxPower();
     
     int setDefaultMotorMode();
-    int setMotorsPower(const int left,const int right);
+    int setMotorsPower(const int left, const int right);
     int setMotorsPower(const motorsPower power);
     
     int stop();

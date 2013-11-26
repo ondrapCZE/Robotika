@@ -10,6 +10,8 @@
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
 
+#include "../../../obecne/basic.h"
+
 motorDriverMD22::motorDriverMD22(std::string deviceI2C, int driverAddress){
     // Open I2C bus for read and write operation
         if((i2cDevice = open(deviceI2C.c_str(),O_RDWR)) < 0){
@@ -46,15 +48,14 @@ int motorDriverMD22::setDefaultMotorMode(){
 }
 
 int motorDriverMD22::setMotorsPower(int left, int right){
-    motorsPower speed(left,right);
-    return setMotorsPower(speed);
+    return setMotorsPower(motorsPower(left,right));
 }
 
 int motorDriverMD22::setMotorsPower(motorsPower power){
 	int returnState = 0;
         
 	buffer[0] = 1;
-	buffer[1] = power.left + 128;
+	buffer[1] = basic_robotic_fce::valueInRange<int>(power.left,MAX_POWER) + 128;
 
 	if(write(i2cDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
@@ -62,7 +63,7 @@ int motorDriverMD22::setMotorsPower(motorsPower power){
 	}else{	
 
                 buffer[0] = 2;
-                buffer[1] = power.right + 128;
+                buffer[1] = basic_robotic_fce::valueInRange<int>(power.right,MAX_POWER) + 128;
 
                 if(write(i2cDevice,buffer,2) != 2){
                         printf("Cannot write to motor module \n\r");

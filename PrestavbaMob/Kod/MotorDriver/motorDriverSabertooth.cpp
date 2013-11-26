@@ -7,7 +7,9 @@
 #include <termios.h> /* POSIX terminal control definitions */
 #include <stdlib.h>
 
-motorDriverSabertooth::motorDriverSabertooth(std::string device){
+#include "../../../obecne/basic.h"
+
+motorDriverSabertooth::motorDriverSabertooth(const std::string device){
         serialDevice = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
     
         if(serialDevice < -1){
@@ -37,7 +39,7 @@ std::string motorDriverSabertooth::getName(){
 }
 
 unsigned int motorDriverSabertooth::getMaxPower(){
-    return maxPower;
+    return MAX_POWER;
 }
     
 int motorDriverSabertooth::setMotorsPower(const int left,const int right){
@@ -47,13 +49,8 @@ int motorDriverSabertooth::setMotorsPower(const int left,const int right){
 int motorDriverSabertooth::setMotorsPower(const motorsPower power){
         int returnState = 0;
         
-        //TODO: check whether value is in range of motor power
-        
-        uint8_t left = power.left + 64;
-        uint8_t right = power.right + 192;
-        
-        buffer[0] = left;
-        buffer[1] = right;
+        buffer[0] = basic_robotic_fce::valueInRange<int>(power.left,MAX_POWER) + 64;
+        buffer[1] = basic_robotic_fce::valueInRange<int>(power.right, MAX_POWER) + 192;
         if(write(serialDevice,buffer,2) != 2){
 		printf("Cannot write to motor module \n\r");
 		returnState = 1; // error state
