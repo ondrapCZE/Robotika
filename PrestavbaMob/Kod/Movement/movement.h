@@ -3,7 +3,7 @@
 
 #include "../DifferencialniPodvozek/mobDifferencialChassis.h"
 
-class Movement{
+class Movement {
 private:
 	BasicDifferencialChassis* chassis;
 	State finalState;

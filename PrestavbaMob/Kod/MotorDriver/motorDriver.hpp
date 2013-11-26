@@ -7,22 +7,23 @@
 /*!
  * struct Speed serve for storage speed on the left and right wheels.
  */
-struct motorsPower{
+struct motorsPower {
 	int left;
 	int right;
-	
-	motorsPower(int left = 0, int right = 0) : left(left), right(right) {};
+
+	motorsPower(int left = 0, int right = 0) : left(left), right(right) {
+	};
 };
 
-class motorDriver{
+class motorDriver {
 public:
-    virtual std::string getName()=0;
-    virtual unsigned int getMaxPower()=0;
-    
-    virtual int setMotorsPower(const int left,const int right)=0;
-    virtual int setMotorsPower(const motorsPower power)=0;
-    
-    virtual int stop()=0;
+	virtual std::string getName() = 0;
+	virtual unsigned int getMaxPower() = 0;
+
+	virtual int setMotorsPower(const int left, const int right) = 0;
+	virtual int setMotorsPower(const motorsPower power) = 0;
+
+	virtual int stop() = 0;
 };
 
 #endif
