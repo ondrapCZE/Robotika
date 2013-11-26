@@ -5,7 +5,7 @@
 
 #include <string>
 
-class encoderAtmel : public encoder {
+class encoderAtmel : public encoderReader {
 	static const unsigned int BUFFER_SIZE = 5;
 	static const unsigned int MAX_UINT16 = 65535;
 	static const unsigned int MAX_DIFFERENCE = (MAX_UINT16 / 2);

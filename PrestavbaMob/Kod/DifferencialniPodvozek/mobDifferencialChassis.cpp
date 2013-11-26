@@ -14,14 +14,14 @@
 const unsigned int BUFFER_SIZE = 10;
 const unsigned int MAX_MOTOR_SPEED = 63;
 
-MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriver* driver) : encoderReader(encoderReader), driver(driver) {
+MobDifferencialChassis::MobDifferencialChassis(encoderReader* encoder, motorDriver* driver) : encoder(encoder), driver(driver) {
 
 	stateMutex = PTHREAD_MUTEX_INITIALIZER;
 	speedMutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 	// Default value for Mob
-	chassisParam.wheelbase = 0.233f;
+	chassisParam.wheelBase = 0.233f;
 	chassisParam.wheelRadius = 0.0531f;
 	chassisParam.maxSpeed = 0.4f;
 	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
@@ -38,24 +38,24 @@ MobDifferencialChassis::MobDifferencialChassis(encoder* encoderReader, motorDriv
 	pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
-WheelDistance MobDifferencialChassis::computeDistance(Encoders distance) {
-	WheelDistance distanceInMeters;
+WheelsDistance MobDifferencialChassis::computeDistance(Encoders distance) {
+	WheelsDistance distanceInMeters;
 	distanceInMeters.left = distance.left * metersPerTick;
 	distanceInMeters.right = distance.right * metersPerTick;
 
 	return distanceInMeters;
 }
 
-Speed MobDifferencialChassis::computeSpeed(WheelDistance distance, float time) {
-	Speed speed;
+WheelsSpeed MobDifferencialChassis::computeSpeed(WheelsDistance distance, float time) {
+	WheelsSpeed speed;
 	speed.left = distance.left / time;
 	speed.right = distance.right / time;
 
 	return speed;
 }
 
-void MobDifferencialChassis::changeRobotState(WheelDistance change) {
-	double angleChange = (change.right - change.left) / chassisParam.wheelbase;
+void MobDifferencialChassis::changeRobotState(WheelsDistance change) {
+	double angleChange = (change.right - change.left) / chassisParam.wheelBase;
 	double distanceChange = (change.right + change.left) / 2;
 
 	pthread_mutex_lock(&stateMutex);
@@ -70,15 +70,15 @@ void MobDifferencialChassis::changeRobotState(WheelDistance change) {
 }
 
 Encoders MobDifferencialChassis::getChangeOfEncoders() {
-	return encoderReader->getChangeOfEncoders();
+	return encoder->getChangeOfEncoders();
 }
 
 int MobDifferencialChassis::sendMotorPower(struct motorsPower speedMotors) {
 	return driver->setMotorsPower(speedMotors);
 }
 
-motorsPower MobDifferencialChassis::PIRegulator(Speed actualSpeed, Speed desireSpeed) {
-	Speed speedDifference = desireSpeed - actualSpeed;
+motorsPower MobDifferencialChassis::PIRegulator(WheelsSpeed actualSpeed, WheelsSpeed desireSpeed) {
+	WheelsSpeed speedDifference = desireSpeed - actualSpeed;
 	PIRegulatorValue.integralPartLeft += speedDifference.left;
 	PIRegulatorValue.integralPartRight += speedDifference.right;
 
@@ -108,8 +108,8 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer) {
 
 		// Compute actual speed and use PID
 		float time = (microStart - lastMicroTime) / 1000000.0f; // time in sec
-		WheelDistance distance = This->computeDistance(differenceEncoders);
-		Speed actualSpeed = This->computeSpeed(distance, time);
+		WheelsDistance distance = This->computeDistance(differenceEncoders);
+		WheelsSpeed actualSpeed = This->computeSpeed(distance, time);
 		This->changeRobotState(distance);
 		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 
@@ -133,19 +133,19 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer) {
 	return 0;
 }
 
-void MobDifferencialChassis::setDifferencialChassisParameters(DifferencialChassisParameters differencialChassisParameters) {
-	chassisParam = differencialChassisParameters;
-	metersPerTick = (2 * M_PI * differencialChassisParameters.wheelRadius) / (double) differencialChassisParameters.wheelTics;
+void MobDifferencialChassis::setDifferencialChassisParameters(DiffChassisParm diffChassisParm) {
+	chassisParam = diffChassisParm;
+	metersPerTick = (2 * M_PI * diffChassisParm.wheelRadius) / (double) diffChassisParm.wheelTics;
 }
 
 void MobDifferencialChassis::stop() {
 	PIRegulatorValue.integralPartLeft = 0;
 	PIRegulatorValue.integralPartRight = 0;
-	setSpeed(Speed(0, 0));
+	setSpeed(WheelsSpeed(0, 0));
 	driver->stop();
 }
 
-void MobDifferencialChassis::setSpeed(Speed speed) {
+void MobDifferencialChassis::setSpeed(WheelsSpeed speed) {
 	speed.left = basic_robotic_fce::valueInRange(speed.left, MAX_SPEED);
 	speed.right = basic_robotic_fce::valueInRange(speed.right, MAX_SPEED);
 
@@ -162,12 +162,12 @@ State MobDifferencialChassis::getState() {
 	return copyState;
 }
 
-WheelDistance MobDifferencialChassis::getWheelDistance() {
+WheelsDistance MobDifferencialChassis::getWheelDistance() {
 	pthread_mutex_lock(&stateMutex);
-	WheelDistance copyWheelDistance = wheelDistance;
+	WheelsDistance copyWheelsDistance = wheelDistance;
 	pthread_mutex_unlock(&stateMutex);
 
-	return copyWheelDistance;
+	return copyWheelsDistance;
 }
 
 float MobDifferencialChassis::getMaxSpeed() {

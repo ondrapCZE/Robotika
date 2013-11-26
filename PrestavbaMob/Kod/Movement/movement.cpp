@@ -35,7 +35,7 @@ void Movement::rotate(float angle) {
 		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 
 		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
-		chassis->setSpeed(Speed(motorSpeed, -motorSpeed));
+		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
 
 		chassisState = chassis->getState();
 		angleDifference = chassisState.angle - finalState.angle;
@@ -50,7 +50,7 @@ void Movement::rotate(float angle) {
 }
 
 void Movement::moveStraight(float meter) {
-	WheelDistance finalWheelDistance = chassis->getWheelDistance();
+	WheelsDistance finalWheelDistance = chassis->getWheelDistance();
 	finalWheelDistance.left += meter;
 	finalWheelDistance.right += meter;
 
@@ -58,7 +58,7 @@ void Movement::moveStraight(float meter) {
 	float differenceRight = meter;
 	float maxSpeed = SPEED_STEP;
 	while ((std::abs(differenceLeft) > EPSILON_DISTANCE) || (std::abs(differenceRight) > EPSILON_DISTANCE)) {
-		WheelDistance wheelDistance = chassis->getWheelDistance();
+		WheelsDistance wheelDistance = chassis->getWheelDistance();
 		differenceLeft = finalWheelDistance.left - wheelDistance.left;
 		differenceRight = finalWheelDistance.right - wheelDistance.right;
 		float meanDifference = (differenceLeft + differenceRight) / 2.0f;
@@ -71,7 +71,7 @@ void Movement::moveStraight(float meter) {
 		float speedRight = speed + (differenceRight - meanDifference) / (SLEEP_TIME / 1000000.0f);
 		//printf("Speed [%f,%f] \n", speedLeft, speedRight);
 
-		chassis->setSpeed(Speed(speedLeft, speedRight));
+		chassis->setSpeed(WheelsSpeed(speedLeft, speedRight));
 
 		maxSpeed += SPEED_STEP;
 		if (maxSpeed >= MAX_SPEED) {
@@ -85,7 +85,7 @@ void Movement::moveStraight(float meter) {
 
 int main() {
 	motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
-	encoder* encoderReader = new encoderAtmel("/dev/i2c-1", 0x30);
+	encoderReader* encoderReader = new encoderAtmel("/dev/i2c-1", 0x30);
 	MobDifferencialChassis mobChassis(encoderReader, driver);
 	Movement basic(&mobChassis);
 

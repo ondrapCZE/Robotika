@@ -3,15 +3,20 @@
 
 #include <stdint.h>
 #include "../../../obecne/basic.h"
-
+#include "../Encoder/encoder.hpp"
+#include "../MotorDriver/motorDriver.hpp"
 /*!
  * struct DifferencialChassisParameters serve for setting basic parameters.
  */
-struct DifferencialChassisParameters {
-	float wheelbase;
+struct DiffChassisParm{
+	float wheelBase;
 	float wheelRadius;
 	float maxSpeed;
+	float reductionRatio;
 	unsigned int wheelTics;
+	
+	encoderReader* encoder;
+	motorDriver* driver;
 };
 
 struct PIValue {
@@ -25,26 +30,26 @@ struct PIValue {
 	};
 };
 
-struct WheelDistance {
+struct WheelsDistance {
 	float left;
 	float right;
 
-	WheelDistance(float left = 0, float right = 0) : left(left), right(right) {
+	WheelsDistance(float left = 0, float right = 0) : left(left), right(right) {
 	};
 };
 
 /*!
  * struct Speed serve for storage speed on the left and right wheels.
  */
-struct Speed {
+struct WheelsSpeed {
 	float left;
 	float right;
 
-	Speed(float left = 0, float right = 0) : left(left), right(right) {
+	WheelsSpeed(float left = 0, float right = 0) : left(left), right(right) {
 	};
 
-	Speed operator-(Speed ob2) {
-		Speed temp(left - ob2.left, right - ob2.right);
+	WheelsSpeed operator-(WheelsSpeed ob2) {
+		WheelsSpeed temp(left - ob2.left, right - ob2.right);
 		return temp;
 	};
 };
@@ -58,13 +63,13 @@ public:
 	/*!
 	\param differencialChassisParameters an struct DifferencialChassisParameters argument.
 	 */
-	virtual void setDifferencialChassisParameters(DifferencialChassisParameters differencialChassisParameters) = 0;
+	virtual void setDifferencialChassisParameters(DiffChassisParm differencialChassisParameters) = 0;
 	//! A pure virtual member.
 	/*!
 	\param speed an struct Speed argument.
 	 */
 	virtual void stop() = 0;
-	virtual void setSpeed(Speed speed) = 0;
+	virtual void setSpeed(WheelsSpeed speed) = 0;
 	//! A pure virtual member.
 	/*!
 	\return actual state of the chassis
@@ -76,7 +81,7 @@ public:
 	/*!
 		\return actual distance on both wheels
 	 */
-	virtual WheelDistance getWheelDistance() = 0;
+	virtual WheelsDistance getWheelDistance() = 0;
 
 	virtual float getMaxSpeed() = 0;
 };

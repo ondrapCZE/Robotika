@@ -21,53 +21,53 @@ struct Distance {
 class MobDifferencialChassis : public BasicDifferencialChassis {
 	int encodersAcquireTime;
 
-	DifferencialChassisParameters chassisParam;
+	DiffChassisParm chassisParam;
 	motorDriver* driver;
-	encoder* encoderReader;
+	encoderReader* encoder;
 	double metersPerTick;
 
 	PIValue PIRegulatorValue;
 
 	State robotState;
-	WheelDistance wheelDistance;
-	Speed desireSpeed;
+	WheelsDistance wheelDistance;
+	WheelsSpeed desireSpeed;
 
 	pthread_t updateEncodersThreadHandler;
 
 	pthread_mutex_t stateMutex;
 	pthread_mutex_t speedMutex;
 
-	WheelDistance computeDistance(Encoders distance);
-	Speed computeSpeed(WheelDistance distance, float time); // distance in m and time in sec
+	WheelsDistance computeDistance(Encoders distance);
+	WheelsSpeed computeSpeed(WheelsDistance distance, float time); // distance in m and time in sec
 
-	void changeRobotState(WheelDistance change);
+	void changeRobotState(WheelsDistance change);
 
 	int sendMotorPower(struct motorsPower speedMotors);
-	motorsPower PIRegulator(Speed actualSpeed, Speed desireSpeed);
+	motorsPower PIRegulator(WheelsSpeed actualSpeed, WheelsSpeed desireSpeed);
 
 	Encoders getChangeOfEncoders();
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
-	MobDifferencialChassis(encoder* encoderReader, motorDriver* driver);
+	MobDifferencialChassis(encoderReader* encoder, motorDriver* driver);
 	//! 
 	/*!
 	\param differencialChassisParameters an struct DifferencialChassisParameters argument.
 	 */
-	void setDifferencialChassisParameters(DifferencialChassisParameters differencialChassisParameters);
+	void setDifferencialChassisParameters(DiffChassisParm differencialChassisParameters);
 	//! 
 	/*!
 	\param speed an struct Speed argument.
 	 */
 	void stop();
 
-	void setSpeed(Speed speed);
+	void setSpeed(WheelsSpeed speed);
 	//! 
 	/*!
 	\return actual state of the chassis
 	 */
 	State getState();
 
-	WheelDistance getWheelDistance();
+	WheelsDistance getWheelDistance();
 
 	float getMaxSpeed();
 };
