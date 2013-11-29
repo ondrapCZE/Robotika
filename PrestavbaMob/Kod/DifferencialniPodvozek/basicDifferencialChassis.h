@@ -5,18 +5,26 @@
 #include "../../../obecne/basic.h"
 #include "../Encoder/encoder.hpp"
 #include "../MotorDriver/motorDriver.hpp"
+
 /*!
  * struct DifferencialChassisParameters serve for setting basic parameters.
  */
-struct DiffChassisParm{
+struct DiffChassisParam {
 	float wheelBase;
 	float wheelRadius;
 	float maxSpeed;
 	float reductionRatio;
 	unsigned int wheelTics;
-	
+
 	encoderReader* encoder;
 	motorDriver* driver;
+
+	DiffChassisParam(float wheelBase = 0, float wheelRadius = 0, float maxSpeed = 0,
+		float reductionRatio = 0, unsigned int wheelTics = 0, encoderReader* encoder = NULL,
+		motorDriver* driver = NULL) : wheelBase(wheelBase), wheelRadius(wheelRadius),
+	maxSpeed(maxSpeed), reductionRatio(reductionRatio), wheelTics(wheelTics),
+	encoder(encoder), driver(driver) {
+	};
 };
 
 struct PIValue {
@@ -58,18 +66,18 @@ struct WheelsSpeed {
  * struct DifferencialChassis is virtual class which is necessary to define.
  */
 class BasicDifferencialChassis {
+protected:
+	DiffChassisParam diffChassisParam;
 public:
-	//! A pure virtual member.
-	/*!
-	\param differencialChassisParameters an struct DifferencialChassisParameters argument.
-	 */
-	virtual void setDifferencialChassisParameters(DiffChassisParm differencialChassisParameters) = 0;
+	BasicDifferencialChassis(const DiffChassisParam diffChassisParam) : diffChassisParam(diffChassisParam) {
+	};
+	
 	//! A pure virtual member.
 	/*!
 	\param speed an struct Speed argument.
 	 */
 	virtual void stop() = 0;
-	virtual void setSpeed(WheelsSpeed speed) = 0;
+	virtual void setSpeed(const WheelsSpeed speed) = 0;
 	//! A pure virtual member.
 	/*!
 	\return actual state of the chassis

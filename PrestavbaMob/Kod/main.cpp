@@ -3,14 +3,21 @@
 #include "MotorDriver/motorDriverSabertooth.hpp"
 #include "DifferencialniPodvozek/mobDifferencialChassis.h"
 #include "Encoder/encoderAtmel.hpp"
+#include "Movement/movement.h"
 
-int main() {
-	motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
-	encoderReader* encoderReader = new encoderAtmel("/dev/i2c-1", 0x30);
-	MobDifferencialChassis mobChassis(encoderReader, driver);
+int main(){		
+	// Default value for Mob
+	DiffChassisParam chassisParam;
+	chassisParam.wheelBase = 0.233f;
+	chassisParam.wheelRadius = 0.0531f;
+	chassisParam.maxSpeed = 0.5f;
+	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
+	chassisParam.driver = new motorDriverSabertooth("/dev/ttyAMA0");
+	chassisParam.encoder = new encoderAtmel("/dev/i2c-1", 0x30);
+	
+	MobDifferencialChassis mobChassis(chassisParam);
 	Movement basic(&mobChassis);
-
-
+	
 	for (int i = 0; i < 4; ++i) {
 		//printf("Move forward \n\r\n\r");
 		basic.moveStraight(0.7f);

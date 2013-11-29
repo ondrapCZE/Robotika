@@ -12,21 +12,13 @@
 #include "../../../obecne/basic.h"
 
 const unsigned int BUFFER_SIZE = 10;
-const unsigned int MAX_MOTOR_SPEED = 63;
 
-MobDifferencialChassis::MobDifferencialChassis(encoderReader* encoder, motorDriver* driver) : encoder(encoder), driver(driver) {
+MobDifferencialChassis::MobDifferencialChassis(const DiffChassisParam diffChassisParam) : BasicDifferencialChassis(diffChassisParam) {
 
 	stateMutex = PTHREAD_MUTEX_INITIALIZER;
 	speedMutex = PTHREAD_MUTEX_INITIALIZER;
 
-
-	// Default value for Mob
-	chassisParam.wheelBase = 0.233f;
-	chassisParam.wheelRadius = 0.0531f;
-	chassisParam.maxSpeed = 0.4f;
-	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
-
-	metersPerTick = (2 * M_PI * chassisParam.wheelRadius) / (float) chassisParam.wheelTics;
+	metersPerTick = (2 * M_PI * diffChassisParam.wheelRadius) / (float) diffChassisParam.wheelTics;
 
 	sendMotorPower(motorsPower(0, 0));
 
@@ -55,7 +47,7 @@ WheelsSpeed MobDifferencialChassis::computeSpeed(WheelsDistance distance, float 
 }
 
 void MobDifferencialChassis::changeRobotState(WheelsDistance change) {
-	double angleChange = (change.right - change.left) / chassisParam.wheelBase;
+	double angleChange = (change.right - change.left) / diffChassisParam.wheelBase;
 	double distanceChange = (change.right + change.left) / 2;
 
 	pthread_mutex_lock(&stateMutex);
@@ -70,11 +62,11 @@ void MobDifferencialChassis::changeRobotState(WheelsDistance change) {
 }
 
 Encoders MobDifferencialChassis::getChangeOfEncoders() {
-	return encoder->getChangeOfEncoders();
+	return diffChassisParam.encoder->getChangeOfEncoders();
 }
 
 int MobDifferencialChassis::sendMotorPower(struct motorsPower speedMotors) {
-	return driver->setMotorsPower(speedMotors);
+	return diffChassisParam.driver->setMotorsPower(speedMotors);
 }
 
 motorsPower MobDifferencialChassis::PIRegulator(WheelsSpeed actualSpeed, WheelsSpeed desireSpeed) {
@@ -87,8 +79,8 @@ motorsPower MobDifferencialChassis::PIRegulator(WheelsSpeed actualSpeed, WheelsS
 
 	// set in boundaries
 	motorsPower speedMotors;
-	speedMotors.left = basic_robotic_fce::valueInRange<int>(speedLeft, MAX_MOTOR_SPEED);
-	speedMotors.right = basic_robotic_fce::valueInRange<int>(speedRight, MAX_MOTOR_SPEED);
+	speedMotors.left = basic_robotic_fce::valueInRange<int>(speedLeft, diffChassisParam.driver->getMaxPower());
+	speedMotors.right = basic_robotic_fce::valueInRange<int>(speedRight, diffChassisParam.driver->getMaxPower());
 
 	return speedMotors;
 }
@@ -133,21 +125,16 @@ void* MobDifferencialChassis::updateEncodersThread(void* ThisPointer) {
 	return 0;
 }
 
-void MobDifferencialChassis::setDifferencialChassisParameters(DiffChassisParm diffChassisParm) {
-	chassisParam = diffChassisParm;
-	metersPerTick = (2 * M_PI * diffChassisParm.wheelRadius) / (double) diffChassisParm.wheelTics;
-}
-
 void MobDifferencialChassis::stop() {
 	PIRegulatorValue.integralPartLeft = 0;
 	PIRegulatorValue.integralPartRight = 0;
 	setSpeed(WheelsSpeed(0, 0));
-	driver->stop();
+	diffChassisParam.driver->stop();
 }
 
 void MobDifferencialChassis::setSpeed(WheelsSpeed speed) {
-	speed.left = basic_robotic_fce::valueInRange(speed.left, MAX_SPEED);
-	speed.right = basic_robotic_fce::valueInRange(speed.right, MAX_SPEED);
+	speed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam.maxSpeed);
+	speed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam.maxSpeed);
 
 	pthread_mutex_lock(&speedMutex);
 	desireSpeed = speed;
@@ -171,27 +158,5 @@ WheelsDistance MobDifferencialChassis::getWheelDistance() {
 }
 
 float MobDifferencialChassis::getMaxSpeed() {
-	return chassisParam.maxSpeed;
+	return diffChassisParam.maxSpeed;
 }
-
-/*
-int main(){
-				motorDriver* driver = new motorDriverSabertooth("/dev/ttyAMA0");
-	MobDifferencialChassis mobChassis("/dev/i2c-1",0x30,driver);
-        
-				Speed stop(0,0);
-	mobChassis.setSpeed(stop);
-	sleep(2);
-        
-				Speed desire(0.2f,0.2f);
-	mobChassis.setSpeed(desire);
-				sleep(5);
-				Speed back(-0.2f,-0.2f);
-				mobChassis.setSpeed(back);
-				sleep(5);
-				mobChassis.setSpeed(stop);
-				sleep(1);
-        
-	return 0;
-}
- */

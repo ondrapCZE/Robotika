@@ -8,8 +8,6 @@
 #include "../MotorDriver/motorDriver.hpp"
 #include "../Encoder/encoder.hpp"
 
-const float MAX_SPEED = 0.45f;
-
 struct Distance {
 	double left;
 	double right;
@@ -21,9 +19,6 @@ struct Distance {
 class MobDifferencialChassis : public BasicDifferencialChassis {
 	int encodersAcquireTime;
 
-	DiffChassisParm chassisParam;
-	motorDriver* driver;
-	encoderReader* encoder;
 	double metersPerTick;
 
 	PIValue PIRegulatorValue;
@@ -48,12 +43,8 @@ class MobDifferencialChassis : public BasicDifferencialChassis {
 	Encoders getChangeOfEncoders();
 	static void* updateEncodersThread(void* ThisPointer); // time in ms	
 public:
-	MobDifferencialChassis(encoderReader* encoder, motorDriver* driver);
-	//! 
-	/*!
-	\param differencialChassisParameters an struct DifferencialChassisParameters argument.
-	 */
-	void setDifferencialChassisParameters(DiffChassisParm differencialChassisParameters);
+
+	MobDifferencialChassis(const DiffChassisParam diffChassisParam);
 	//! 
 	/*!
 	\param speed an struct Speed argument.
