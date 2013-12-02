@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <vector>
+#include <algorithm>
 
 #include <sys/time.h>
 #include <pthread.h>
@@ -15,10 +16,47 @@ static const int SLEEP_TIME = 20000; // us
 static const float SPEED_STEP = 0.025f;
 
 Movement::Movement(BasicDifferencialChassis* chassis) : chassis(chassis) {
-
+	
 }
 
 void Movement::moveCircle(float diameter, float angle, direction circleDirection){
+	float shorterDiameter = diameter/2.0f - chassis->getWheelbase()/2.0f;
+	float longerDiameter = diameter/2.0f + chassis->getWheelbase()/2.0f;
+	float wheelsRatio = shorterDiameter / longerDiameter;
+	
+	WheelsDistance finalWheelsDistance = chassis->getWheelDistance();
+	switch(circleDirection){
+		case LEFT:
+			finalWheelsDistance.left += shorterDiameter*angle;
+			finalWheelsDistance.right += longerDiameter*angle;
+			break;
+		case RIGHT:
+			finalWheelsDistance.right += shorterDiameter*angle;
+			finalWheelsDistance.left += longerDiameter*angle;
+			break;
+		default:
+			break;
+	}
+	
+	float maxSpeed = SPEED_STEP;
+	WheelsDistance differenceDistance;
+	do{
+		differenceDistance = finalWheelsDistance - chassis->getWheelDistance();
+		float minDistance = std::min(differenceDistance.left, differenceDistance.right);
+		float maxDistance = std::max(differenceDistance.left, differenceDistance.right);
+		float currentRatio = minDistance / maxDistance;
+		
+		float speed = basic_robotic_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxSpeed());
+		
+		if(circleDirection == LEFT){
+			chassis->setSpeed(WheelsSpeed(currentRatio*speed, speed));
+		}else{
+			chassis->setSpeed(WheelsSpeed(speed, currentRatio*speed));
+		}
+		
+		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		usleep(SLEEP_TIME);
+	}while((std::abs(differenceDistance.left) > EPSILON_DISTANCE) || (std::abs(differenceDistance.right) > EPSILON_DISTANCE));
 	
 }
 

@@ -21,7 +21,7 @@ struct DiffChassisParam {
 
 	DiffChassisParam(float wheelBase = 0, float wheelRadius = 0, float maxSpeed = 0,
 		float reductionRatio = 0, unsigned int wheelTics = 0, encoderReader* encoder = NULL,
-		motorDriver* driver = NULL) : wheelBase(wheelBase), wheelRadius(wheelRadius),
+		motorDriver* driver = NULL) : wheelbase(wheelbase), wheelRadius(wheelRadius),
 	maxSpeed(maxSpeed), reductionRatio(reductionRatio), wheelTics(wheelTics),
 	encoder(encoder), driver(driver) {
 	};
@@ -43,6 +43,11 @@ struct WheelsDistance {
 	float right;
 
 	WheelsDistance(float left = 0, float right = 0) : left(left), right(right) {
+	};
+	
+	WheelsDistance operator-(WheelsDistance ob2) {
+		WheelsDistance temp(left - ob2.left, right - ob2.right);
+		return temp;
 	};
 };
 

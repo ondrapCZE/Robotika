@@ -47,7 +47,7 @@ WheelsSpeed MobDifferencialChassis::computeSpeed(WheelsDistance distance, float 
 }
 
 void MobDifferencialChassis::changeRobotState(WheelsDistance change) {
-	double angleChange = (change.right - change.left) / diffChassisParam.wheelBase;
+	double angleChange = (change.right - change.left) / diffChassisParam.wheelbase;
 	double distanceChange = (change.right + change.left) / 2;
 
 	pthread_mutex_lock(&stateMutex);
