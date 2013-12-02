@@ -18,27 +18,8 @@ Movement::Movement(BasicDifferencialChassis* chassis) : chassis(chassis) {
 
 }
 
-void Movement::rotate(float angle) {
-	finalState = chassis->getState();
-	finalState.angle += angle;
-
-	State chassisState = chassis->getState();
-	float angleDifference = chassisState.angle - finalState.angle;
-	float maxSpeed = SPEED_STEP;
-	//printf("Angle difference: %f epsilon: %f \n", angleDifference, EPSILON_ANGLE);
-	while (std::abs(angleDifference) > EPSILON_ANGLE) {
-		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
-
-		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
-		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
-
-		chassisState = chassis->getState();
-		angleDifference = chassisState.angle - finalState.angle;
-
-		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
-
-		usleep(SLEEP_TIME);
-	}
+void Movement::moveCircle(float diameter, float angle, direction circleDirection){
+	
 }
 
 void Movement::moveStraight(float meter) {
@@ -72,3 +53,25 @@ void Movement::moveStraight(float meter) {
 	}
 }
 
+void Movement::rotate(float angle) {
+	finalState = chassis->getState();
+	finalState.angle += angle;
+
+	State chassisState = chassis->getState();
+	float angleDifference = chassisState.angle - finalState.angle;
+	float maxSpeed = SPEED_STEP;
+	//printf("Angle difference: %f epsilon: %f \n", angleDifference, EPSILON_ANGLE);
+	while (std::abs(angleDifference) > EPSILON_ANGLE) {
+		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
+
+		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
+		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
+
+		chassisState = chassis->getState();
+		angleDifference = chassisState.angle - finalState.angle;
+
+		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+
+		usleep(SLEEP_TIME);
+	}
+}

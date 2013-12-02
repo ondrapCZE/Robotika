@@ -10,7 +10,7 @@
  * struct DifferencialChassisParameters serve for setting basic parameters.
  */
 struct DiffChassisParam {
-	float wheelBase;
+	float wheelbase;
 	float wheelRadius;
 	float maxSpeed;
 	float reductionRatio;
@@ -91,7 +91,8 @@ public:
 	 */
 	virtual WheelsDistance getWheelDistance() = 0;
 
-	virtual float getMaxSpeed() = 0;
+	virtual float getMaxSpeed(){ return diffChassisParam.maxSpeed; };
+	virtual float getWheelbase(){ return diffChassisParam.wheelbase; };
 };
 
 #endif

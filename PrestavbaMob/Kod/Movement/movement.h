@@ -3,6 +3,11 @@
 
 #include "../DifferencialniPodvozek/mobDifferencialChassis.h"
 
+enum direction{
+	LEFT,
+	RIGHT
+};
+
 class Movement {
 private:
 	BasicDifferencialChassis* chassis;
@@ -10,6 +15,7 @@ private:
 public:
 	Movement(BasicDifferencialChassis* chassis);
 
+	void moveCircle(float diameter, float angle, direction circleDirection);
 	void moveStraight(float meter);
 	void rotate(float angle);
 };
