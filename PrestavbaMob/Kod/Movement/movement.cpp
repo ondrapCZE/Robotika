@@ -45,6 +45,7 @@ void Movement::moveCircle(float diameter, float angle, direction circleDirection
 		float minDistance = std::min(differenceDistance.left, differenceDistance.right);
 		float maxDistance = std::max(differenceDistance.left, differenceDistance.right);
 		float currentRatio = minDistance / maxDistance;
+		//printf("Current ratio: %f Default ratio: %f \n\r", currentRatio, wheelsRatio);
 		
 		float speed = basic_robotic_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxSpeed());
 		

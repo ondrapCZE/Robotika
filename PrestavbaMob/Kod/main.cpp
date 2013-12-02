@@ -18,7 +18,9 @@ int main(){
 	MobDifferencialChassis mobChassis(chassisParam);
 	Movement basic(&mobChassis);
 	
-	basic.moveCircle(1.0,M_PI,LEFT);
+	for(float diameter = 1.0; diameter >= -0.001f; diameter -= 0.1f){
+		basic.moveCircle(diameter,2*M_PI,RIGHT);
+	}
 	/*
 	for (int i = 0; i < 4; ++i) {
 		//printf("Move forward \n\r\n\r");
