@@ -10,7 +10,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 
-static const float EPSILON_ANGLE = M_PI / 720.0f;
+static const float EPSILON_ANGLE = M_PI / 360.0f;
 static const float EPSILON_DISTANCE = 0.01f;
 static const int SLEEP_TIME = 20000; // us
 static const float SPEED_STEP = 0.025f;
@@ -69,7 +69,7 @@ void Movement::moveStraight(float meter) {
 	float differenceLeft = meter;
 	float differenceRight = meter;
 	float maxSpeed = SPEED_STEP;
-	while ((std::abs(differenceLeft) > EPSILON_DISTANCE) || (std::abs(differenceRight) > EPSILON_DISTANCE)) {
+	while (hypot(differenceLeft,differenceRight) > EPSILON_DISTANCE) {
 		WheelsDistance wheelDistance = chassis->getWheelDistance();
 		differenceLeft = finalWheelDistance.left - wheelDistance.left;
 		differenceRight = finalWheelDistance.right - wheelDistance.right;
@@ -87,7 +87,7 @@ void Movement::moveStraight(float meter) {
 
 		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 
-		printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
+		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
 		usleep(SLEEP_TIME);
 	}
 }
@@ -103,7 +103,7 @@ void Movement::rotate(float angle) {
 	while (std::abs(angleDifference) > EPSILON_ANGLE) {
 		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 
-		printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
+		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
 
 		chassisState = chassis->getState();

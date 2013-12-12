@@ -1,7 +1,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 
 #define RS_PIN 	0

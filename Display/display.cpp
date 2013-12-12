@@ -92,7 +92,7 @@ bool Display::init(){
 
 bool Display::clearDisplay(){
 	bool result = writeDisplay(CLEAR_DISPLAY, commandMode);
-	usleep(200);
+	usleep(2000);
 	return result;
 }
 
@@ -172,6 +172,7 @@ unsigned int Display::writeText(std::string text){
 	return index;
 }
 
+/*
 int main(){
 	Display display("/dev/i2c-1");	
 	
@@ -183,3 +184,5 @@ int main(){
 
 	return 0;
 }
+*/
+

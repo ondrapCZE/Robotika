@@ -4,8 +4,14 @@
 #include "DifferencialniPodvozek/mobDifferencialChassis.h"
 #include "Encoder/encoderAtmel.hpp"
 #include "Movement/movement.h"
+#include "../../Display/display.h"
 
-int main(){		
+int main(){
+	// Init display 
+	Display display("/dev/i2c-1");	
+	display.init();
+	display.writeText("Start move");
+	
 	// Default value for Mob
 	DiffChassisParam chassisParam;
 	chassisParam.wheelbase = 0.233f;
@@ -17,7 +23,6 @@ int main(){
 	
 	MobDifferencialChassis mobChassis(chassisParam);
 	Movement basic(&mobChassis);
-	
 	/*
 	for(float diameter = 1.0; diameter >= -0.001f; diameter -= 0.1f){
 		basic.moveCircle(diameter,2*M_PI,RIGHT);
@@ -26,8 +31,12 @@ int main(){
 	
 	for (int i = 0; i < 4; ++i) {
 		//printf("Move forward \n\r\n\r");
+		display.clearDisplay();
+		display.writeText("Move straight");
 		basic.moveStraight(0.7f);
 		//printf("Rotate \n\r\n\r");
+		display.clearDisplay();
+		display.writeText("Rotate");
 		basic.rotate(M_PI_2);
 	}
 	
