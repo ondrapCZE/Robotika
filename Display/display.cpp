@@ -173,12 +173,12 @@ unsigned int Display::writeText(std::string text){
 }
 
 int main(){
-	Display display("/dev/i2c-0");	
+	Display display("/dev/i2c-1");	
 	
 	display.init();
-	std::string text = "       Miluji       ";
+	std::string text = "     Jmenuji se     ";
 	display.writeText(text);
-	std::string text2 = "         te!       ";
+	std::string text2 = "         Mob       ";
 	display.writeText(text2);
 
 	return 0;

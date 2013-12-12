@@ -87,7 +87,7 @@ void Movement::moveStraight(float meter) {
 
 		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 
-		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
+		printf("Wheel distance [%f,%f], speed[%f,%f] \n", differenceLeft, differenceRight, speedLeft, speedRight);
 		usleep(SLEEP_TIME);
 	}
 }
@@ -103,7 +103,7 @@ void Movement::rotate(float angle) {
 	while (std::abs(angleDifference) > EPSILON_ANGLE) {
 		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 
-		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
+		printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
 
 		chassisState = chassis->getState();

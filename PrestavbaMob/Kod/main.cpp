@@ -10,7 +10,7 @@ int main(){
 	DiffChassisParam chassisParam;
 	chassisParam.wheelbase = 0.233f;
 	chassisParam.wheelRadius = 0.0531f;
-	chassisParam.maxSpeed = 0.5f;
+	chassisParam.maxSpeed = 0.45f;
 	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
 	chassisParam.driver = new motorDriverSabertooth("/dev/ttyAMA0");
 	chassisParam.encoder = new encoderAtmel("/dev/i2c-1", 0x30);
@@ -18,18 +18,19 @@ int main(){
 	MobDifferencialChassis mobChassis(chassisParam);
 	Movement basic(&mobChassis);
 	
+	/*
 	for(float diameter = 1.0; diameter >= -0.001f; diameter -= 0.1f){
 		basic.moveCircle(diameter,2*M_PI,RIGHT);
 	}
-	/*
+	*/
+	
 	for (int i = 0; i < 4; ++i) {
 		//printf("Move forward \n\r\n\r");
 		basic.moveStraight(0.7f);
 		//printf("Rotate \n\r\n\r");
 		basic.rotate(M_PI_2);
 	}
-	*/
-
+	
 
 	//basic.moveStraight(1.0f);
 	//basic.rotate(2*M_PI);
