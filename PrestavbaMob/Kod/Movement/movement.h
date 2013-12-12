@@ -15,9 +15,9 @@ private:
 public:
 	Movement(BasicDifferencialChassis* chassis);
 
-	void moveCircle(float diameter, float angle, direction circleDirection);
-	void moveStraight(float meter);
-	void rotate(float angle);
+	void moveCircle(float diameter, float angle, direction circleDirection, float outSpeed = 0);
+	void moveStraight(float meter, float outSpeed = 0);
+	void rotate(float angle, float outSpeed = 0);
 };
 
 #endif

@@ -33,11 +33,11 @@ int main(){
 		//printf("Move forward \n\r\n\r");
 		display.clearDisplay();
 		display.writeText("Move straight");
-		basic.moveStraight(0.7f);
+		basic.moveStraight(0.7f,0.1);
 		//printf("Rotate \n\r\n\r");
 		display.clearDisplay();
 		display.writeText("Rotate");
-		basic.rotate(M_PI_2);
+		basic.rotate(M_PI_2,0.1);
 	}
 	
 
