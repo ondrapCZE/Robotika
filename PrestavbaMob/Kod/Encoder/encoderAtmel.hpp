@@ -1,9 +1,10 @@
 #ifndef ENCODER_ATMEL_H
 #define ENCODER_ATMEL_H
 
-#include "encoder.hpp"
-
 #include <string>
+#include <unistd.h>
+
+#include "encoder.hpp"
 
 class encoderAtmel : public encoderReader {
 	static const unsigned int BUFFER_SIZE = 5;

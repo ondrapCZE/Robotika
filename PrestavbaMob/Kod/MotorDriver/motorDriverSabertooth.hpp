@@ -2,6 +2,7 @@
 #define MOTOR_DRIVER_SABERTOOTH_H
 
 #include <termios.h> /* POSIX terminal control definitions */
+#include <unistd.h>
 
 #include "motorDriver.hpp"
 

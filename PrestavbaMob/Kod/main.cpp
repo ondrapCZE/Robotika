@@ -5,6 +5,7 @@
 #include "Encoder/encoderAtmel.hpp"
 #include "Movement/movement.h"
 #include "../../Display/display.h"
+#include "../../obecne/tsqueue.hpp"
 
 int main(){
 	// Init display 
