@@ -13,21 +13,24 @@ struct Vector{
 };
 
 struct VectorCheckpoint{
+	const bool outVectorAssig;
 	Position checkpoint;
 	Vector outVector;
 	
+	VectorState(Position checkpoint) : checkpoint(checkpoint), 
+	outVectorAssig(false){};
+	
 	VectorState(Position checkpoint, Vector outVector) : checkpoint(checkpoint), 
-	outVector(outVector) {};
+	outVector(outVector), outVectorAssig(true){};
 };
 
-virtual class stateMovement{
+class stateMovement{
 public:
-	void addCheckpoint(const VectorCheckpoint &checkpoint);
-	void addCheckpoint(const std::vector<VectorCheckpoint> &checkpoints);
+	virtual void addCheckpoint(const VectorCheckpoint &checkpoint)=0;
+	virtual void addCheckpoint(const std::vector<VectorCheckpoint> &checkpoints)=0;
 	
-	State getActualState();
-	void clear();
-	unsigned int size();
+	virtual State getActualState()=0;
+	virtual void clearCheckpoints()=0;
 };
 
 #endif
