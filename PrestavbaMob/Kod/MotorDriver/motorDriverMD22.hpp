@@ -3,6 +3,7 @@
 // int motorsAddress = 0x58 for mob md22
 
 #include "motorDriver.hpp"
+#include <unistd.h>  /* UNIX standard function definitions */
 
 class motorDriverMD22 : public motorDriver {
 	static const unsigned int MAX_POWER = 127;

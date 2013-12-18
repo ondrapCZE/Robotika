@@ -2,7 +2,9 @@
 #define DIFFERENCIAL_CHASSIS_H
 
 #include <string>
-#include <pthread.h>
+#include <thread>
+#include <mutex>
+#include <atomic>
 
 #include "basicDifferencialChassis.h"
 #include "../MotorDriver/motorDriver.hpp"
@@ -17,8 +19,6 @@ struct Distance {
 };
 
 class MobDifferencialChassis : public BasicDifferencialChassis {
-	int encodersAcquireTime;
-
 	double metersPerTick;
 
 	PIValue PIRegulatorValue;
@@ -26,11 +26,12 @@ class MobDifferencialChassis : public BasicDifferencialChassis {
 	State robotState;
 	WheelsDistance wheelDistance;
 	WheelsSpeed desireSpeed;
+	
+	std::atomic<bool> end;
+	std::thread loopPidThread;
 
-	pthread_t updateEncodersThreadHandler;
-
-	pthread_mutex_t stateMutex;
-	pthread_mutex_t speedMutex;
+	std::mutex stateMutex;
+	std::mutex speedMutex;
 
 	WheelsDistance computeDistance(Encoders distance);
 	WheelsSpeed computeSpeed(WheelsDistance distance, float time); // distance in m and time in sec
@@ -41,7 +42,7 @@ class MobDifferencialChassis : public BasicDifferencialChassis {
 	motorsPower PIRegulator(WheelsSpeed actualSpeed, WheelsSpeed desireSpeed);
 
 	Encoders getChangeOfEncoders();
-	static void* updateEncodersThread(void* ThisPointer); // time in ms	
+	void updateEncoders(const int period); // time in ms	
 public:
 
 	MobDifferencialChassis(const DiffChassisParam diffChassisParam);
@@ -61,6 +62,8 @@ public:
 	WheelsDistance getWheelDistance();
 
 	float getMaxSpeed();
+	
+	~MobDifferencialChassis();
 };
 
 #endif

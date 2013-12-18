@@ -1,11 +1,13 @@
 #include "display.h"
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
+#include <thread>
 
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #include <fcntl.h>
+#include <unistd.h>  /* UNIX standard function definitions */
 #include <linux/i2c-dev.h>
 
 Display::Display(std::string I2CName){
@@ -66,16 +68,16 @@ bool Display::writeChar(char character){
 bool Display::init(){
 	if(!writeDisplay4bit(0x03, commandMode))
 		return false;
-	usleep(4300);
+	std::this_thread::sleep_for(std::chrono::microseconds(4300));
 	if(!writeDisplay4bit(0x03, commandMode))
 		return false;
-	usleep(200);
+	std::this_thread::sleep_for(std::chrono::microseconds(200));
 	if(!writeDisplay4bit(0x03, commandMode))
 		return false;
-	usleep(200);	
+	std::this_thread::sleep_for(std::chrono::microseconds(200));
 	if(!writeDisplay4bit(0x02, commandMode))
 		return false;
-	usleep(200);
+	std::this_thread::sleep_for(std::chrono::microseconds(200));
 	// now display is set to 4bit interface and backlight is turn on
 
 	functionSet(false,true,false);
@@ -92,13 +94,13 @@ bool Display::init(){
 
 bool Display::clearDisplay(){
 	bool result = writeDisplay(CLEAR_DISPLAY, commandMode);
-	usleep(2000);
+	std::this_thread::sleep_for(std::chrono::microseconds(2000));
 	return result;
 }
 
 bool Display::returnHome(){
 	bool result = writeDisplay(RETURN_HOME, commandMode);
-	usleep(2000);
+	std::this_thread::sleep_for(std::chrono::microseconds(2000));
 	return result;
 }
 

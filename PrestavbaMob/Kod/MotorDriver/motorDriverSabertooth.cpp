@@ -32,6 +32,8 @@ motorDriverSabertooth::motorDriverSabertooth(const std::string device) {
 	termiosSerialParams.c_cflag |= (CLOCAL | CREAD);
 
 	tcsetattr(serialDevice, TCSANOW, &termiosSerialParams);
+	
+	stop();
 }
 
 std::string motorDriverSabertooth::getName() {

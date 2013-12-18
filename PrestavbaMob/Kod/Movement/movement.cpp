@@ -6,9 +6,9 @@
 #include <cmath>
 #include <vector>
 #include <algorithm>
+#include <thread>
 
 #include <sys/time.h>
-#include <pthread.h>
 
 static const float EPSILON_ANGLE = M_PI / 360.0f;
 static const float EPSILON_DISTANCE = 0.01f;
@@ -58,7 +58,7 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 		}
 		
 		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
-		usleep(SLEEP_TIME);
+		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}while(hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 	
 }
@@ -88,7 +88,7 @@ void Movement::moveStraight(const float &meter){
 		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 
 		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", difference.left, difference.right, speedLeft, speedRight);
-		usleep(SLEEP_TIME);
+		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}while (hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 }
 
@@ -112,6 +112,6 @@ void Movement::rotate(const float &angle){
 		// create increased ramp
 		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 
-		usleep(SLEEP_TIME);
+		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}
 }

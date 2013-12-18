@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 
 #include "MotorDriver/motorDriverSabertooth.hpp"
 #include "DifferencialniPodvozek/mobDifferencialChassis.h"
@@ -46,7 +47,5 @@ int main(){
 	//basic.rotate(2*M_PI);
 
 	mobChassis.stop();
-	usleep(1000000);
-
 	return 0;
 }
