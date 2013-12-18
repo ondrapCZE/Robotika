@@ -23,14 +23,14 @@ public:
 		if(dataDeque.empty())
 			return false;
 		
-		element = dataDeque.front();
+		element = std::move(dataDeque.front());
 		dataDeque.pop_front();
 		return true;
 	}
 	
 	T pop(){
 		std::unique_lock<std::mutex> uq_lck(lck);
-		emptyCondition.wait(uq_lck,[](){return !dataDeque.empty();});
+		emptyCondition.wait(uq_lck,[this]{return !dataDeque.empty();});
 		T copy = dataDeque.front();
 		dataDeque.pop_front();
 		return copy;

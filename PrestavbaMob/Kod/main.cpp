@@ -4,15 +4,15 @@
 #include "MotorDriver/motorDriverSabertooth.hpp"
 #include "DifferencialniPodvozek/mobDifferencialChassis.h"
 #include "Encoder/encoderAtmel.hpp"
-#include "Movement/movement.h"
+//#include "Movement/movement.h"
 #include "../../Display/display.h"
-#include "../../obecne/tsqueue.hpp"
+#include "Movement/checkpointMovementHermit.hpp"
 
 int main(){
 	// Init display 
 	Display display("/dev/i2c-1");	
 	display.init();
-	display.writeText("Start move");
+	display.writeText("Start program");
 	
 	// Default value for Mob
 	DiffChassisParam chassisParam;
@@ -24,13 +24,15 @@ int main(){
 	chassisParam.encoder = new encoderAtmel("/dev/i2c-1", 0x30);
 	
 	MobDifferencialChassis mobChassis(chassisParam);
-	Movement basic(&mobChassis);
-	/*
-	for(float diameter = 1.0; diameter >= -0.001f; diameter -= 0.1f){
-		basic.moveCircle(diameter,2*M_PI,RIGHT);
-	}
-	*/
+	checkpointMovementHermit basic(&mobChassis);
 	
+	basic.addCheckpoint(Checkpoint(Position(1,2)));
+	basic.addCheckpoint(Checkpoint(Position(3,4)));
+	basic.addCheckpoint(Checkpoint(Position(5,6)));
+	basic.addCheckpoint(Checkpoint(Position(7,8)));
+	basic.addCheckpoint(Checkpoint(Position(9,10)));
+	
+	/*
 	for (int i = 0; i < 4; ++i) {
 		//printf("Move forward \n\r\n\r");
 		display.clearDisplay();
@@ -41,11 +43,12 @@ int main(){
 		display.writeText("Rotate");
 		basic.rotate(M_PI_2);
 	}
-	
+	*/
 
 	//basic.moveStraight(1.0f);
 	//basic.rotate(2*M_PI);
 
 	mobChassis.stop();
+	std::this_thread::sleep_for(std::chrono::seconds(5));
 	return 0;
 }

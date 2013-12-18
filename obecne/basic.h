@@ -21,7 +21,7 @@ struct Position {
 	double x;
 	double y;
 
-	Position(double x = 0, double y = 0) : x(y), y(y){
+	Position(double x = 0, double y = 0) : x(x), y(y){
 	};
 };
 
