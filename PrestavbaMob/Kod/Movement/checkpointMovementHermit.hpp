@@ -2,6 +2,7 @@
 #define CHECKPOINT_MOVEMENT_H
 
 #include <thread>
+#include <atomic>
 
 #include "../DifferencialniPodvozek/basicDifferencialChassis.h"
 #include "checkpointMovement.hpp"
@@ -11,6 +12,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	tsqueue<Checkpoint> checkpointsQueue;
 	BasicDifferencialChassis* chassis;
 	
+	std::atomic<bool> end;
 	std::thread moveToCheckpointsThread;
 	
 	void moveToCheckpoints();
@@ -21,6 +23,7 @@ public:
 	
 	State getActualState();
 	void clearCheckpoints();
+	~checkpointMovementHermit();
 };
 
 #endif

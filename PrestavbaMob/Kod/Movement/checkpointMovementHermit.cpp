@@ -2,7 +2,7 @@
 #include <iostream>
 
 void checkpointMovementHermit::moveToCheckpoints() {
-	while(true){
+	while(!end){
 		Checkpoint checkpoint;
 		if(checkpointsQueue.tryPop(checkpoint)){
 			std::cout << checkpoint.position.x << "," << checkpoint.position.y << std::endl;
@@ -14,6 +14,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 
 
 checkpointMovementHermit::checkpointMovementHermit(BasicDifferencialChassis* chassis) : chassis(chassis) {
+	end = false;
 	moveToCheckpointsThread = std::move(std::thread(&checkpointMovementHermit::moveToCheckpoints,this));
 }
 
@@ -33,4 +34,9 @@ State checkpointMovementHermit::getActualState(){
 
 void checkpointMovementHermit::clearCheckpoints(){
 	checkpointsQueue.clear();
+}
+
+checkpointMovementHermit::~checkpointMovementHermit(){
+	end = true;
+	moveToCheckpointsThread.join();
 }

@@ -4,7 +4,7 @@
 #include "MotorDriver/motorDriverSabertooth.hpp"
 #include "DifferencialniPodvozek/mobDifferencialChassis.h"
 #include "Encoder/encoderAtmel.hpp"
-//#include "Movement/movement.h"
+#include "Movement/movement.h"
 #include "../../Display/display.h"
 #include "Movement/checkpointMovementHermit.hpp"
 
@@ -24,6 +24,7 @@ int main(){
 	chassisParam.encoder = new encoderAtmel("/dev/i2c-1", 0x30);
 	
 	MobDifferencialChassis mobChassis(chassisParam);
+	//Movement basic(&mobChassis);
 	checkpointMovementHermit basic(&mobChassis);
 	
 	basic.addCheckpoint(Checkpoint(Position(1,2)));
