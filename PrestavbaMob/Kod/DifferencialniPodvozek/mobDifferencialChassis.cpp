@@ -119,7 +119,7 @@ void MobDifferencialChassis::updateEncoders(const int period) {
 		long int sleepMicro = period * 1000 - (microStop - microStart);
 		lastMicroTime = microStart;
 
-		printf("Usleep time: %li \n\r", sleepMicro);
+		//printf("Usleep time: %li \n\r", sleepMicro);
 		std::this_thread::sleep_for(std::chrono::microseconds(sleepMicro));
 	}
 }

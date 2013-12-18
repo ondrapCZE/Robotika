@@ -30,7 +30,7 @@ public:
 	
 	T pop(){
 		std::unique_lock<std::mutex> uq_lck(lck);
-		emptyCondition.wait(uq_lck,[bool](){return !dataDeque.empty();});
+		emptyCondition.wait(uq_lck,[](){return !dataDeque.empty();});
 		T copy = dataDeque.front();
 		dataDeque.pop_front();
 		return copy;
