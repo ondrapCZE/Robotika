@@ -49,6 +49,6 @@ int main(){
 	//basic.rotate(2*M_PI);
 	
 	mobChassis.stop();
-	std::this_thread::sleep_for(std::chrono::seconds(2));
+	std::this_thread::sleep_for(std::chrono::seconds(2000));
 	return 0;
 }

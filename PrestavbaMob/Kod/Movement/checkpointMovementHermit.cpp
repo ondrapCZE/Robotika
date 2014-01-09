@@ -27,12 +27,12 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 	State actualState = chassis->getState();
 	float distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);
 	while(distance > epsilon){
-		float inter = distance * pointsOnMeter;
+		float inter = 1 / (distance * pointsOnMeter); // TODO: better calculation
 		float speed = chassis->getSpeed();
 		
 		Checkpoint actual(Position(actualState.x,actualState.y),Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
 		Position positionHermit = calculatePointHermit(actual,target,inter);
-		printf("%f %f;\n",positionHermit.x,positionHermit.y);
+		printf("Hermit curve point [%f,%f]\n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
 		
 		actualState = chassis->getState();
@@ -46,22 +46,18 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 	float angle = basic_robotic_fce::angle(Position(actualState.x,actualState.y),target);
 	float angleDistance = (angle*chassis->getWheelbase())/2.0f;
 	
-	WheelsDistance difference = (distance-angleDistance,distance+angleDistance);
+	WheelsDistance difference(distance-angleDistance,distance+angleDistance);
 	WheelsDistance finale = chassis->getWheelDistance() + difference;
 	while(hypot(difference.left,difference.right) > epsilon){		
-		if(abs(difference.left) > abs(difference.right)){
-			float ratio = difference.left/difference.right;
-			chassis->setSpeed(chassis->getMaxSpeed(),chassis->getMaxSpeed()*ratio);
-		}else{
-			float ratio = difference.right/difference.left;
-			chassis->setSpeed(chassis->getMaxSpeed()*ratio,chassis->getMaxSpeed());
-		}
-		
+
+
 		difference = finale - chassis->getWheelDistance();
+		printf("Actual difference [%f,%f]\n", difference.left, difference.right);
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
 }
 
-
+// TODO: calculate output vector for checkpoint
 void checkpointMovementHermit::moveToCheckpoints() {
 	Checkpoint last;
 	Checkpoint target;

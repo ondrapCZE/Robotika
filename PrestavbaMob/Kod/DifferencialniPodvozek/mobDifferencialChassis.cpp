@@ -26,7 +26,7 @@ MobDifferencialChassis::MobDifferencialChassis(const DiffChassisParam diffChassi
 	PIRegulatorValue.I = 12;
 
 	//encodersAcquireTime = 10; // every x ms
-	loopPidThread = std::move(std::thread(&MobDifferencialChassis::updateEncoders,this,10));
+	loopPidThread = std::move(std::thread(&MobDifferencialChassis::updateEncoders,this,5));
 	//pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
