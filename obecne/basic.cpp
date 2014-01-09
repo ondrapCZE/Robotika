@@ -1,12 +1,13 @@
-#include "basic.h"
 #define _USE_MATH_DEFINES
 #include <cmath>
+
+#include "basic.h"
 
 //basic_robotic_fce::randn_notrig(double Mu, double Sigma){
 //
 //}
 
-inline double basic_robotic_fce::normAngle(double Angle) {
+double basic_robotic_fce::normAngle(double Angle) {
 	while (Angle > M_PI)
 		Angle -= 2 * M_PI;
 
@@ -14,6 +15,18 @@ inline double basic_robotic_fce::normAngle(double Angle) {
 		Angle += 2 * M_PI;
 
 	return Angle;
+}
+
+double basic_robotic_fce::angle(const Position start, const Position end){
+	double diffY = end.y - start.y;
+	double diffX = end.x - start.x;
+	double angle = diffY / hypot(diffX,diffY);
+	
+	if(diffX < 0){
+		angle = M_PI - angle;
+	}
+	
+	return angle;
 }
 
 // algorithm from avr lib

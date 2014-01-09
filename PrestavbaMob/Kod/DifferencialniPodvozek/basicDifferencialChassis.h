@@ -45,7 +45,12 @@ struct WheelsDistance {
 	WheelsDistance(float left = 0, float right = 0) : left(left), right(right) {
 	};
 	
-	WheelsDistance operator-(WheelsDistance ob2) {
+	WheelsDistance operator+(const WheelsDistance &ob2) const {
+		WheelsDistance temp(left + ob2.left, right + ob2.right);
+		return temp;
+	};
+	
+	WheelsDistance operator-(const WheelsDistance &ob2) const{
 		WheelsDistance temp(left - ob2.left, right - ob2.right);
 		return temp;
 	};
@@ -83,6 +88,7 @@ public:
 	 */
 	virtual void stop() = 0;
 	virtual void setSpeed(const WheelsSpeed speed) = 0;
+	virtual void setSpeed(const float left, const float right){ setSpeed(WheelsSpeed(left,right)); };
 	//! A pure virtual member.
 	/*!
 	\return actual state of the chassis

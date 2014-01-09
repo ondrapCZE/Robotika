@@ -28,18 +28,44 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 	float distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);
 	while(distance > epsilon){
 		float inter = distance * pointsOnMeter;
-
-		Checkpoint actual(Position(actualState.x,actualState.y),Vector());
-		Position positionHermit = calculatePointHermit(actual,target,inter); 
-	
+		float speed = chassis->getSpeed();
+		
+		Checkpoint actual(Position(actualState.x,actualState.y),Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
+		Position positionHermit = calculatePointHermit(actual,target,inter);
+		printf("%f %f;\n",positionHermit.x,positionHermit.y);
+		moveToPosition(positionHermit);
+		
 		actualState = chassis->getState();
 		distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);;
 	}
 }
 
+void checkpointMovementHermit::moveToPosition(const Position& target){
+	State actualState = chassis->getState();
+	float distance = hypot(target.x - actualState.x, target.y - actualState.y);
+	float angle = basic_robotic_fce::angle(Position(actualState.x,actualState.y),target);
+	float angleDistance = (angle*chassis->getWheelbase())/2.0f;
+	
+	WheelsDistance difference = (distance-angleDistance,distance+angleDistance);
+	WheelsDistance finale = chassis->getWheelDistance() + difference;
+	while(hypot(difference.left,difference.right) > epsilon){		
+		if(abs(difference.left) > abs(difference.right)){
+			float ratio = difference.left/difference.right;
+			chassis->setSpeed(chassis->getMaxSpeed(),chassis->getMaxSpeed()*ratio);
+		}else{
+			float ratio = difference.right/difference.left;
+			chassis->setSpeed(chassis->getMaxSpeed()*ratio,chassis->getMaxSpeed());
+		}
+		
+		difference = finale - chassis->getWheelDistance();
+	}
+}
+
+
 void checkpointMovementHermit::moveToCheckpoints() {
+	Checkpoint last;
+	Checkpoint target;
 	while(!end){
-		Checkpoint target;
 		if(checkpointsQueue.tryPop(target)){
 			std::cout << target.position.x << "," << target.position.y << std::endl;
 			moveToCheckpoint(target);
