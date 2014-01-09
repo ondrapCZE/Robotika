@@ -16,7 +16,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	std::thread moveToCheckpointsThread;
 	
 	const float epsilon = 0.01;
-	const unsigned int pointsOnMeter = 20; 
+	const unsigned int pointsOnMeter = 10; 
 	
 	Vector calculateOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness = 0.5f);
 	Position calculatePointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);

@@ -47,17 +47,17 @@ struct Position {
 	Position(double x = 0, double y = 0) : x(x), y(y){
 	};
 	
-	Position operator-(const Position ob2) const{
+	Position operator-(const Position &ob2) const{
 		Position temp(x - ob2.x, y - ob2.y);
 		return temp;
 	};
 	
-	Position operator+(const Position ob2) const{
+	Position operator+(const Position &ob2) const{
 		Position temp(x + ob2.x, y + ob2.y);
 		return temp;
 	};
 	
-	Position operator+(const Vector ob2) const{
+	Position operator+(const Vector &ob2) const{
 		Position temp(x + ob2.x, y + ob2.y);
 		return temp;
 	};

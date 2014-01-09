@@ -23,8 +23,17 @@ public:
 		if(dataDeque.empty())
 			return false;
 		
-		element = std::move(dataDeque.front());
+		element = dataDeque.front();
 		dataDeque.pop_front();
+		return true;
+	}
+	
+	bool tryFront(T &element){
+		std::lock_guard<std::mutex> guard(lck);		
+		if(dataDeque.empty())
+			return false;
+		
+		element = std::move(dataDeque.front());
 		return true;
 	}
 	
