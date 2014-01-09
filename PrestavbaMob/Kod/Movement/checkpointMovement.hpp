@@ -5,13 +5,6 @@
 
 #include "../../../obecne/basic.h"
 
-struct Vector{
-	double x;
-	double y;
-	
-	Vector(double x=0, double y=0) : x(x), y(y){};
-};
-
 struct Checkpoint{
 	bool outVectorAssig;
 	Position position;

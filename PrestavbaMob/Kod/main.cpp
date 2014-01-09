@@ -27,11 +27,10 @@ int main(){
 	//Movement basic(&mobChassis);
 	checkpointMovementHermit basic(&mobChassis);
 	
-	basic.addCheckpoint(Checkpoint(Position(1,2)));
-	basic.addCheckpoint(Checkpoint(Position(3,4)));
-	basic.addCheckpoint(Checkpoint(Position(5,6)));
-	basic.addCheckpoint(Checkpoint(Position(7,8)));
-	basic.addCheckpoint(Checkpoint(Position(9,10)));
+	basic.addCheckpoint(Checkpoint(Position(1,0)));
+	basic.addCheckpoint(Checkpoint(Position(1,1)));
+	basic.addCheckpoint(Checkpoint(Position(0,1)));
+	basic.addCheckpoint(Checkpoint(Position(0,0)));
 	
 	/*
 	for (int i = 0; i < 4; ++i) {
@@ -45,11 +44,12 @@ int main(){
 		basic.rotate(M_PI_2);
 	}
 	*/
-
-	//basic.moveStraight(1.0f);
-	//basic.rotate(2*M_PI);
-
+	/*
+	basic.moveStraight(1.0f);
+	basic.rotate(2*M_PI);
+	*/
+	
 	mobChassis.stop();
-	std::this_thread::sleep_for(std::chrono::seconds(5));
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 	return 0;
 }

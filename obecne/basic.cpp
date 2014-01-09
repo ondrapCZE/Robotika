@@ -6,7 +6,7 @@
 //
 //}
 
-double basic_robotic_fce::normAngle(double Angle) {
+inline double basic_robotic_fce::normAngle(double Angle) {
 	while (Angle > M_PI)
 		Angle -= 2 * M_PI;
 
@@ -16,8 +16,11 @@ double basic_robotic_fce::normAngle(double Angle) {
 	return Angle;
 }
 
-// algorithm from avr lib
+inline float basic_robotic_fce::distance(Position start, Position end){
+	return hypot(start.x - end.x, start.y - end.y);
+}
 
+// algorithm from avr lib
 uint8_t basic_robotic_fce::crc8(uint8_t crc, uint8_t data) {
 	uint8_t i;
 

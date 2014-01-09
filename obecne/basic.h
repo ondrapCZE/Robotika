@@ -13,6 +13,28 @@
 
 #include <stdint.h>
 
+struct Vector{
+	double x;
+	double y;
+	
+	Vector(double x=0, double y=0) : x(x), y(y){};
+	
+	Vector operator-(const Vector ob2) const{
+		Vector temp(x - ob2.x, y - ob2.y);
+		return temp;
+	};
+	
+	Vector operator+(const Vector ob2) const{
+		Vector temp(x + ob2.x, y + ob2.y);
+		return temp;
+	};
+	
+	Vector operator*(const float a) const{
+		Vector temp(x * a, y * a);
+		return temp;
+	};
+};
+
 /*!
 	\struct position
 	\brief Position structure for robot or object in 2D world.
@@ -22,6 +44,26 @@ struct Position {
 	double y;
 
 	Position(double x = 0, double y = 0) : x(x), y(y){
+	};
+	
+	Position operator-(const Position ob2) const{
+		Position temp(x - ob2.x, y - ob2.y);
+		return temp;
+	};
+	
+	Position operator+(const Position ob2) const{
+		Position temp(x + ob2.x, y + ob2.y);
+		return temp;
+	};
+	
+	Position operator+(const Vector ob2) const{
+		Position temp(x + ob2.x, y + ob2.y);
+		return temp;
+	};
+	
+	Position operator*(const float a) const{
+		Position temp(x * a, y * a);
+		return temp;
 	};
 };
 
@@ -52,19 +94,25 @@ namespace basic_robotic_fce {
 		\return normalized input angle
 	 */
 	double normAngle(double Angle);
+	
+	float distance(Position start, Position end);
 
 	uint8_t crc8(uint8_t crc, uint8_t data);
 
-	template <class V> V valueInRange(V value, V range) {
-		if (value < range) {
-			if (value > -range) {
+	template <class V> inline V valueInRange(V value, V lowerBoundary, V higherBoundary) {
+		if(value < lowerBoundary){
+			return lowerBoundary;
+		}else{
+			if(value > higherBoundary){
+				return higherBoundary;
+			}else{
 				return value;
-			} else {
-				return -range;
 			}
-		} else {
-			return range;
 		}
+	}
+	
+	template <class V> inline V valueInRange(V value, V range) {
+		return valueInRange(value,-range,range);
 	}
 }
 
