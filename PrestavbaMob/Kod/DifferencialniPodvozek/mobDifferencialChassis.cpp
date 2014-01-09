@@ -103,7 +103,9 @@ void MobDifferencialChassis::updateEncoders(const int period) {
 		changeRobotState(distance);
 		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 		
+		float tempFrontSpeed = (actualSpeed.left + actualSpeed.right)/2.0f;
 		speedMutex.lock();
+		frontSpeed = tempFrontSpeed;
 		WheelsSpeed copyDesSpeed = desireSpeed;
 		speedMutex.unlock();
 		
@@ -135,29 +137,23 @@ void MobDifferencialChassis::setSpeed(WheelsSpeed speed) {
 	speed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam.maxSpeed);
 	speed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam.maxSpeed);
 	
-	speedMutex.lock();
+	std::lock_guard<std::mutex> lock(speedMutex);
 	desireSpeed = speed;
-	speedMutex.unlock();
 }
 
 State MobDifferencialChassis::getState() {
-	stateMutex.lock();
-	State copyState = robotState;
-	stateMutex.unlock();
-
-	return copyState;
+	std::lock_guard<std::mutex> lock(stateMutex);
+	return robotState;
 }
 
 WheelsDistance MobDifferencialChassis::getWheelDistance() {
-	stateMutex.lock();
-	WheelsDistance copyWheelsDistance = wheelDistance;
-	stateMutex.unlock();
-
-	return copyWheelsDistance;
+	std::lock_guard<std::mutex> lock(stateMutex);
+	return wheelDistance;
 }
 
-float MobDifferencialChassis::getMaxSpeed() {
-	return diffChassisParam.maxSpeed;
+float MobDifferencialChassis::getSpeed(){
+	std::lock_guard<std::mutex> lock(speedMutex);
+	return frontSpeed;
 }
 
 MobDifferencialChassis::~MobDifferencialChassis(){

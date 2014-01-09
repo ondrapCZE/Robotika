@@ -1,5 +1,5 @@
 /*!
-	\brief 	Basic structur, class and function for robotic usage
+	\brief 	Basic structure, class and function for robotic usage
  *	Units for position is in meters. Angle use radian.
 
 	\author Ondrej Pilat
@@ -12,6 +12,7 @@
 #define BASIC_H
 
 #include <stdint.h>
+#include <cmath>
 
 struct Vector{
 	double x;
@@ -94,8 +95,6 @@ namespace basic_robotic_fce {
 		\return normalized input angle
 	 */
 	double normAngle(double Angle);
-	
-	float distance(Position start, Position end);
 
 	uint8_t crc8(uint8_t crc, uint8_t data);
 

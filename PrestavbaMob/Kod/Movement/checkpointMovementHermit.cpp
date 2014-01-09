@@ -1,5 +1,6 @@
-#include "checkpointMovementHermit.hpp"
 #include <iostream>
+
+#include "checkpointMovementHermit.hpp"
 
 Vector checkpointMovementHermit::calculateOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness){
 	float checkedTightness = basic_robotic_fce::valueInRange(tightness, 0.0f, 1.0f);
@@ -21,13 +22,21 @@ Position checkpointMovementHermit::calculatePointHermit(const Checkpoint& actual
 	return curvePosition;
 }
 
+//TODO:
 void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
-	while(basic_robotic_fce::distance(target.position, chassis->getState()) > epsilon){
-		
+	State actualState = chassis->getState();
+	float distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);
+	while(distance > epsilon){
+		float inter = distance * pointsOnMeter;
+
+		Checkpoint actual(Position(actualState.x,actualState.y),Vector());
+		Position positionHermit = calculatePointHermit(actual,target,inter); 
+	
+		actualState = chassis->getState();
+		distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);;
 	}
 }
 
-//TODO:
 void checkpointMovementHermit::moveToCheckpoints() {
 	while(!end){
 		Checkpoint target;
