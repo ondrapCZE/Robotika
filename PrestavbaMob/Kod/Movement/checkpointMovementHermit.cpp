@@ -3,13 +3,39 @@
 
 #include "checkpointMovementHermit.hpp"
 
-Vector checkpointMovementHermit::calculateOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness){
+Circle checkpointMovementHermit::getCircle(const State& state, const Position& point){
+	// compute line on which is all circle centers
+	Position average = (state.position + point)/2;
+	float a = point.x - state.position.x;
+	float b = point.y - state.position.y;
+	float c = -a*average.x - b*average.y;
+	
+	// compute tanget line to the state
+	float m = std::tan(state.angle + M_PI_2);
+	float g = state.position.y - state.position.x*m;
+	
+	// compute circle center
+	Circle circle;
+	if(std::abs(b) < epsilon){ // b is near to the zero
+		circle.center.x = -c/a;
+		circle.center.y = m*circle.center.x + g;
+	}else{ // b is greater than zero
+		circle.center.x = (-b*g -c)/(a + m);
+		circle.center.y = (-a*circle.center.x -c)/b;
+	}
+	
+	circle.radius = circle.center.distance(state.position);
+	printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
+	return circle;
+}
+
+Vector checkpointMovementHermit::getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness){
 	float checkedTightness = basic_robotic_fce::valueInRange(tightness, 0.0f, 1.0f);
 	Position temp = (next.position - prev.position)*checkedTightness;
 	return Vector(temp.x,temp.y);
 }
 
-Position checkpointMovementHermit::calculatePointHermit(const Checkpoint& actual, const Checkpoint& target, const float inter) {
+Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual, const Checkpoint& target, const float inter) {
 	float checkedInter = basic_robotic_fce::valueInRange(inter,0.0f,1.0f);
 	float powInter2 = checkedInter*checkedInter;
 	float powInter3 = powInter2*checkedInter;
@@ -25,54 +51,29 @@ Position checkpointMovementHermit::calculatePointHermit(const Checkpoint& actual
 
 void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 	State actualState = chassis->getState();
-	float distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);
+	float distance = actualState.position.distance(target.position);
 	while(distance > 0.02){
 		float inter = 1 / (distance * pointsOnMeter); // TODO: better calculation
 		float speed = chassis->getSpeed();
 		
-		Checkpoint actual(Position(actualState.x,actualState.y),Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
-		Position positionHermit = calculatePointHermit(actual,target,inter);
+		Checkpoint actual(actualState.position,Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
+		Position positionHermit = getPointHermit(actual,target,inter);
 		printf("Hermit curve point [%f,%f]\n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
 		
 		actualState = chassis->getState();
-		distance = hypot(target.position.x - actualState.x, target.position.y - actualState.y);;
+		distance = actualState.position.distance(target.position);
 	}
 }
 
+// TODO: FIND ERROR WITH COMPUTATION ANGLE DISTANCE
 void checkpointMovementHermit::moveToPosition(const Position& target){
-	State actualState = chassis->getState();
-	float distance = hypot(target.x - actualState.x, target.y - actualState.y);
-	float angle = basic_robotic_fce::angle(Position(actualState.x,actualState.y),target);
-	float angleDistance = (angle*chassis->getWheelbase())/2.0f;
-	printf("Angle %f , distance %f, angleDistance %f", M_PI * angle / 180.0, distance, angleDistance);
-	
-	WheelsDistance difference(distance-angleDistance,distance+angleDistance);
-	WheelsDistance finale = chassis->getWheelDistance() + difference;
-	while(std::hypot(difference.left,difference.right) > 0.01){		
-		float ratio;
-		WheelsSpeed wheelsSpeed;
-		
-		if(std::abs(difference.left) > std::abs(difference.right)){
-			ratio = difference.right / difference.left;
-			wheelsSpeed = WheelsSpeed(0.1,0.1*ratio);
-		}else{
-			ratio = difference.left / difference.right;
-			wheelsSpeed = WheelsSpeed(0.1*ratio,0.1);
-		}
-
-		chassis->setSpeed(wheelsSpeed);
-		
-		difference = finale - chassis->getWheelDistance();
-		printf("Actual difference [%f,%f], ratio %f \n", difference.left, difference.right, ratio);
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
-	}
+	getCircle(chassis->getState(),target);
 }
 
 void checkpointMovementHermit::moveToCheckpoints() {
 	Checkpoint last;
-	last.position.x = chassis->getState().x;
-	last.position.y = chassis->getState().y;
+	last.position = chassis->getState().position;
 	while(!end){
 		Checkpoint target;
 		if(checkpointsQueue.tryPop(target)){
@@ -80,7 +81,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			if(!target.outVectorAssig){
 				Checkpoint next;
 				if(checkpointsQueue.tryFront(next)){
-					target.outVector = calculateOutputVector(last,next);
+					target.outVector = getOutputVector(last,next);
 				}
 			}
 			

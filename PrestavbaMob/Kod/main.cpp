@@ -25,6 +25,7 @@ int main(){
 	
 	MobDifferencialChassis mobChassis(chassisParam);
 	//Movement basic(&mobChassis);
+	
 	checkpointMovementHermit basic(&mobChassis);
 	
 	basic.addCheckpoint(Checkpoint(Position(1,0)));

@@ -59,7 +59,7 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 		
 		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
-	}while(hypot(difference.left,difference.right) > EPSILON_DISTANCE);
+	}while(std::hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 	
 }
 
@@ -89,7 +89,7 @@ void Movement::moveStraight(const float &meter){
 
 		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", difference.left, difference.right, speedLeft, speedRight);
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
-	}while (hypot(difference.left,difference.right) > EPSILON_DISTANCE);
+	}while (std::hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 }
 
 void Movement::rotate(const float &angle){

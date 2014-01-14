@@ -47,6 +47,10 @@ struct Position {
 	Position(double x = 0, double y = 0) : x(x), y(y){
 	};
 	
+	double distance(const Position &position) const{
+		return std::hypot(x - position.x, y - position.y);
+	}
+	
 	Position operator-(const Position &ob2) const{
 		Position temp(x - ob2.x, y - ob2.y);
 		return temp;
@@ -62,8 +66,13 @@ struct Position {
 		return temp;
 	};
 	
-	Position operator*(const float a) const{
+	Position operator*(const double a) const{
 		Position temp(x * a, y * a);
+		return temp;
+	};
+	
+	Position operator/(const double a) const{
+		Position temp(x / a, y / a);
 		return temp;
 	};
 };
@@ -72,11 +81,17 @@ struct Position {
 	\struct state
 	\brief State for robot. Inherit x,y from position structure.
  */
-struct State : public Position {
+struct State{
+	Position position;
 	double angle;
 
-	State(double X = 0, double Y = 0, double Angle = 0) : Position(X, Y), angle(Angle) {
+	State(double X = 0, double Y = 0, double Angle = 0) : position(X, Y), angle(Angle) {
 	};
+};
+
+struct Circle{
+	Position center;
+	double radius;
 };
 
 namespace basic_robotic_fce {
