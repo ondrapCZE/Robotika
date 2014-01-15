@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <pthread.h>
 #include <fcntl.h>
 #include <c++/4.6/mutex>
 #include <iostream>
@@ -25,8 +26,12 @@ MobDifferencialChassis::MobDifferencialChassis(const DiffChassisParam diffChassi
 	PIRegulatorValue.P = 200; // 740 oscillate value 
 	PIRegulatorValue.I = 12;
 
-	//encodersAcquireTime = 10; // every x ms
 	loopPidThread = std::move(std::thread(&MobDifferencialChassis::updateEncoders,this,5));
+	// set thread higher priority and FIFO order
+	struct sched_param param;
+	param.__sched_priority = 90;
+	pthread_setschedparam(loopPidThread.native_handle(),SCHED_FIFO,&param);
+	
 	//pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
@@ -54,8 +59,8 @@ void MobDifferencialChassis::changeRobotState(WheelsDistance change) {
 	wheelDistance.left += change.left;
 	wheelDistance.right += change.right;
 
-	robotState.x += distanceChange * cos(robotState.angle + (angleChange / 2.0f));
-	robotState.y += distanceChange * sin(robotState.angle + (angleChange / 2.0f));
+	robotState.position.x += distanceChange * cos(robotState.angle + (angleChange / 2.0f));
+	robotState.position.y += distanceChange * sin(robotState.angle + (angleChange / 2.0f));
 	robotState.angle += angleChange;
 	stateMutex.unlock();
 }

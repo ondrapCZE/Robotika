@@ -2,6 +2,7 @@
 #include <cmath>
 
 #include "checkpointMovementHermit.hpp"
+#include "movement.h"
 
 Circle checkpointMovementHermit::getCircle(const State& state, const Position& point){
 	// compute line on which is all circle centers
@@ -25,7 +26,7 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 	}
 	
 	circle.radius = circle.center.distance(state.position);
-	printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
+	//printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
 	return circle;
 }
 
@@ -52,13 +53,14 @@ Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual, cons
 void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 	State actualState = chassis->getState();
 	float distance = actualState.position.distance(target.position);
-	while(distance > 0.02){
-		float inter = 1 / (distance * pointsOnMeter); // TODO: better calculation
+	while(distance > epsilon){
+		float inter = 1 / (float)(distance * pointsOnMeter); // TODO: better calculation
 		float speed = chassis->getSpeed();
 		
 		Checkpoint actual(actualState.position,Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
 		Position positionHermit = getPointHermit(actual,target,inter);
-		printf("Hermit curve point [%f,%f]\n",positionHermit.x,positionHermit.y);
+		//printf("Hermit curve point [%f,%f]\n",positionHermit.x,positionHermit.y);
+		printf("%f %f;\n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
 		
 		actualState = chassis->getState();
@@ -68,7 +70,30 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 
 // TODO: FIND ERROR WITH COMPUTATION ANGLE DISTANCE
 void checkpointMovementHermit::moveToPosition(const Position& target){
-	getCircle(chassis->getState(),target);
+	Circle circle = getCircle(chassis->getState(),target);
+	float shorterDiameter = circle.radius - chassis->getWheelbase()/2.0f;
+	float longerDiameter = circle.radius + chassis->getWheelbase()/2.0f;
+	float wheelsRatio = shorterDiameter / longerDiameter;
+	
+	//TODO: change this part !!!
+	State actualState = chassis->getState();
+	//printf("Actual state [%f,%f] angle %f \n", actualState.position.x, actualState.position.y, actualState.angle);
+	float m = std::tan(actualState.angle);
+	float g = actualState.position.y - m*actualState.position.x;
+	float result = circle.center.y + m*circle.center.x + g;
+	
+	if(result < 0){
+		chassis->setSpeed(0.2f,0.2f*wheelsRatio);
+	}else{
+		chassis->setSpeed(0.2f*wheelsRatio,0.2f);
+	}
+	
+	//printf("%f %f;\n", actualState.position.x,actualState.position.y);
+	do{
+		std::this_thread::sleep_for(std::chrono::milliseconds(15));
+		//printf("%f %f;\n", actualState.position.x,actualState.position.y);
+		State actualState = chassis->getState();
+	}while((actualState.position.distance(target) < epsilon));
 }
 
 void checkpointMovementHermit::moveToCheckpoints() {

@@ -8,6 +8,7 @@
 #include "checkpointMovement.hpp"
 #include "../../../obecne/tsqueue.hpp"
 #include "../../../obecne/basic.h"
+#include "movement.h"
 
 class checkpointMovementHermit : public checkpointMovement{
 	tsqueue<Checkpoint> checkpointsQueue;
