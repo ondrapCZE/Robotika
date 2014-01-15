@@ -88,7 +88,7 @@ public:
 	 */
 	virtual void stop() = 0;
 	virtual void setSpeed(const WheelsSpeed speed) = 0;
-	virtual void setSpeed(const float left, const float right){ setSpeed(WheelsSpeed(left,right)); };
+	virtual void setSpeed(const float left, const float right) = 0;
 	//! A pure virtual member.
 	/*!
 	\return actual state of the chassis

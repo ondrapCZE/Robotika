@@ -107,7 +107,7 @@ namespace basic_robotic_fce {
 	//!	Function returns normalized input angle in range -Pi to Pi
 	/*!	
 		\param Angle an double argument.
-		\return normalized input angle
+		\return normalized input angle in range -Pi to Pi
 	 */
 	double normAngle(double Angle);
 

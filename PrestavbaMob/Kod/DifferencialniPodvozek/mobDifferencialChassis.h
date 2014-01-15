@@ -53,7 +53,8 @@ public:
 	 */
 	void stop();
 
-	void setSpeed(WheelsSpeed speed);
+	void setSpeed(const WheelsSpeed speed);
+	void setSpeed(const float left, const float right){ setSpeed(WheelsSpeed(left,right)); };
 	//! 
 	/*!
 	\return actual state of the chassis

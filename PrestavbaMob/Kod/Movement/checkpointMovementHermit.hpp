@@ -19,14 +19,15 @@ class checkpointMovementHermit : public checkpointMovement{
 	
 	const float epsilon = 0.01;
 	const float epsilonZero = 1.0e-10;
-	const unsigned int pointsOnMeter = 10; 
+	const float speed = 0.4f;
+	const unsigned int pointsOnMeter = 20; 
 	
 	Circle getCircle(const State &state, const Position &point);
 	Vector getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness = 0.5f);
 	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);
 	
 	void moveToCheckpoint(Checkpoint &target);
-	void moveToPosition(const Position &target);
+	void moveToPosition(const State& state, const Position &target);
 	void moveToCheckpoints();
 public:
 	checkpointMovementHermit(BasicDifferencialChassis* chassis);

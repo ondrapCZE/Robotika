@@ -138,12 +138,13 @@ void MobDifferencialChassis::stop() {
 	diffChassisParam.driver->stop();
 }
 
-void MobDifferencialChassis::setSpeed(WheelsSpeed speed) {
-	speed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam.maxSpeed);
-	speed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam.maxSpeed);
+void MobDifferencialChassis::setSpeed(const WheelsSpeed speed) {
+	WheelsSpeed safeSpeed;
+	safeSpeed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam.maxSpeed);
+	safeSpeed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam.maxSpeed);
 	
 	std::lock_guard<std::mutex> lock(speedMutex);
-	desireSpeed = speed;
+	desireSpeed = safeSpeed;
 }
 
 State MobDifferencialChassis::getState() {
