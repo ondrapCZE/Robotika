@@ -21,7 +21,8 @@ struct Distance {
 class MobDifferencialChassis : public BasicDifferencialChassis {
 	double metersPerTick;
 
-	PIValue PIRegulatorValue;
+	PIValue PIParamLeft;
+	PIValue PIParamRight;
 
 	State robotState;
 	WheelsDistance wheelDistance;
@@ -40,7 +41,7 @@ class MobDifferencialChassis : public BasicDifferencialChassis {
 	void changeRobotState(WheelsDistance change);
 
 	int sendMotorPower(struct motorsPower speedMotors);
-	motorsPower PIRegulator(WheelsSpeed actualSpeed, WheelsSpeed desireSpeed);
+	int PIRegulator(const float actualSpeed, const float desireSpeed, PIValue &PIParam);
 
 	Encoders getChangeOfEncoders();
 	void updateEncoders(const int period); // time in ms	

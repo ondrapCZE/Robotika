@@ -7,34 +7,35 @@
 #include "../MotorDriver/motorDriver.hpp"
 
 /*!
- * struct DifferencialChassisParameters serve for setting basic parameters.
+ * struct DifferencialChassisParameters serve for preserving basic chassis parameters.
  */
 struct DiffChassisParam {
-	float wheelbase;
-	float wheelRadius;
-	float maxSpeed;
-	float reductionRatio;
-	unsigned int wheelTics;
+	float wheelbase; /*!< size between wheels in meters */
+	float wheelRadius; /*!< both wheels have same radius */
+	float maxSpeed; /*!< chassis are can move only up to this speed */
+	float reductionRatio; /*!< both wheels have same reduction ratio on motors */
+	unsigned int wheelTics; /*!< how much is for one turn wheel */ 
 
-	encoderReader* encoder;
-	motorDriver* driver;
+	encoderReader* encoder; /*!< chassis have to have encoder on both wheels */
+	motorDriver* driver; /*!< motor power driver on the chassis wheels */
 
+	//! Simple constructor only filling input parameters in the chassis variables 
 	DiffChassisParam(float wheelBase = 0, float wheelRadius = 0, float maxSpeed = 0,
 		float reductionRatio = 0, unsigned int wheelTics = 0, encoderReader* encoder = NULL,
 		motorDriver* driver = NULL) : wheelbase(wheelbase), wheelRadius(wheelRadius),
 	maxSpeed(maxSpeed), reductionRatio(reductionRatio), wheelTics(wheelTics),
 	encoder(encoder), driver(driver) {
-	};
+	}; 
 };
 
+//! PI regulator values 
 struct PIValue {
-	int P;
-	int I;
+	int P; /*! Proportional part */
+	int I; /*! Integral part*/
 
-	float integralPartLeft;
-	float integralPartRight;
+	float ISum; /*!  */
 
-	PIValue(int P = 90, int I = 0) : P(P), I(I), integralPartLeft(0), integralPartRight(0) {
+	PIValue(int P = 90, int I = 0) : P(P), I(I), ISum(0){
 	};
 };
 

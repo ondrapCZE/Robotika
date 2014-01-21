@@ -22,9 +22,13 @@ MobDifferencialChassis::MobDifferencialChassis(const DiffChassisParam diffChassi
 
 	sendMotorPower(motorsPower(0, 0));
 
-	// Set PIRegulator
-	PIRegulatorValue.P = 200; // 740 oscillate value 
-	PIRegulatorValue.I = 12;
+	// Set PI regulator parameters for left wheel
+	PIParamLeft.P = 200; // 740 oscillate value 
+	PIParamLeft.I = 12;
+	
+	// Set PI regulator parameters for right wheel
+	PIParamLeft.P = 200; // 740 oscillate value 
+	PIParamLeft.I = 12;
 
 	loopPidThread = std::move(std::thread(&MobDifferencialChassis::updateEncoders,this,5));
 	// set thread higher priority and FIFO order
@@ -73,20 +77,14 @@ int MobDifferencialChassis::sendMotorPower(struct motorsPower speedMotors) {
 	return diffChassisParam.driver->setMotorsPower(speedMotors);
 }
 
-motorsPower MobDifferencialChassis::PIRegulator(WheelsSpeed actualSpeed, WheelsSpeed desireSpeed) {
-	WheelsSpeed speedDifference = desireSpeed - actualSpeed;
-	PIRegulatorValue.integralPartLeft += speedDifference.left;
-	PIRegulatorValue.integralPartRight += speedDifference.right;
+int MobDifferencialChassis::PIRegulator(const float actualSpeed,const float desireSpeed, PIValue &PIParam) {
+	float speedDifference = desireSpeed - actualSpeed;
+	PIParam.ISum += speedDifference;
 
-	int speedLeft = PIRegulatorValue.P * speedDifference.left + PIRegulatorValue.I * PIRegulatorValue.integralPartLeft;
-	int speedRight = PIRegulatorValue.P * speedDifference.right + PIRegulatorValue.I * PIRegulatorValue.integralPartRight;
+	int speed = PIParam.P * speedDifference + PIParam.I * PIParam.ISum;
 
 	// set in boundaries
-	motorsPower speedMotors;
-	speedMotors.left = basic_robotic_fce::valueInRange<int>(speedLeft, diffChassisParam.driver->getMaxPower());
-	speedMotors.right = basic_robotic_fce::valueInRange<int>(speedRight, diffChassisParam.driver->getMaxPower());
-
-	return speedMotors;
+	return basic_robotic_fce::valueInRange<int>(speed, diffChassisParam.driver->getMaxPower());
 }
 
 void MobDifferencialChassis::updateEncoders(const int period) {
@@ -114,7 +112,9 @@ void MobDifferencialChassis::updateEncoders(const int period) {
 		WheelsSpeed copyDesSpeed = desireSpeed;
 		speedMutex.unlock();
 		
-		motorsPower valueMotors = PIRegulator(actualSpeed, copyDesSpeed);
+		motorsPower valueMotors;
+		valueMotors.left = PIRegulator(actualSpeed.left, copyDesSpeed.left, PIParamLeft);
+		valueMotors.right = PIRegulator(actualSpeed.right, copyDesSpeed.right, PIParamRight);
 		//printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
 		
 		//printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
@@ -132,8 +132,8 @@ void MobDifferencialChassis::updateEncoders(const int period) {
 }
 
 void MobDifferencialChassis::stop() {
-	PIRegulatorValue.integralPartLeft = 0;
-	PIRegulatorValue.integralPartRight = 0;
+	PIParamLeft.ISum = 0;
+	PIParamRight.ISum = 0;
 	setSpeed(WheelsSpeed(0, 0));
 	diffChassisParam.driver->stop();
 }
