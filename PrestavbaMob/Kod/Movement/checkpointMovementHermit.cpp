@@ -61,6 +61,7 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 		
 		Checkpoint actual(actualState.position,Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
 		Position positionHermit = getPointHermit(actual,target,inter);
+		printf("%f %f;\n",actual.position.x, actual.position.y);
 		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
 		//printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
 		moveToPosition(actualState,positionHermit);
@@ -125,7 +126,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 	}
 }
 
-checkpointMovementHermit::checkpointMovementHermit(BasicDifferencialChassis* chassis) : chassis(chassis) {
+checkpointMovementHermit::checkpointMovementHermit(BasicDifferentialChassis* chassis) : chassis(chassis) {
 	end = false;
 	moveToCheckpointsThread = std::move(std::thread(&checkpointMovementHermit::moveToCheckpoints,this));
 }

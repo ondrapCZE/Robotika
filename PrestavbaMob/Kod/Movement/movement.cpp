@@ -15,7 +15,7 @@ static const float EPSILON_DISTANCE = 0.01f;
 static const int SLEEP_TIME = 20000; // us
 static const float SPEED_STEP = 0.05f;
 
-Movement::Movement(BasicDifferencialChassis* chassis) : chassis(chassis) {
+Movement::Movement(BasicDifferentialChassis* chassis) : chassis(chassis) {
 	
 }
 

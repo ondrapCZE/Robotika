@@ -12,15 +12,15 @@
 
 class checkpointMovementHermit : public checkpointMovement{
 	tsqueue<Checkpoint> checkpointsQueue;
-	BasicDifferencialChassis* chassis;
+	BasicDifferentialChassis* chassis;
 	
 	std::atomic<bool> end;
 	std::thread moveToCheckpointsThread;
 	
 	const float epsilon = 0.01;
 	const float epsilonZero = 1.0e-10;
-	const float speed = 0.35f;
-	const unsigned int pointsOnMeter = 20; 
+	const float speed = 0.3f;
+	const unsigned int pointsOnMeter = 10; 
 	
 	Circle getCircle(const State &state, const Position &point);
 	Vector getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness = 0.5f);
@@ -30,7 +30,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	void moveToPosition(const State& state, const Position &target);
 	void moveToCheckpoints();
 public:
-	checkpointMovementHermit(BasicDifferencialChassis* chassis);
+	checkpointMovementHermit(BasicDifferentialChassis* chassis);
 	void addCheckpoint(const Checkpoint &checkpoint);
 	void addCheckpoint(const std::vector<Checkpoint> &checkpoints);
 	

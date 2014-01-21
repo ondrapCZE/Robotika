@@ -6,23 +6,22 @@
 #include "../Encoder/encoder.hpp"
 #include "../MotorDriver/motorDriver.hpp"
 
-/*!
- * struct DifferencialChassisParameters serve for preserving basic chassis parameters.
- */
+
+//! Serve for preserving basic chassis parameters.
 struct DiffChassisParam {
-	float wheelbase; /*!< size between wheels in meters */
-	float wheelRadius; /*!< both wheels have same radius */
-	float maxSpeed; /*!< chassis are can move only up to this speed */
-	float reductionRatio; /*!< both wheels have same reduction ratio on motors */
-	unsigned int wheelTics; /*!< how much is for one turn wheel */ 
+	float wheelbase; /*!< Size between wheels in meters. */
+	float wheelRadius; /*!< Both wheels have same radius in meters. */
+	float maxSpeed; /*!< Chassis are can move only up to this speed in meters per second. */
+	float reductionRatio; /*!< Both wheels have same reduction ratio on motors. */
+	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
 
-	encoderReader* encoder; /*!< chassis have to have encoder on both wheels */
-	motorDriver* driver; /*!< motor power driver on the chassis wheels */
+	encoderReader* encoder; /*!< Chassis have to have encoder on both wheels. */
+	motorDriver* driver; /*!< Motor power driver on the chassis wheels. */
 
-	//! Simple constructor only filling input parameters in the chassis variables 
-	DiffChassisParam(float wheelBase = 0, float wheelRadius = 0, float maxSpeed = 0,
-		float reductionRatio = 0, unsigned int wheelTics = 0, encoderReader* encoder = NULL,
-		motorDriver* driver = NULL) : wheelbase(wheelbase), wheelRadius(wheelRadius),
+	//! Constructor only assign input parameters in the variables.
+	DiffChassisParam(const float wheelBase = 0,const float wheelRadius = 0,const float maxSpeed = 0,
+		const float reductionRatio = 0,const unsigned int wheelTics = 0, encoderReader* encoder = std::nullptr_t(),
+		motorDriver* driver = std::nullptr_t()) : wheelbase(wheelbase), wheelRadius(wheelRadius),
 	maxSpeed(maxSpeed), reductionRatio(reductionRatio), wheelTics(wheelTics),
 	encoder(encoder), driver(driver) {
 	}; 
@@ -30,79 +29,84 @@ struct DiffChassisParam {
 
 //! PI regulator values 
 struct PIValue {
-	int P; /*! Proportional part */
-	int I; /*! Integral part*/
+	int P; /*! Proportional part. */
+	int I; /*! Integral part. */
 
-	float ISum; /*!  */
+	float ISum; /*! Sum all differences between actual speed and desire speed. */
 
-	PIValue(int P = 90, int I = 0) : P(P), I(I), ISum(0){
+	//!  Constructor only assign input parameters in the variables.
+	PIValue(const int P = 90, const int I = 0) : P(P), I(I), ISum(0){
 	};
 };
 
+//! Traveled distance on both wheels in meters.
 struct WheelsDistance {
-	float left;
-	float right;
+	float left; /*! traveled distance on the left wheel in meters */
+	float right; /*! traveled distance on the right wheel in meters */
 
-	WheelsDistance(float left = 0, float right = 0) : left(left), right(right) {
+	//! Constructor only assign input parameters in the variables.
+	WheelsDistance(const float left = 0, const float right = 0) : left(left), right(right) {
 	};
 	
+	//! Addition between WheelsDistance.
+	/*!
+	 \param ob2 second WheelsDistance
+	 \return new WheelsDistance where parameters are equal 
+	  to the addition between same parameter from both WheelsDistance
+	 */
 	WheelsDistance operator+(const WheelsDistance &ob2) const {
 		WheelsDistance temp(left + ob2.left, right + ob2.right);
 		return temp;
 	};
 	
+	//! Subtraction between WheelsDistance.
+	/*!
+	 \param ob2 second WheelsDistance
+	 \return new WheelsDistance where parameters are equal 
+	  to the subtraction between same parameter from both WheelsDistance
+	 */
 	WheelsDistance operator-(const WheelsDistance &ob2) const{
 		WheelsDistance temp(left - ob2.left, right - ob2.right);
 		return temp;
 	};
 };
 
-/*!
- * struct Speed serve for storage speed on the left and right wheels.
- */
-struct WheelsSpeed {
-	float left;
-	float right;
 
+ //! Serve for storage speed on the wheels.
+struct WheelsSpeed {
+	float left; /*! Speed on the left wheel in meters per second. */
+	float right; /*! Speed on the right wheel in meters per second. */
+
+	//! Constructor only assign input parameters in the PIValue variables.
 	WheelsSpeed(float left = 0, float right = 0) : left(left), right(right) {
 	};
 
+	//! Subtraction between WheelsSpeed.
+	/*!
+	 \param ob2 second WheelsSpeed
+	 \return new WheelsSpeed where parameters are equal 
+	  to the subtraction between same parameter from both WheelsSpeed
+	 */
 	WheelsSpeed operator-(WheelsSpeed ob2) {
 		WheelsSpeed temp(left - ob2.left, right - ob2.right);
 		return temp;
 	};
 };
 
-/*!
- * struct DifferencialChassis is virtual class which is necessary to define.
- */
-class BasicDifferencialChassis {
+ //! Basic virtual differential chassis representation
+class BasicDifferentialChassis {
 protected:
 	DiffChassisParam diffChassisParam;
 public:
-	BasicDifferencialChassis(const DiffChassisParam diffChassisParam) : diffChassisParam(diffChassisParam) {
+	BasicDifferentialChassis(const DiffChassisParam diffChassisParam) : diffChassisParam(diffChassisParam) {
 	};
 	
-	//! A pure virtual member.
-	/*!
-	\param speed an struct Speed argument.
-	 */
+	
 	virtual void stop() = 0;
 	virtual void setSpeed(const WheelsSpeed speed) = 0;
 	virtual void setSpeed(const float left, const float right) = 0;
-	//! A pure virtual member.
-	/*!
-	\return actual state of the chassis
-	 */
 	virtual State getState() = 0;
-
-	//! A pure virtual member
-
-	/*!
-		\return actual distance on both wheels
-	 */
 	virtual WheelsDistance getWheelDistance() = 0;
-
 	virtual float getSpeed() = 0;	
 	virtual float getMaxSpeed(){ return diffChassisParam.maxSpeed; };
 	virtual float getWheelbase(){ return diffChassisParam.wheelbase; };

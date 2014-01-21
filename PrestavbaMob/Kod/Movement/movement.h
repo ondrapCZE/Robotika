@@ -10,10 +10,10 @@ enum direction{
 
 class Movement {
 private:
-	BasicDifferencialChassis* chassis;
+	BasicDifferentialChassis* chassis;
 	State finalState;
 public:
-	Movement(BasicDifferencialChassis* chassis);
+	Movement(BasicDifferentialChassis* chassis);
 
 	void moveCircle(const float &diameter, const float &angle, 
 	const direction &circleDirection);
