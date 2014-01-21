@@ -59,7 +59,7 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 		//printf("inter %f \ndistance %f \n", inter,distance);
 		float speed = chassis->getSpeed();
 		
-		Checkpoint actual(actualState.position,Vector(10*speed*cos(actualState.angle),10*speed*sin(actualState.angle)));
+		Checkpoint actual(actualState.position,Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
 		Position positionHermit = getPointHermit(actual,target,inter);
 		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
 		//printf("hermit %f %f \n",positionHermit.x,positionHermit.y);

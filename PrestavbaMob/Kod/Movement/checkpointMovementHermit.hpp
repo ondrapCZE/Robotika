@@ -19,7 +19,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	
 	const float epsilon = 0.01;
 	const float epsilonZero = 1.0e-10;
-	const float speed = 0.4f;
+	const float speed = 0.35f;
 	const unsigned int pointsOnMeter = 20; 
 	
 	Circle getCircle(const State &state, const Position &point);
