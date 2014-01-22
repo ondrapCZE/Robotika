@@ -51,56 +51,59 @@ Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual, cons
 	return curvePosition;
 }
 
-void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
-	State actualState = chassis->getState();
-	float distance = actualState.position.distance(target.position);
-	while(distance > epsilon){
-		float inter = basic_robotic_fce::valueInRange(1.0f - distance,0.0f,1.0f) + 0.12;
-		//printf("inter %f \ndistance %f \n", inter,distance);
-		float speed = chassis->getSpeed();
-		
-		Checkpoint actual(actualState.position,Vector(speed*cos(actualState.angle),speed*sin(actualState.angle)));
-		Position positionHermit = getPointHermit(actual,target,inter);
-		printf("%f %f;\n",actual.position.x, actual.position.y);
+void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Checkpoint &end){
+	float distance = start.position.distance(end.position);
+	float step  = 1.0f / (distance*pointsOnMeter);
+	for(float i = step; i <= 1.0f; i+=step){
+		Position positionHermit = getPointHermit(start,end,i);
 		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
 		//printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
-		moveToPosition(actualState,positionHermit);
-		
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
-		actualState = chassis->getState();
-		distance = actualState.position.distance(target.position);
+		moveToPosition(positionHermit);
 	}
 }
 
-void checkpointMovementHermit::moveToPosition(const State& state, const Position& target){
-	Circle circle = getCircle(chassis->getState(),target);
-	float shorterDiameter = circle.radius - chassis->getWheelbase()/2.0f;
-	float longerDiameter = circle.radius + chassis->getWheelbase()/2.0f;
-	float wheelsRatio = shorterDiameter / longerDiameter;
+void checkpointMovementHermit::moveToPosition(const Position& target){
+	State state = chassis->getState();
 	
-	float targetAngle = basic_robotic_fce::angle(state.position, target);
-	float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
-	
-	//printf("finalAngle %f \nwheelsRatio %f \n", finalAngle, wheelsRatio);
-	
-	if(finalAngle > 0){
-		if(finalAngle <= M_PI_2){ // move to the left on the circle
-			chassis->setSpeed(speed*wheelsRatio,speed);
-			//printf("Left %f,%f\n",speed*wheelsRatio,speed);
+	while(target.distance(state.position) > epsilon){
+		printf("%f %f;\n",state.position.x, state.position.y);
+		Circle circle = getCircle(state,target);
+		float shorterDiameter = circle.radius - chassis->getWheelbase()/2.0f;
+		float longerDiameter = circle.radius + chassis->getWheelbase()/2.0f;
+		float wheelsRatio = shorterDiameter / longerDiameter;
+
+		float targetAngle = basic_robotic_fce::angle(state.position, target);
+		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
+
+		//printf("finalAngle %f \nwheelsRatio %f \n", finalAngle, wheelsRatio);
+
+		if(finalAngle > 0){
+			if(finalAngle <= M_PI_2){ // move to the left on the circle
+				chassis->setSpeed(speed*wheelsRatio,speed);
+				//printf("Left %f,%f\n",speed*wheelsRatio,speed);
+			}else{
+				chassis->setSpeed(speed*wheelsRatio,speed);
+			}
 		}else{
-			chassis->setSpeed(speed*wheelsRatio,speed);
+			if(finalAngle >= -M_PI_2){ // move to the right on the circle
+				chassis->setSpeed(speed,speed*wheelsRatio);
+				//printf("Right %f,%f\n",0.2f*wheelsRatio,0.2f);
+			}else{
+				chassis->setSpeed(speed,speed*wheelsRatio);
+			}
 		}
-	}else{
-		if(finalAngle >= -M_PI_2){ // move to the right on the circle
-			chassis->setSpeed(speed,speed*wheelsRatio);
-			//printf("Right %f,%f\n",0.2f*wheelsRatio,0.2f);
-		}else{
-			chassis->setSpeed(speed,speed*wheelsRatio);
-		}
+	
+		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		state = chassis->getState();
 	}
 }
 
 void checkpointMovementHermit::moveToCheckpoints() { 
+	State state = chassis->getState();
+	Checkpoint last;
+	last.position = chassis->getState().position; 
+	last.outVector = Vector(cos(state.angle),sin(state.angle));
+	// TODO: change last.outputVector according to the chassis front speed
 	while(!end){
 		Checkpoint target;
 		if(checkpointsQueue.tryPop(target)){
@@ -117,7 +120,8 @@ void checkpointMovementHermit::moveToCheckpoints() {
 							target.position.y,
 							target.outVector.x,
 							target.outVector.y);
-			moveToCheckpoint(target);
+			moveToCheckpoint(last,target);
+			last = target;
 		}else{		
 			chassis->stop();
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
