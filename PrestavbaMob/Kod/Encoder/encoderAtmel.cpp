@@ -49,9 +49,9 @@ bool encoderAtmel::checkBufferValidity(const unsigned int size) {
 	}
 
 	bool crcCheck = (crc == buffer[(size - 1)]);
-	if (!crcCheck) {
+	/*if (!crcCheck) {
 		printf("Damaged data wrong crc \n");
-	}
+	}*/
 	return crcCheck;
 }
 

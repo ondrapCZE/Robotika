@@ -55,7 +55,7 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 	State actualState = chassis->getState();
 	float distance = actualState.position.distance(target.position);
 	while(distance > epsilon){
-		float inter = basic_robotic_fce::valueInRange(1.0f - distance,0.0f,1.0f) + 0.05;
+		float inter = basic_robotic_fce::valueInRange(1.0f - distance,0.0f,1.0f) + 0.12;
 		//printf("inter %f \ndistance %f \n", inter,distance);
 		float speed = chassis->getSpeed();
 		
@@ -72,7 +72,6 @@ void checkpointMovementHermit::moveToCheckpoint(Checkpoint& target){
 	}
 }
 
-// TODO: change name
 void checkpointMovementHermit::moveToPosition(const State& state, const Position& target){
 	Circle circle = getCircle(chassis->getState(),target);
 	float shorterDiameter = circle.radius - chassis->getWheelbase()/2.0f;
@@ -117,7 +116,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 							target.position.x, 
 							target.position.y,
 							target.outVector.x,
-							target.outVector.x);
+							target.outVector.y);
 			moveToCheckpoint(target);
 		}else{		
 			chassis->stop();
