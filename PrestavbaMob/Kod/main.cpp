@@ -25,28 +25,26 @@ int main(){
 	
 	MobDifferentialChassis mobChassis(chassisParam);
 	//Movement basic(&mobChassis);
-	
-	
+
 	checkpointMovementHermit basic(&mobChassis);
 	
 	basic.addCheckpoint(Checkpoint(Position(1,0)));
-	basic.addCheckpoint(Checkpoint(Position(2,1)));
-	basic.addCheckpoint(Checkpoint(Position(1,2)));
-	basic.addCheckpoint(Checkpoint(Position(1,0)));
+	basic.addCheckpoint(Checkpoint(Position(1,1)));
+	basic.addCheckpoint(Checkpoint(Position(0,1)));
 	basic.addCheckpoint(Checkpoint(Position(0,0)));
-	
+
 	/*
 	for (int i = 0; i < 4; ++i) {
 		//printf("Move forward \n\r\n\r");
 		display.clearDisplay();
 		display.writeText("Move straight");
-		basic.moveStraight(0.7f);
+		basic.moveStraight(1.0f);
 		//printf("Rotate \n\r\n\r");
 		display.clearDisplay();
 		display.writeText("Rotate");
 		basic.rotate(M_PI_2);
-	}
-	*/
+	}*/
+	
 	
 	//basic.moveStraight(1.0f);
 	//basic.rotate(2*M_PI);

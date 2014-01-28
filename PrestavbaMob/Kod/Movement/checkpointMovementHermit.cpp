@@ -51,6 +51,17 @@ Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual, cons
 	return curvePosition;
 }
 
+float checkpointMovementHermit::getSmoothSpeed(float desireSpeed, float actualSpeed){
+	float outSpeed = actualSpeed;
+	if(desireSpeed > actualSpeed){
+		outSpeed += speedStep;
+	}else{
+		outSpeed -= speedStep; 
+	}
+	
+	return basic_robotic_fce::valueInRange(outSpeed,desireSpeed);
+}
+
 void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Checkpoint &end){
 	float distance = start.position.distance(end.position);
 	float step  = 1.0f / (distance*pointsOnMeter);
@@ -75,23 +86,26 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		float targetAngle = basic_robotic_fce::angle(state.position, target);
 		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
 
-		//printf("finalAngle %f \nwheelsRatio %f \n", finalAngle, wheelsRatio);
-
-		if(finalAngle > 0){
-			if(finalAngle <= M_PI_2){ // move to the left on the circle
-				chassis->setSpeed(speed*wheelsRatio,speed);
-				//printf("Left %f,%f\n",speed*wheelsRatio,speed);
-			}else{
-				chassis->setSpeed(speed*wheelsRatio,speed);
-			}
-		}else{
-			if(finalAngle >= -M_PI_2){ // move to the right on the circle
-				chassis->setSpeed(speed,speed*wheelsRatio);
-				//printf("Right %f,%f\n",0.2f*wheelsRatio,0.2f);
-			}else{
-				chassis->setSpeed(speed,speed*wheelsRatio);
-			}
+		WheelsSpeed wheelsSpeed;
+		if(finalAngle >= 0 && finalAngle <= M_PI_2){
+				wheelsSpeed.left = speed*wheelsRatio;
+				wheelsSpeed.right = speed;
+		}else	if(finalAngle < 0 && finalAngle >= -M_PI_2){ // move to the right on the circle
+				wheelsSpeed.left = speed;
+				wheelsSpeed.right = speed*wheelsRatio;
 		}
+		
+		if(std::abs(finalAngle) > M_PI_2){
+			wheelsSpeed.left = -wheelsSpeed.left;
+			wheelsSpeed.right = -wheelsSpeed.right;
+		}
+		
+		//WheelsSpeed actualWheelsSpeed = chassis->getSpeed();
+		//wheelsSpeed.left = getSmoothSpeed(wheelsSpeed.left,actualWheelsSpeed.left);
+		//wheelsSpeed.right = getSmoothSpeed(wheelsSpeed.right,actualWheelsSpeed.right);
+		//printf("Actual speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
+		
+		chassis->setSpeed(wheelsSpeed);
 	
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		state = chassis->getState();
@@ -103,7 +117,6 @@ void checkpointMovementHermit::moveToCheckpoints() {
 	Checkpoint last;
 	last.position = chassis->getState().position; 
 	last.outVector = Vector(cos(state.angle),sin(state.angle));
-	// TODO: change last.outputVector according to the chassis front speed
 	while(!end){
 		Checkpoint target;
 		if(checkpointsQueue.tryPop(target)){

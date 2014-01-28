@@ -17,7 +17,7 @@
 const unsigned int BUFFER_SIZE = 10;
 
 MobDifferentialChassis::MobDifferentialChassis(const DiffChassisParam diffChassisParam) : BasicDifferentialChassis(diffChassisParam) {
-	end = false;
+	end.store(false);
 	metersPerTick = (2 * M_PI * diffChassisParam.wheelRadius) / (float) diffChassisParam.wheelTics;
 
 	sendMotorPower(motorsPower(0, 0));
@@ -27,8 +27,8 @@ MobDifferentialChassis::MobDifferentialChassis(const DiffChassisParam diffChassi
 	PIParamLeft.I = 12;
 	
 	// Set PI regulator parameters for right wheel
-	PIParamLeft.P = 200; // 740 oscillate value 
-	PIParamLeft.I = 12;
+	PIParamRight.P = 200; // 740 oscillate value 
+	PIParamRight.I = 12;
 
 	loopPidThread = std::move(std::thread(&MobDifferentialChassis::updateEncoders,this,5));
 	// set thread higher priority and FIFO order
@@ -92,7 +92,7 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 	//printf("Sleep time: %i \n\r", This->encodersAcquireTime);
 
 	long int lastMicroTime = 1;
-	while(!end){
+	while(!end.load()){
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
@@ -106,9 +106,8 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 		changeRobotState(distance);
 		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 		
-		float tempFrontSpeed = (actualSpeed.left + actualSpeed.right)/2.0f;
 		speedMutex.lock();
-		frontSpeed = tempFrontSpeed;
+		speed = actualSpeed;
 		WheelsSpeed copyDesSpeed = desireSpeed;
 		speedMutex.unlock();
 		
@@ -157,12 +156,12 @@ WheelsDistance MobDifferentialChassis::getWheelDistance() {
 	return wheelDistance;
 }
 
-float MobDifferentialChassis::getSpeed(){
+WheelsSpeed MobDifferentialChassis::getSpeed(){
 	std::lock_guard<std::mutex> lock(speedMutex);
-	return frontSpeed;
+	return speed;
 }
 
 MobDifferentialChassis::~MobDifferentialChassis(){
-	end = true;
+	end.store(true);
 	loopPidThread.join();
 }
