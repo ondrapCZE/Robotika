@@ -1,3 +1,10 @@
+/*! 
+ *  \brief     Atmega encoder reader funtion implementation 
+ *  \author    Ondrej Pilat (pilat.ondrej@seznam.cz, ondrap.cz)
+ *  \version   0.1
+ *  \date      2013
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>

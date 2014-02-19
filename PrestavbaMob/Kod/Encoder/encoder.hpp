@@ -1,3 +1,10 @@
+/*!
+*  \brief     Encoder reader class
+*  \author    Ondrej Pilat (pilat.ondrej@seznam.cz, ondrap.cz)
+*  \version   0.1
+*  \date      2013
+*/
+
 #ifndef ENCODER_H
 #define ENCODER_H
 
