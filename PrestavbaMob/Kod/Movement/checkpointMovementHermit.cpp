@@ -136,7 +136,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			moveToCheckpoint(last,target);
 			last = target;
 		}else{		
-			chassis->stop();
+			//chassis->stop();
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}

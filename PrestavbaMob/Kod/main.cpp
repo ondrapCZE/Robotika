@@ -30,8 +30,14 @@ int main(){
 	
 	basic.addCheckpoint(Checkpoint(Position(1,0)));
 	basic.addCheckpoint(Checkpoint(Position(1,1)));
-	basic.addCheckpoint(Checkpoint(Position(0,1)));
-	basic.addCheckpoint(Checkpoint(Position(0,0)));
+        basic.addCheckpoint(Checkpoint(Position(0.5,2)));
+        basic.addCheckpoint(Checkpoint(Position(0,1)));
+	basic.addCheckpoint(Checkpoint(Position(1,1)));
+        basic.addCheckpoint(Checkpoint(Position(0,0)));
+        basic.addCheckpoint(Checkpoint(Position(0,1)));
+        basic.addCheckpoint(Checkpoint(Position(1,0)));
+	//basic.addCheckpoint(Checkpoint(Position(0.5f,0.5f)));
+	//basic.addCheckpoint(Checkpoint(Position(0,0)));
 
 	/*
 	for (int i = 0; i < 4; ++i) {
