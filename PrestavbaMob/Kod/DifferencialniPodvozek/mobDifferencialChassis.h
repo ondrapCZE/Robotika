@@ -26,8 +26,8 @@ class MobDifferentialChassis : public BasicDifferentialChassis {
 
 	State robotState;
 	WheelsDistance wheelDistance;
+	WheelsSpeed speed;
 	WheelsSpeed desireSpeed;
-	float frontSpeed;
 	
 	std::atomic<bool> end;
 	std::thread loopPidThread;
@@ -63,7 +63,7 @@ public:
 	State getState();
 
 	WheelsDistance getWheelDistance();
-	float getSpeed();
+	WheelsSpeed getSpeed();
 	
 	~MobDifferentialChassis();
 };

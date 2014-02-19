@@ -107,7 +107,7 @@ public:
 	virtual void setSpeed(const float left, const float right) = 0;
 	virtual State getState() = 0;
 	virtual WheelsDistance getWheelDistance() = 0;
-	virtual float getSpeed() = 0;	
+	virtual WheelsSpeed getSpeed() = 0;
 	virtual float getMaxSpeed(){ return diffChassisParam.maxSpeed; };
 	virtual float getWheelbase(){ return diffChassisParam.wheelbase; };
 };
