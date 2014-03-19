@@ -4,20 +4,22 @@
 #include <vector>
 #include <mutex>
 
-#include "particle.hpp"
-#include "particle_visitor.hpp"
-
 namespace mcl{
 
-typedef std::vector<Particle&> ParticleVector;
-
+template <class AdvancedParticle>
 class Mcl{
-    std::mutex lock;
-    ParticleVector particles_;
+    std::mutex mutex_;
+    std::vector<AdvancedParticle*> particles_;
 public:
-    void addParticle(Particle& particle);
+    void addParticle(AdvancedParticle* particle);
     int adaptiveResample();
     void resample(int count);
+};
+
+template <class AdvancedParticle>
+void Mcl<AdvancedParticle>::addParticle(AdvancedParticle* particle){
+    std::lock_guard<std::mutex> lock(mutex_);
+    particles_.push_back(particle);
 };
 
 }

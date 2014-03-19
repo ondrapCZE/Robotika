@@ -1,13 +1,15 @@
 #ifndef PARTICLE_H
 #define PARTICLE_H
 
+namespace mcl{
+
 class Particle{
 protected:
     double weight_;
 public:
-    virtual void accept(class ParticleVisitor &particleVisitor) = 0;
-    void weight(double weight){ weight = weight_ };
+    void weight(double weight){ weight = weight_; };
     double weight(){ return weight_; };
 };
 
+}
 #endif
