@@ -5,6 +5,7 @@ project(${PROJECT_NAME})
 
 ADD_DEFINITIONS(
     -std=c++11 # Or -std=c++0x
+    -pthread
     # Other flags
 )
 

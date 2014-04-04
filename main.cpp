@@ -1,12 +1,11 @@
 #include <cmath>
 #include <iostream>
 
-#include "MotorDriver/motorDriverSabertooth.hpp"
-#include "DifferencialniPodvozek/mobDifferencialChassis.h"
-#include "Encoder/encoderAtmel.hpp"
-#include "Movement/movement.h"
-#include "../../Display/display.h"
-#include "Movement/checkpointMovementHermit.hpp"
+#include "PrestavbaMob/Kod/MotorDriver/sabertooth/motorDriverSabertooth.hpp"
+#include "PrestavbaMob/Kod/DifferencialniPodvozek/mobDifferencialChassis.h"
+#include "PrestavbaMob/Kod/Encoder/encoderAtmel.hpp"
+#include "Display/display.h"
+#include "PrestavbaMob/Kod/Movement/hermit/checkpointMovementHermit.hpp"
 
 int main(){
 	// Init display 
@@ -18,7 +17,7 @@ int main(){
 	DiffChassisParam chassisParam;
 	chassisParam.wheelbase = 0.2335f;
 	chassisParam.wheelRadius = 0.0531f;
-	chassisParam.maxSpeed = 0.45f;
+	chassisParam.maxSpeed = 0.5f;
 	chassisParam.wheelTics = 29696; // Use 10bit resolution encoder and 29:1 gearbox
 	chassisParam.driver = new motorDriverSabertooth("/dev/ttyAMA0");
 	chassisParam.encoder = new encoderAtmel("/dev/i2c-1", 0x30);
