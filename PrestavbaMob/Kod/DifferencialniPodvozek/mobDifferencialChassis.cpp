@@ -8,7 +8,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include <fcntl.h>
-#include <c++/4.6/mutex>
+#include <mutex>
 #include <iostream>
 
 #include "mobDifferencialChassis.h"
