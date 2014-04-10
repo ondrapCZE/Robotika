@@ -11,15 +11,15 @@
 //#include "movement.h"
 
 class checkpointMovementHermit : public checkpointMovement{
-	tsqueue<Checkpoint> checkpointsQueue;
-	BasicDifferentialChassis* chassis;
+	tsqueue<Checkpoint> checkpointsQueue_;
+	BasicDifferentialChassis* chassis_;
 	
-	std::atomic<bool> end;
-	std::thread moveToCheckpointsThread;
+	std::atomic<bool> end_;
+	std::thread moveToCheckpointsThread_;
 	
-	const float epsilon = 0.01;
-	const float epsilonZero = 1.0e-10;
-	const float speed = 0.3f;
+	const float epsilon_ = 0.01;
+	const float epsilonZero_ = 1.0e-10;
+	float speed_ = 0.3f;
 	const float speedStep = 0.1f;
 	const unsigned int pointsOnMeter = 100; 
 	

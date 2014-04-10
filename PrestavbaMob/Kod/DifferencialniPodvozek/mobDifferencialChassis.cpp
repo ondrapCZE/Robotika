@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cmath>
+#include <iostream>
+#include <chrono>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -8,8 +10,7 @@
 #include <sys/time.h>
 #include <pthread.h>
 #include <fcntl.h>
-#include <mutex>
-#include <iostream>
+
 
 #include "mobDifferencialChassis.h"
 #include "../../../obecne/basic.h"
@@ -130,11 +131,33 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 	}
 }
 
-void MobDifferentialChassis::stop() {
+void MobDifferentialChassis::stop(bool slow) {
+
+	if(slow){
+		do{
+			WheelsSpeed desire;
+			if(wheelsSpeed_.left > 0){
+				desire.left = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.left - 0.1, 0.0 , wheelsSpeed_.left);
+			}else{
+				desire.left = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.left + 0.1, wheelsSpeed_.left, 0.0);
+			}
+
+			if(wheelsSpeed_.right > 0){
+				desire.right = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.right - 0.1, 0.0 , wheelsSpeed_.right);
+			}else{
+				desire.right = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.right + 0.1, wheelsSpeed_.right, 0.0);
+			}
+
+			setSpeed(desire);
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		}while(abs(wheelsSpeed_.left) < 0.001 &&  abs(wheelsSpeed_.right) < 0.001);
+	}else{
+		setSpeed(WheelsSpeed(0, 0));
+		diffChassisParam_.driver->stop();
+	}
+
 	PIParamLeft_.ISum = 0;
 	PIParamRight_.ISum = 0;
-	setSpeed(WheelsSpeed(0, 0));
-	diffChassisParam_.driver->stop();
 }
 
 void MobDifferentialChassis::setSpeed(const WheelsSpeed speed) {

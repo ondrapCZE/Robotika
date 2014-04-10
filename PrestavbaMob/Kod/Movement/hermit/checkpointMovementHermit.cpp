@@ -18,7 +18,7 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 	
 	// compute circle center
 	Circle circle;
-	if(std::abs(b) < epsilonZero){ // b is near to the zero
+	if(std::abs(b) < epsilonZero_){ // b is near to the zero
 		circle.center.x = -c/a;
 		circle.center.y = m*circle.center.x + g;
 	}else{ // b is greater than zero
@@ -74,13 +74,12 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 }
 
 void checkpointMovementHermit::moveToPosition(const Position& target){
-	State state = chassis->getState();
+	State state = chassis_->getState();
 	
-	while(target.distance(state.position) > epsilon){
-		printf("%f %f;\n",state.position.x, state.position.y);
+	while(target.distance(state.position) > epsilon_){
 		Circle circle = getCircle(state,target);
-		float shorterDiameter = circle.radius - chassis->getWheelbase()/2.0f;
-		float longerDiameter = circle.radius + chassis->getWheelbase()/2.0f;
+		float shorterDiameter = circle.radius - chassis_->getWheelbase()/2.0f;
+		float longerDiameter = circle.radius + chassis_->getWheelbase()/2.0f;
 		float wheelsRatio = shorterDiameter / longerDiameter;
 
 		float targetAngle = basic_robotic_fce::angle(state.position, target);
@@ -88,11 +87,11 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 
 		WheelsSpeed wheelsSpeed;
 		if(finalAngle >= 0 && finalAngle <= M_PI_2){
-				wheelsSpeed.left = speed*wheelsRatio;
-				wheelsSpeed.right = speed;
+				wheelsSpeed.left = speed_*wheelsRatio;
+				wheelsSpeed.right = speed_;
 		}else	if(finalAngle < 0 && finalAngle >= -M_PI_2){ // move to the right on the circle
-				wheelsSpeed.left = speed;
-				wheelsSpeed.right = speed*wheelsRatio;
+				wheelsSpeed.left = speed_;
+				wheelsSpeed.right = speed_*wheelsRatio;
 		}
 		
 		if(std::abs(finalAngle) > M_PI_2){
@@ -105,26 +104,26 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		//wheelsSpeed.right = getSmoothSpeed(wheelsSpeed.right,actualWheelsSpeed.right);
 		//printf("Actual speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
 		
-		chassis->setSpeed(wheelsSpeed);
+		chassis_->setSpeed(wheelsSpeed);
 	
 		std::this_thread::sleep_for(std::chrono::milliseconds(4));
-		state = chassis->getState();
+		state = chassis_->getState();
 	}
 }
 
 void checkpointMovementHermit::moveToCheckpoints() { 
-	State state = chassis->getState();
+	State state = chassis_->getState();
 	Checkpoint last;
-	last.position = chassis->getState().position; 
+	last.position = chassis_->getState().position; 
 	last.outVector = Vector(cos(state.angle),sin(state.angle));
-	while(!end){
+	while(!end_){
 		Checkpoint target;
-		if(checkpointsQueue.tryPop(target)){
+		if(checkpointsQueue_.tryPop(target)){
 			
 			if(!target.outVectorAssig){
 				Checkpoint next;
-				if(checkpointsQueue.tryFront(next)){
-					target.outVector = getOutputVector(chassis->getState().position,next);
+				if(checkpointsQueue_.tryFront(next)){
+					target.outVector = getOutputVector(chassis_->getState().position,next);
 				}
 			}
 			
@@ -136,36 +135,37 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			moveToCheckpoint(last,target);
 			last = target;
 		}else{		
-			//chassis->stop();
+			chassis_->stop(true);
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
 }
 
-checkpointMovementHermit::checkpointMovementHermit(BasicDifferentialChassis* chassis) : chassis(chassis) {
-	end = false;
-	moveToCheckpointsThread = std::move(std::thread(&checkpointMovementHermit::moveToCheckpoints,this));
+checkpointMovementHermit::checkpointMovementHermit(BasicDifferentialChassis* chassis) : chassis_(chassis) {
+	end_ = false;
+	speed_ = chassis->getMaxSpeed();
+	moveToCheckpointsThread_ = std::move(std::thread(&checkpointMovementHermit::moveToCheckpoints,this));
 }
 
 void checkpointMovementHermit::addCheckpoint(const Checkpoint& checkpoint){
-	checkpointsQueue.push(checkpoint);
+	checkpointsQueue_.push(checkpoint);
 }
 
 void checkpointMovementHermit::addCheckpoint(const std::vector<Checkpoint>& checkpoints){
 	for(auto element : checkpoints){
-		checkpointsQueue.push(element);
+		checkpointsQueue_.push(element);
 	}
 }
 
 State checkpointMovementHermit::getActualState(){
-	return chassis->getState();
+	return chassis_->getState();
 }
 
 void checkpointMovementHermit::clearCheckpoints(){
-	checkpointsQueue.clear();
+	checkpointsQueue_.clear();
 }
 
 checkpointMovementHermit::~checkpointMovementHermit(){
-	end = true;
-	moveToCheckpointsThread.join();
+	end_ = true;
+	moveToCheckpointsThread_.join();
 }

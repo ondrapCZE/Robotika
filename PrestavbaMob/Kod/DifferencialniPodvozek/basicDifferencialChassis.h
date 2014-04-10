@@ -102,7 +102,7 @@ public:
 	};
 	
 	
-	virtual void stop() = 0;
+	virtual void stop(bool slow) = 0;
 	virtual void setSpeed(const WheelsSpeed speed) = 0;
 	virtual void setSpeed(const float left, const float right) = 0;
 	virtual State getState() = 0;

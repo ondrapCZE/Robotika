@@ -52,7 +52,7 @@ public:
 	/*!
 	\param speed an struct Speed argument.
 	 */
-	void stop();
+	void stop(bool slow = false);
 
 	void setSpeed(const WheelsSpeed speed);
 	void setSpeed(const float left, const float right){ setSpeed(WheelsSpeed(left,right)); };
