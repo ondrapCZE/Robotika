@@ -67,7 +67,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 	float step  = 1.0f / (distance*pointsOnMeter);
 	for(float i = step; i <= 1.0f; i+=step){
 		Position positionHermit = getPointHermit(start,end,i);
-		printf("step %i \n", step);
+		printf("step %f \n", step);
 		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
 		printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
@@ -103,7 +103,7 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		//WheelsSpeed actualWheelsSpeed = chassis->getSpeed();
 		//wheelsSpeed.left = getSmoothSpeed(wheelsSpeed.left,actualWheelsSpeed.left);
 		//wheelsSpeed.right = getSmoothSpeed(wheelsSpeed.right,actualWheelsSpeed.right);
-		//printf("Actual speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
+		printf("Desire speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
 		
 		chassis_->setSpeed(wheelsSpeed);
 	
