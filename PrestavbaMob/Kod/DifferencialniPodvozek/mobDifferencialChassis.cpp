@@ -60,7 +60,7 @@ void MobDifferentialChassis::changeRobotState(WheelsDistance change) {
 	double angleChange = (change.right - change.left) / diffChassisParam_.wheelbase;
 	double distanceChange = (change.right + change.left) / 2;
 
-	std::lock_quard<mutex>(stateMutex_);
+	std::lock_guard<std::mutex> lock(stateMutex_);
 	wheelsDistance_.left += change.left;
 	wheelsDistance_.right += change.right;
 
