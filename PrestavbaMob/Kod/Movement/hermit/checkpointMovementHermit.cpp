@@ -83,7 +83,7 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		float shorterDiameter = circle.radius - chassis_->getWheelbase()/2.0f;
 		float longerDiameter = circle.radius + chassis_->getWheelbase()/2.0f;
 		float wheelsRatio = shorterDiameter / longerDiameter;
-		printf("Diameters shorter %f longer %f ratio %f \n" shorterDiameter, longerDiamter, wheelsRatio);
+		printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
 
 		float targetAngle = basic_robotic_fce::angle(state.position, target);
 		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);

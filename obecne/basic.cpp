@@ -18,20 +18,7 @@ double basic_robotic_fce::normAngle(double Angle) {
 }
 
 double basic_robotic_fce::angle(const Position start, const Position end){
-	double diffY = end.y - start.y;
-	double diffX = end.x - start.x;
-	double distance = std::hypot(diffX,diffY);
-	
-	if(distance == 0)
-		return 0;
-	
-	double angle = std::asin(diffY / distance);
-	
-	if(diffX < 0){
-		angle = M_PI - angle;
-	}
-	
-	return angle;
+	return atan2(end.x - start.x, end.y - start.y);
 }
 
 // algorithm from avr lib
