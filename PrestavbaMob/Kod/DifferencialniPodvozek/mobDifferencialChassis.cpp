@@ -24,11 +24,11 @@ MobDifferentialChassis::MobDifferentialChassis(const DiffChassisParam diffChassi
 	sendMotorPower(motorsPower(0, 0));
 
 	// Set PI regulator parameters for left wheel
-	PIParamLeft_.P = 200; // 740 oscillate value 
+	PIParamLeft_.P = 200;
 	PIParamLeft_.I = 12;
 	
 	// Set PI regulator parameters for right wheel
-	PIParamRight_.P = 200; // 740 oscillate value 
+	PIParamRight_.P = 200;
 	PIParamRight_.I = 12;
 
 	loopPidThread_ = std::move(std::thread(&MobDifferentialChassis::updateEncoders,this,5));

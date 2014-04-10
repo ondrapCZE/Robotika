@@ -67,9 +67,9 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 	float step  = 1.0f / (distance*pointsOnMeter);
 	for(float i = step; i <= 1.0f; i+=step){
 		Position positionHermit = getPointHermit(start,end,i);
-		printf("step %f \n", i);
+		//printf("step %f \n", i);
 		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
-		printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
+		//printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
 	}
 }
@@ -118,7 +118,6 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 }
 
 void checkpointMovementHermit::moveToCheckpoints() { 
-	State state = chassis_->getState();
 	Checkpoint last;
 	bool robotWaited = true;
 	while(!end_){
@@ -139,17 +138,21 @@ void checkpointMovementHermit::moveToCheckpoints() {
 							target.outVector.y);
 
 			if(robotWaited){
-				last.position = chassis_->getState().position;
+				State state = chassis_->getState();
+				last.position = state.position;
 				last.outVector = Vector(cos(state.angle),sin(state.angle));
 			}
 
 			moveToCheckpoint(last,target);
 			robotWaited = false;
 			last = target;
-		}else{		
-			chassis_->stop(true);
-			robotWaited = true;
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}else{
+			if(!robotWaited){
+				chassis_->stop(true);
+				robotWaited = true;
+			}
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(40));
 		}
 	}
 }
