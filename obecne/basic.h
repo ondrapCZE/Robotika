@@ -111,7 +111,7 @@ namespace basic_robotic_fce {
 	 */
 	double normAngle(double Angle);
 
-	double angle(const Position start,const Position end);
+	double angle(const Position &start,const Position &end);
 	
 	uint8_t crc8(uint8_t crc, uint8_t data);
 

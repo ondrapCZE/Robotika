@@ -1,30 +1,35 @@
 #include <iostream>
 #include <cmath>
 #include <utility>
+#include <limits>
 
 #include "checkpointMovementHermit.hpp"
 //#include "movement.h"
 
 Circle checkpointMovementHermit::getCircle(const State& state, const Position& point){
-	// compute line on which is all circle centers
+	// compute line on which is placed all circle centers
 	Position average = (state.position + point)/2;
 	float a = point.x - state.position.x;
 	float b = point.y - state.position.y;
 	float c = -a*average.x - b*average.y;
 	
 	// compute tanget line to the state
-	float m = std::tan(state.angle + M_PI_2);
-	float g = state.position.y - state.position.x*m;
+	float a_chassis = -sin(state.angle);
+	float b_chassis = cos(state.angle);
+    float c_chassis = -a_chassis*state.position.x - b_chassis*state.position.y;
 	
-	// compute circle center
 	Circle circle;
-	if(std::abs(b) < epsilonZero_){ // b is near to the zero
-		circle.center.x = -c/a;
-		circle.center.y = m*circle.center.x + g;
-	}else{ // b is greater than zero
-		circle.center.x = (-b*g -c)/(a + m*b);
-		circle.center.y = (-a*circle.center.x -c)/b;
-	}	
+	float scale = a*b_chassis - b*a_chassis;
+
+	if(abs(scale) > epsilonZero_){
+		circle.center.x = (b*c_chassis - c*b_chassis) / scale;
+		circle.center.y = (c*a_chassis - a*c_chassis) / scale;
+	}else{ // center is in the infinity, lines are parallel
+		circle.center.x = std::numeric_limits<int>::max();
+		circle.center.y = std::numeric_limits<int>::max();
+	}
+
+
 	
 	circle.radius = circle.center.distance(state.position);
 	//printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
