@@ -89,6 +89,8 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
 		printf("Angle target %f final %f \n", targetAngle, finalAngle);
 
+
+		//TODO: fix backward movement if angle is bigger than M_PI_2 !!!
 		WheelsSpeed wheelsSpeed;
 		if(finalAngle >= 0 && finalAngle <= M_PI_2){
 				wheelsSpeed.left = speed_*wheelsRatio;
@@ -118,8 +120,7 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 void checkpointMovementHermit::moveToCheckpoints() { 
 	State state = chassis_->getState();
 	Checkpoint last;
-	last.position = chassis_->getState().position; 
-	last.outVector = Vector(cos(state.angle),sin(state.angle));
+	bool robotWaited = true;
 	while(!end_){
 		Checkpoint target;
 		if(checkpointsQueue_.tryPop(target)){
@@ -136,10 +137,18 @@ void checkpointMovementHermit::moveToCheckpoints() {
 							target.position.y,
 							target.outVector.x,
 							target.outVector.y);
+
+			if(robotWaited){
+				last.position = chassis_->getState().position;
+				last.outVector = Vector(cos(state.angle),sin(state.angle));
+			}
+
 			moveToCheckpoint(last,target);
+			robotWaited = false;
 			last = target;
 		}else{		
 			chassis_->stop(true);
+			robotWaited = true;
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
 	}
