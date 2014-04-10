@@ -19,21 +19,21 @@ struct Distance {
 };
 
 class MobDifferentialChassis : public BasicDifferentialChassis {
-	double metersPerTick;
+	double metersPerTick_;
 
-	PIValue PIParamLeft;
-	PIValue PIParamRight;
+	PIValue PIParamLeft_;
+	PIValue PIParamRight_;
 
-	State robotState;
-	WheelsDistance wheelDistance;
-	WheelsSpeed speed;
-	WheelsSpeed desireSpeed;
+	State robotState_;
+	WheelsDistance wheelsDistance_;
+	WheelsSpeed wheelsSpeed_;
+	WheelsSpeed wheelsDesireSpeed_;
 	
-	std::atomic<bool> end;
-	std::thread loopPidThread;
+	std::atomic<bool> end_;
+	std::thread loopPidThread_;
 
-	std::mutex stateMutex;
-	std::mutex speedMutex;
+	std::mutex stateMutex_;
+	std::mutex speedMutex_;
 
 	WheelsDistance computeDistance(Encoders distance);
 	WheelsSpeed computeSpeed(WheelsDistance distance, float time); // distance in m and time in sec

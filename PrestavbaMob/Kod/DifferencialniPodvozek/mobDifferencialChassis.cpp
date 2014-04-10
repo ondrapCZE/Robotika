@@ -17,32 +17,32 @@
 const unsigned int BUFFER_SIZE = 10;
 
 MobDifferentialChassis::MobDifferentialChassis(const DiffChassisParam diffChassisParam) : BasicDifferentialChassis(diffChassisParam) {
-	end.store(false);
-	metersPerTick = (2 * M_PI * diffChassisParam.wheelRadius) / (float) diffChassisParam.wheelTics;
+	end_.store(false);
+	metersPerTick_ = (2 * M_PI * diffChassisParam.wheelRadius) / (float) diffChassisParam.wheelTics;
 
 	sendMotorPower(motorsPower(0, 0));
 
 	// Set PI regulator parameters for left wheel
-	PIParamLeft.P = 200; // 740 oscillate value 
-	PIParamLeft.I = 12;
+	PIParamLeft_.P = 200; // 740 oscillate value 
+	PIParamLeft_.I = 12;
 	
 	// Set PI regulator parameters for right wheel
-	PIParamRight.P = 200; // 740 oscillate value 
-	PIParamRight.I = 12;
+	PIParamRight_.P = 200; // 740 oscillate value 
+	PIParamRight_.I = 12;
 
-	loopPidThread = std::move(std::thread(&MobDifferentialChassis::updateEncoders,this,5));
+	loopPidThread_ = std::move(std::thread(&MobDifferentialChassis::updateEncoders,this,5));
 	// set thread higher priority and FIFO order
 	struct sched_param param;
 	param.__sched_priority = 90;
-	pthread_setschedparam(loopPidThread.native_handle(),SCHED_FIFO,&param);
+	pthread_setschedparam(loopPidThread_.native_handle(),SCHED_FIFO,&param);
 	
 	//pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
 WheelsDistance MobDifferentialChassis::computeDistance(Encoders distance) {
 	WheelsDistance distanceInMeters;
-	distanceInMeters.left = distance.left * metersPerTick;
-	distanceInMeters.right = distance.right * metersPerTick;
+	distanceInMeters.left = distance.left * metersPerTick_;
+	distanceInMeters.right = distance.right * metersPerTick_;
 
 	return distanceInMeters;
 }
@@ -56,25 +56,25 @@ WheelsSpeed MobDifferentialChassis::computeSpeed(WheelsDistance distance, float 
 }
 
 void MobDifferentialChassis::changeRobotState(WheelsDistance change) {
-	double angleChange = (change.right - change.left) / diffChassisParam.wheelbase;
+	double angleChange = (change.right - change.left) / diffChassisParam_.wheelbase;
 	double distanceChange = (change.right + change.left) / 2;
 
-	stateMutex.lock();
-	wheelDistance.left += change.left;
-	wheelDistance.right += change.right;
+	stateMutex_.lock();
+	wheelsDistance_.left += change.left;
+	wheelsDistance_.right += change.right;
 
-	robotState.position.x += distanceChange * cos(robotState.angle + (angleChange / 2.0f));
-	robotState.position.y += distanceChange * sin(robotState.angle + (angleChange / 2.0f));
-	robotState.angle += angleChange;
-	stateMutex.unlock();
+	robotState_.position.x += distanceChange * cos(robotState_.angle + (angleChange / 2.0f));
+	robotState_.position.y += distanceChange * sin(robotState_.angle + (angleChange / 2.0f));
+	robotState_.angle += angleChange;
+	stateMutex_.unlock();
 }
 
 Encoders MobDifferentialChassis::getChangeOfEncoders() {
-	return diffChassisParam.encoder->getChangeOfEncoders();
+	return diffChassisParam_.encoder->getChangeOfEncoders();
 }
 
 int MobDifferentialChassis::sendMotorPower(struct motorsPower speedMotors) {
-	return diffChassisParam.driver->setMotorsPower(speedMotors);
+	return diffChassisParam_.driver->setMotorsPower(speedMotors);
 }
 
 int MobDifferentialChassis::PIRegulator(const float actualSpeed,const float desireSpeed, PIValue &PIParam) {
@@ -84,7 +84,7 @@ int MobDifferentialChassis::PIRegulator(const float actualSpeed,const float desi
 	int speed = PIParam.P * speedDifference + PIParam.I * PIParam.ISum;
 
 	// set in boundaries
-	return basic_robotic_fce::valueInRange<int>(speed, diffChassisParam.driver->getMaxPower());
+	return basic_robotic_fce::valueInRange<int>(speed, diffChassisParam_.driver->getMaxPower());
 }
 
 void MobDifferentialChassis::updateEncoders(const int period) {
@@ -92,7 +92,7 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 	//printf("Sleep time: %i \n\r", This->encodersAcquireTime);
 
 	long int lastMicroTime = 1;
-	while(!end.load()){
+	while(!end_.load()){
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
@@ -106,14 +106,14 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 		changeRobotState(distance);
 		//printf("Actual speed left: %f  right: %f \n\r", actualSpeed.left, actualSpeed.right);
 		
-		speedMutex.lock();
-		speed = actualSpeed;
-		WheelsSpeed copyDesSpeed = desireSpeed;
-		speedMutex.unlock();
+		speedMutex_.lock();
+		wheelsSpeed_ = actualSpeed;
+		WheelsSpeed copyDesSpeed = wheelsDesireSpeed_;
+		speedMutex_.unlock();
 		
 		motorsPower valueMotors;
-		valueMotors.left = PIRegulator(actualSpeed.left, copyDesSpeed.left, PIParamLeft);
-		valueMotors.right = PIRegulator(actualSpeed.right, copyDesSpeed.right, PIParamRight);
+		valueMotors.left = PIRegulator(actualSpeed.left, copyDesSpeed.left, PIParamLeft_);
+		valueMotors.right = PIRegulator(actualSpeed.right, copyDesSpeed.right, PIParamRight_);
 		//printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
 		
 		//printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
@@ -131,37 +131,37 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 }
 
 void MobDifferentialChassis::stop() {
-	PIParamLeft.ISum = 0;
-	PIParamRight.ISum = 0;
+	PIParamLeft_.ISum = 0;
+	PIParamRight_.ISum = 0;
 	setSpeed(WheelsSpeed(0, 0));
-	diffChassisParam.driver->stop();
+	diffChassisParam_.driver->stop();
 }
 
 void MobDifferentialChassis::setSpeed(const WheelsSpeed speed) {
 	WheelsSpeed safeSpeed;
-	safeSpeed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam.maxSpeed);
-	safeSpeed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam.maxSpeed);
+	safeSpeed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam_.maxSpeed);
+	safeSpeed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam_.maxSpeed);
 	
-	std::lock_guard<std::mutex> lock(speedMutex);
-	desireSpeed = safeSpeed;
+	std::lock_guard<std::mutex> lock(speedMutex_);
+	wheelsDesireSpeed_ = safeSpeed;
 }
 
 State MobDifferentialChassis::getState() {
-	std::lock_guard<std::mutex> lock(stateMutex);
-	return robotState;
+	std::lock_guard<std::mutex> lock(stateMutex_);
+	return robotState_;
 }
 
 WheelsDistance MobDifferentialChassis::getWheelDistance() {
-	std::lock_guard<std::mutex> lock(stateMutex);
-	return wheelDistance;
+	std::lock_guard<std::mutex> lock(stateMutex_);
+	return wheelsDistance_;
 }
 
 WheelsSpeed MobDifferentialChassis::getSpeed(){
-	std::lock_guard<std::mutex> lock(speedMutex);
-	return speed;
+	std::lock_guard<std::mutex> lock(speedMutex_);
+	return wheelsSpeed_;
 }
 
 MobDifferentialChassis::~MobDifferentialChassis(){
-	end.store(true);
-	loopPidThread.join();
+	end_.store(true);
+	loopPidThread_.join();
 }

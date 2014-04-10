@@ -5,14 +5,14 @@
 #include "../motorDriver.hpp"
 #include <unistd.h>  /* UNIX standard function definitions */
 
-class motorDriverMD22 : public motorDriver {
+class MotorDriverMD22 : public MotorDriver {
 	static const unsigned int MAX_POWER = 127;
 	static const unsigned int BUFFER_SIZE = 3;
 
-	int i2cDevice;
-	unsigned char buffer[BUFFER_SIZE];
+	int i2cDevice_;
+	unsigned char buffer_[BUFFER_SIZE];
 public:
-	motorDriverMD22(std::string deviceI2C, int driverAddress);
+	MotorDriverMD22(std::string deviceI2C, int driverAddress);
 	std::string getName();
 	unsigned int getMaxPower();
 
@@ -22,8 +22,8 @@ public:
 
 	int stop();
 
-	~motorDriverMD22() {
-		close(i2cDevice);
+	~MotorDriverMD22() {
+		close(i2cDevice_);
 	};
 };
 

@@ -13,7 +13,7 @@ struct Encoders{
 	int right;
 };
 
-class encoderReader {
+class EncoderReader {
 public:
 	virtual unsigned int getEncodersResolution()=0;
 	virtual Encoders getEncodersState()=0;

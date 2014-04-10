@@ -15,13 +15,13 @@ struct DiffChassisParam {
 	float reductionRatio; /*!< Both wheels have same reduction ratio on motors. */
 	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
 
-	encoderReader* encoder; /*!< Chassis have to have encoder on both wheels. */
-	motorDriver* driver; /*!< Motor power driver on the chassis wheels. */
+	EncoderReader* encoder; /*!< Chassis have to have encoder on both wheels. */
+	MotorDriver* driver; /*!< Motor power driver on the chassis wheels. */
 
 	//! Constructor only assign input parameters in the variables.
 	DiffChassisParam(const float wheelBase = 0,const float wheelRadius = 0,const float maxSpeed = 0,
-		const float reductionRatio = 0,const unsigned int wheelTics = 0, encoderReader* encoder = std::nullptr_t(),
-		motorDriver* driver = std::nullptr_t()) : wheelbase(wheelbase), wheelRadius(wheelRadius),
+		const float reductionRatio = 0,const unsigned int wheelTics = 0, EncoderReader* encoder = std::nullptr_t(),
+		MotorDriver* driver = std::nullptr_t()) : wheelbase(wheelbase), wheelRadius(wheelRadius),
 	maxSpeed(maxSpeed), reductionRatio(reductionRatio), wheelTics(wheelTics),
 	encoder(encoder), driver(driver) {
 	}; 
@@ -96,9 +96,9 @@ struct WheelsSpeed {
  //! Basic virtual differential chassis representation
 class BasicDifferentialChassis {
 protected:
-	DiffChassisParam diffChassisParam;
+	DiffChassisParam diffChassisParam_;
 public:
-	BasicDifferentialChassis(const DiffChassisParam diffChassisParam) : diffChassisParam(diffChassisParam) {
+	BasicDifferentialChassis(const DiffChassisParam diffChassisParam) : diffChassisParam_(diffChassisParam) {
 	};
 	
 	
@@ -108,8 +108,8 @@ public:
 	virtual State getState() = 0;
 	virtual WheelsDistance getWheelDistance() = 0;
 	virtual WheelsSpeed getSpeed() = 0;
-	virtual float getMaxSpeed(){ return diffChassisParam.maxSpeed; };
-	virtual float getWheelbase(){ return diffChassisParam.wheelbase; };
+	virtual float getMaxSpeed(){ return diffChassisParam_.maxSpeed; };
+	virtual float getWheelbase(){ return diffChassisParam_.wheelbase; };
 };
 
 #endif

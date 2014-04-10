@@ -9,17 +9,17 @@
 
 #include "../../../../obecne/basic.h"
 
-motorDriverSabertooth::motorDriverSabertooth(const std::string device) {
-	serialDevice = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+MotorDriverSabertooth::MotorDriverSabertooth(const std::string device) {
+	serialDevice_ = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
 
-	if (serialDevice < -1) {
+	if (serialDevice_ < -1) {
 		printf("Cannot open serial device: %s \n\r", device.c_str());
 		exit(1);
 	}
 
 	termios termiosSerialParams;
 
-	tcgetattr(serialDevice, &termiosSerialParams);
+	tcgetattr(serialDevice_, &termiosSerialParams);
 
 	termiosSerialParams.c_cflag &= ~PARENB;
 	termiosSerialParams.c_cflag &= ~CSTOPB;
@@ -31,29 +31,29 @@ motorDriverSabertooth::motorDriverSabertooth(const std::string device) {
 
 	termiosSerialParams.c_cflag |= (CLOCAL | CREAD);
 
-	tcsetattr(serialDevice, TCSANOW, &termiosSerialParams);
+	tcsetattr(serialDevice_, TCSANOW, &termiosSerialParams);
 	
 	stop();
 }
 
-std::string motorDriverSabertooth::getName() {
+std::string MotorDriverSabertooth::getName() {
 	return "Sabertooth 2x5 motor driver over serial line\n\r";
 }
 
-unsigned int motorDriverSabertooth::getMaxPower() {
+unsigned int MotorDriverSabertooth::getMaxPower() {
 	return MAX_POWER;
 }
 
-int motorDriverSabertooth::setMotorsPower(const int left, const int right) {
+int MotorDriverSabertooth::setMotorsPower(const int left, const int right) {
 	return setMotorsPower(motorsPower(left, right));
 }
 
-int motorDriverSabertooth::setMotorsPower(const motorsPower power) {
+int MotorDriverSabertooth::setMotorsPower(const motorsPower power) {
 	int returnState = 0;
 
-	buffer[0] = basic_robotic_fce::valueInRange<int>(power.left, MAX_POWER) + 64;
-	buffer[1] = basic_robotic_fce::valueInRange<int>(power.right, MAX_POWER) + 192;
-	if (write(serialDevice, buffer, 2) != 2) {
+	buffer_[0] = basic_robotic_fce::valueInRange<int>(power.left, MAX_POWER) + 64;
+	buffer_[1] = basic_robotic_fce::valueInRange<int>(power.right, MAX_POWER) + 192;
+	if (write(serialDevice_, buffer_, 2) != 2) {
 		printf("Cannot write to motor module \n\r");
 		returnState = 1; // error state
 	}
@@ -61,10 +61,10 @@ int motorDriverSabertooth::setMotorsPower(const motorsPower power) {
 	return returnState;
 }
 
-int motorDriverSabertooth::stop() {
+int MotorDriverSabertooth::stop() {
 	int returnState = 0;
-	buffer[0] = 0;
-	if (write(serialDevice, buffer, 1) != 1) {
+	buffer_[0] = 0;
+	if (write(serialDevice_, buffer_, 1) != 1) {
 		printf("Cannot write to motor module \n\r");
 		returnState = 1; // error state
 	}
