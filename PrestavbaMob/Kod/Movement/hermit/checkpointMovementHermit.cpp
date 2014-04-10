@@ -67,7 +67,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 	float step  = 1.0f / (distance*pointsOnMeter);
 	for(float i = step; i <= 1.0f; i+=step){
 		Position positionHermit = getPointHermit(start,end,i);
-		printf("step %f \n", step);
+		printf("step %f \n", i);
 		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
 		printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
@@ -79,12 +79,15 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 	
 	while(target.distance(state.position) > epsilon_){
 		Circle circle = getCircle(state,target);
+		printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
 		float shorterDiameter = circle.radius - chassis_->getWheelbase()/2.0f;
 		float longerDiameter = circle.radius + chassis_->getWheelbase()/2.0f;
 		float wheelsRatio = shorterDiameter / longerDiameter;
+		printf("Diameters shorter %f longer %f ratio %f \n" shorterDiameter, longerDiamter, wheelsRatio);
 
 		float targetAngle = basic_robotic_fce::angle(state.position, target);
 		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
+		printf("Angle target %f final %f \n", targetAngle, finalAngle);
 
 		WheelsSpeed wheelsSpeed;
 		if(finalAngle >= 0 && finalAngle <= M_PI_2){
