@@ -149,9 +149,9 @@ void MobDifferentialChassis::stop(bool slow) {
 			}
 
 			setSpeed(desire);
-			printf("Actual speed [%f,%f] desire speed [%f,%f]", abs(wheelsSpeed_.left), abs(wheelsSpeed_.right), desire.left, desire.right);
+			//printf("Actual speed [%f,%f] desire speed [%f,%f]\n", std::abs(wheelsSpeed_.left), std::abs(wheelsSpeed_.right), desire.left, desire.right);
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
-		}while(abs(wheelsSpeed_.left) > 0.001 &&  abs(wheelsSpeed_.right) > 0.001);
+		}while(std::abs(wheelsSpeed_.left) > 0.001 &&  std::abs(wheelsSpeed_.right) > 0.001);
 	}else{
 		setSpeed(WheelsSpeed(0, 0));
 		diffChassisParam_.driver->stop();
