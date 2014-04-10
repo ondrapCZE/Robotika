@@ -67,8 +67,9 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 	float step  = 1.0f / (distance*pointsOnMeter);
 	for(float i = step; i <= 1.0f; i+=step){
 		Position positionHermit = getPointHermit(start,end,i);
-		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
-		//printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
+		printf("step %i \n", step);
+		printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
+		printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
 	}
 }

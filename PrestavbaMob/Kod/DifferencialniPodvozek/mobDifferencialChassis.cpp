@@ -60,14 +60,13 @@ void MobDifferentialChassis::changeRobotState(WheelsDistance change) {
 	double angleChange = (change.right - change.left) / diffChassisParam_.wheelbase;
 	double distanceChange = (change.right + change.left) / 2;
 
-	stateMutex_.lock();
+	std::lock_quard<mutex>(stateMutex_);
 	wheelsDistance_.left += change.left;
 	wheelsDistance_.right += change.right;
 
 	robotState_.position.x += distanceChange * cos(robotState_.angle + (angleChange / 2.0f));
 	robotState_.position.y += distanceChange * sin(robotState_.angle + (angleChange / 2.0f));
 	robotState_.angle += angleChange;
-	stateMutex_.unlock();
 }
 
 Encoders MobDifferentialChassis::getChangeOfEncoders() {
@@ -150,7 +149,7 @@ void MobDifferentialChassis::stop(bool slow) {
 
 			setSpeed(desire);
 			//printf("Actual speed [%f,%f] desire speed [%f,%f]\n", std::abs(wheelsSpeed_.left), std::abs(wheelsSpeed_.right), desire.left, desire.right);
-			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}while(std::abs(wheelsSpeed_.left) > 0.001 &&  std::abs(wheelsSpeed_.right) > 0.001);
 	}else{
 		setSpeed(WheelsSpeed(0, 0));
