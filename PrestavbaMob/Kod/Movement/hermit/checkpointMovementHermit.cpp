@@ -14,12 +14,12 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 	float c = -a*average.x - b*average.y;
 	
 	// compute tanget line to the state
-	float a_chassis = -sin(state.angle);
-	float b_chassis = cos(state.angle);
+	float a_chassis = cos(state.angle);
+	float b_chassis = sin(state.angle);
     float c_chassis = -a_chassis*state.position.x - b_chassis*state.position.y;
 	
-
 	float scale = a*b_chassis - b*a_chassis;
+	printf("Scale %f abs(Scale) %f \n", scale, abs(scale));
 	Circle circle;
 	if(abs(scale) > epsilonZero_){
 		circle.center.x = (b*c_chassis - c*b_chassis) / scale;
