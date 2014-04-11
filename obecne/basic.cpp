@@ -18,7 +18,7 @@ double basic_robotic_fce::normAngle(double Angle) {
 }
 
 double basic_robotic_fce::angle(const Position &start, const Position &end){
-	return atan2(end.x - start.x, end.y - start.y);
+	return atan2(end.y - start.y, end.x - start.x);
 }
 
 // algorithm from avr lib
