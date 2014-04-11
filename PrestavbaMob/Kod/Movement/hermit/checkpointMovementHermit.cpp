@@ -19,9 +19,9 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
     float c_chassis = -a_chassis*state.position.x - b_chassis*state.position.y;
 	
 	float scale = a*b_chassis - b*a_chassis;
-	printf("Scale %f abs(Scale) %f \n", scale, abs(scale));
+	printf("Scale %f abs(Scale) %f \n", scale, std::abs(scale));
 	Circle circle;
-	if(abs(scale) > epsilonZero_){
+	if(std::abs(scale) > epsilonZero_){
 		circle.center.x = (b*c_chassis - c*b_chassis) / scale;
 		circle.center.y = (c*a_chassis - a*c_chassis) / scale;
 	}else{ // center is in the infinity, lines are parallel
