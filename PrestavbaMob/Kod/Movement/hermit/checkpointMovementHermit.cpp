@@ -18,9 +18,9 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 	float b_chassis = cos(state.angle);
     float c_chassis = -a_chassis*state.position.x - b_chassis*state.position.y;
 	
-	Circle circle;
-	float scale = a*b_chassis - b*a_chassis;
 
+	float scale = a*b_chassis - b*a_chassis;
+	Circle circle;
 	if(abs(scale) > epsilonZero_){
 		circle.center.x = (b*c_chassis - c*b_chassis) / scale;
 		circle.center.y = (c*a_chassis - a*c_chassis) / scale;
@@ -28,8 +28,6 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 		circle.center.x = std::numeric_limits<int>::max();
 		circle.center.y = std::numeric_limits<int>::max();
 	}
-
-
 	
 	circle.radius = circle.center.distance(state.position);
 	//printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
