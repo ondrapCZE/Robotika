@@ -19,7 +19,7 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
     float c_chassis = -a_chassis*state.position.x - b_chassis*state.position.y;
 	
 	float scale = a*b_chassis - b*a_chassis;
-	printf("Scale %f abs(Scale) %f \n", scale, std::abs(scale));
+	//printf("Scale %f abs(Scale) %f \n", scale, std::abs(scale));
 	Circle circle;
 	if(std::abs(scale) > epsilonZero_){
 		circle.center.x = (b*c_chassis - c*b_chassis) / scale;
@@ -82,15 +82,15 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 	
 	while(target.distance(state.position) > epsilon_){
 		Circle circle = getCircle(state,target);
-		printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
+		//printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
 		float shorterDiameter = circle.radius - chassis_->getWheelbase()/2.0f;
 		float longerDiameter = circle.radius + chassis_->getWheelbase()/2.0f;
 		float wheelsRatio = shorterDiameter / longerDiameter;
-		printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
+		//printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
 
 		float targetAngle = basic_robotic_fce::angle(state.position, target);
 		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
-		printf("Angle target %f final %f \n", targetAngle, finalAngle);
+		//printf("Angle target %f final %f \n", targetAngle, finalAngle);
 
 
 		//TODO: fix backward movement if angle is bigger than M_PI_2 !!!
@@ -111,7 +111,7 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		//WheelsSpeed actualWheelsSpeed = chassis->getSpeed();
 		//wheelsSpeed.left = getSmoothSpeed(wheelsSpeed.left,actualWheelsSpeed.left);
 		//wheelsSpeed.right = getSmoothSpeed(wheelsSpeed.right,actualWheelsSpeed.right);
-		printf("Desire speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
+		//printf("Desire speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
 		
 		chassis_->setSpeed(wheelsSpeed);
 	
