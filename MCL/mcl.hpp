@@ -7,7 +7,7 @@
 
 namespace mcl{
 
-template <class AdvancedParticle>
+template <class AdvancedParticle, class Visitor>
 class Mcl{
     static const unsigned int MAX_PARTICLES;
 
@@ -21,19 +21,20 @@ class Mcl{
 public:
     Mcl();
     void addParticle(AdvancedParticle particle);
+    void visit(const Visitor &visitor);
     void resample(int count);
 };
 
-template <class AdvancedParticle>
-const unsigned int Mcl<AdvancedParticle>::MAX_PARTICLES = 100;
+template <class AdvancedParticle, class Visitor>
+const unsigned int Mcl<AdvancedParticle, Visitor>::MAX_PARTICLES = 100;
 
 // ======================== private functions =======================
 
-template <class AdvancedParticle>
-double Mcl<AdvancedParticle>::particlesWeightSum(){
+template <class AdvancedParticle, class Visitor>
+double Mcl<AdvancedParticle, Visitor>::particlesWeightSum(){
     double weightSum = 0;
     for (auto particle : particles_){
-        weightSum += particle.weight();
+        weightSum += particle.weight_();
     }
 
     return weightSum;
@@ -41,21 +42,28 @@ double Mcl<AdvancedParticle>::particlesWeightSum(){
 
 // ======================== public functions ========================
 
-template <class AdvancedParticle>
-Mcl<AdvancedParticle>::Mcl() 
+template <class AdvancedParticle, class Visitor>
+Mcl<AdvancedParticle, Visitor>::Mcl()
 : randomGenerator_(0)
 {
     
 };
 
-template <class AdvancedParticle>
-void Mcl<AdvancedParticle>::addParticle(AdvancedParticle particle){
+template <class AdvancedParticle, class Visitor>
+void Mcl<AdvancedParticle, Visitor>::addParticle(AdvancedParticle particle){
     std::lock_guard<std::mutex> lock(mutex_);
     particles_.push_back(particle);
 };
 
-template <class AdvancedParticle>
-void Mcl<AdvancedParticle>::resample(int count){
+template <class AdvancedParticle, class Visitor>
+void Mcl<AdvancedParticle, Visitor>::visit(const Visitor &visitor){
+	for(auto particle : particles_){
+		particle.accept(visitor);
+	}
+}
+
+template <class AdvancedParticle, class Visitor>
+void Mcl<AdvancedParticle, Visitor>::resample(int count){
     std::lock_guard<std::mutex> lock(mutex_);
 
     double weightSum = particlesWeightSum();
