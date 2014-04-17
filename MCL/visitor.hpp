@@ -6,7 +6,7 @@ namespace mcl{
 template <class AdvancedParticle>
 class Visitor{
 public:
-	virtual void visit(AdvancedParticle &particle) = 0;
+	virtual void visit(AdvancedParticle *particle) = 0;
 };
 
 }

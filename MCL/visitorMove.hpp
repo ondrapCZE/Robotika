@@ -18,7 +18,7 @@ class VisitorMove : public Visitor<AdvancedParticle>{
 	std::normal_distribution<double> normDistr_;
 public:
 	VisitorMove(double alpha, double distance, double beta, std::mt19937 &randomGenerator);
-	void visit(AdvancedParticle &particle);
+	void visit(AdvancedParticle *particle);
 };
 
 template <class AdvancedParticle>
@@ -30,8 +30,14 @@ randomGenerator_(randomGenerator){
 }
 
 template <class AdvancedParticle>
-void VisitorMove<AdvancedParticle>::visit(AdvancedParticle &particle){
-	particle.state.angle += alpha_ + normDistr_(randomGenerator_)*alpha_;
+void VisitorMove<AdvancedParticle>::visit(AdvancedParticle *particle){
+	particle->state.angle += basic_robotic_fce::normAngle(alpha_ + normDistr_(randomGenerator_)*alpha_);
+
+	double distanceNoised = distance_ + normDistr_(randomGenerator_)*distance_;
+	particle->state.position.x += cos(particle->state.angle) * distanceNoised;
+	particle->state.position.y += sin(particle->state.angle) * distanceNoised;
+
+	particle->state.angle += basic_robotic_fce::normAngle(beta_ + normDistr_(randomGenerator_)*beta_);
 }
 
 }

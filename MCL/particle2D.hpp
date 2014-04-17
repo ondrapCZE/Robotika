@@ -3,7 +3,7 @@
 
 #include "particle.hpp"
 #include "visitor.hpp"
-#include "../obecne/obecne.hpp"
+#include "../obecne/basic.h"
 
 namespace mcl{
 
@@ -11,7 +11,7 @@ namespace mcl{
 		State state_;
 	public:
 		State state();
-		void accept(const Visitor &visitor);
+		void accept(Visitor<Particle2D> &visitor);
 	};
 
 }

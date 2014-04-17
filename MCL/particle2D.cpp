@@ -6,3 +6,7 @@ using namespace mcl;
 State Particle2D::state(){
 	return state_;
 }
+
+void Particle2D::accept(Visitor<Particle2D> &visitor){
+	visitor.visit(this);
+}
