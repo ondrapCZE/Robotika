@@ -87,6 +87,26 @@ struct State{
 
 	State(double X = 0, double Y = 0, double Angle = 0) : position(X, Y), angle(Angle) {
 	};
+
+	State operator-(const State &ob2) const{
+		State temp(position.x - ob2.position.x, position.y - ob2.position.y, angle - ob2.angle);
+		return temp;
+	};
+
+	State operator+(const State &ob2) const{
+		State temp(position.x + ob2.position.x, position.y + ob2.position.y, angle + ob2.angle);
+		return temp;
+	};
+
+	State operator*(const State &ob2) const{
+		State temp(position.x * ob2.position.x, position.y * ob2.position.y, angle * ob2.angle);
+		return temp;
+	};
+
+	State operator/(const double a) const{
+		State temp(position.x / a, position.y / a, angle / a);
+		return temp;
+	};
 };
 
 struct Circle{

@@ -21,7 +21,7 @@ class Mcl{
 public:
     Mcl();
     void addParticle(AdvancedParticle particle);
-    void visit(const Visitor &visitor);
+    void visit(Visitor &visitor);
     void resample(int count);
 };
 
@@ -56,9 +56,9 @@ void Mcl<AdvancedParticle, Visitor>::addParticle(AdvancedParticle particle){
 };
 
 template <class AdvancedParticle, class Visitor>
-void Mcl<AdvancedParticle, Visitor>::visit(const Visitor &visitor){
-	for(auto particle : particles_){
-		particle.accept(visitor);
+void Mcl<AdvancedParticle, Visitor>::visit(Visitor &visitor){
+	for(int i=0; i < particles_.size(); ++i ){
+		particles_[i].accept(visitor);
 	}
 }
 

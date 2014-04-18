@@ -10,6 +10,8 @@ namespace mcl{
 	class Particle2D : public Particle {
 		State state_;
 	public:
+		Particle2D(const double &x = 0, const double &y = 0, const double &theta = 0);
+		void state(const State &state);
 		State state();
 		void accept(Visitor<Particle2D> &visitor);
 	};
