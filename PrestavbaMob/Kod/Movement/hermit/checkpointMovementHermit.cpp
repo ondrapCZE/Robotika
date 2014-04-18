@@ -101,11 +101,17 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		}else	if(finalAngle < 0 && finalAngle >= -M_PI_2){ // move to the right on the circle
 				wheelsSpeed.left = speed_;
 				wheelsSpeed.right = speed_*wheelsRatio;
+		}else if(finalAngle > M_PI_2 && finalAngle < M_PI){
+			wheelsSpeed.left = speed_;
+			wheelsSpeed.right = -speed_;
+		}else if(finalAngle < -M_PI_2 && finalAngle > -M_PI){
+			wheelsSpeed.left = -speed_;
+			wheelsSpeed.right = speed_;
 		}
 		
 		if(std::abs(finalAngle) > M_PI_2){
-			wheelsSpeed.left = -wheelsSpeed.left;
-			wheelsSpeed.right = -wheelsSpeed.right;
+			printf("We test backward motion. \n");
+
 		}
 		
 		//WheelsSpeed actualWheelsSpeed = chassis->getSpeed();
