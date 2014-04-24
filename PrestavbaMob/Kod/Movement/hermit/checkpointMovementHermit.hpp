@@ -20,13 +20,11 @@ class checkpointMovementHermit : public checkpointMovement{
 	const float epsilon_ = 0.01;
 	const float epsilonZero_ = 1.0e-10;
 	float speed_ = 0.3f;
-	const float speedStep = 0.1f;
-	const unsigned int pointsOnMeter = 100; 
+	const unsigned int pointsOnMeter = 100;
 	
 	Circle getCircle(const State &state, const Position &point);
 	Vector getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness = 0.5f);
 	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);
-	float getSmoothSpeed(float desireSpeed, float actualSpeed);
 	
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);
 	void moveToPosition(const Position &target);

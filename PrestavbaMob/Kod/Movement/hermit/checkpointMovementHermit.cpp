@@ -54,25 +54,11 @@ Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual, cons
 	return curvePosition;
 }
 
-float checkpointMovementHermit::getSmoothSpeed(float desireSpeed, float actualSpeed){
-	float outSpeed = actualSpeed;
-	if(desireSpeed > actualSpeed){
-		outSpeed += speedStep;
-	}else{
-		outSpeed -= speedStep; 
-	}
-	
-	return basic_robotic_fce::valueInRange(outSpeed,desireSpeed);
-}
-
 void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Checkpoint &end){
 	float distance = start.position.distance(end.position);
 	float step  = 1.0f / (distance*pointsOnMeter);
 	for(float i = step; i <= 1.0f; i+=step){
 		Position positionHermit = getPointHermit(start,end,i);
-		//printf("step %f \n", i);
-		//printf("position %f %f %f %f \n",actual.position.x, actual.position.y, actual.outVector.x, actual.outVector.y);
-		//printf("hermit %f %f \n",positionHermit.x,positionHermit.y);
 		moveToPosition(positionHermit);
 	}
 }
@@ -102,11 +88,11 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 				wheelsSpeed.left = speed_;
 				wheelsSpeed.right = speed_*wheelsRatio;
 		}else if(finalAngle > M_PI_2 && finalAngle < M_PI){
-			wheelsSpeed.left = speed_;
+			wheelsSpeed.left = -speed_*wheelsRatio;
 			wheelsSpeed.right = -speed_;
 		}else if(finalAngle < -M_PI_2 && finalAngle > -M_PI){
 			wheelsSpeed.left = -speed_;
-			wheelsSpeed.right = speed_;
+			wheelsSpeed.right = -speed_*wheelsRatio;
 		}
 		
 		if(std::abs(finalAngle) > M_PI_2){
@@ -114,14 +100,9 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 
 		}
 		
-		//WheelsSpeed actualWheelsSpeed = chassis->getSpeed();
-		//wheelsSpeed.left = getSmoothSpeed(wheelsSpeed.left,actualWheelsSpeed.left);
-		//wheelsSpeed.right = getSmoothSpeed(wheelsSpeed.right,actualWheelsSpeed.right);
-		//printf("Desire speed[%f,%f] \n", wheelsSpeed.left, wheelsSpeed.right);
-		
 		chassis_->setSpeed(wheelsSpeed);
 	
-		std::this_thread::sleep_for(std::chrono::milliseconds(4));
+		std::this_thread::sleep_for(std::chrono::milliseconds(2));
 		state = chassis_->getState();
 	}
 }
