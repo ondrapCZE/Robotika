@@ -64,13 +64,13 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 }
 
 void checkpointMovementHermit::moveToPosition(const Position& target){
-	State state = chassis_->getState();
+	State state = chassis_.getState();
 	
 	while(target.distance(state.position) > epsilon_){
 		Circle circle = getCircle(state,target);
 		//printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
-		float shorterDiameter = circle.radius - chassis_->getWheelbase()/2.0f;
-		float longerDiameter = circle.radius + chassis_->getWheelbase()/2.0f;
+		float shorterDiameter = circle.radius - chassis_.getWheelbase()/2.0f;
+		float longerDiameter = circle.radius + chassis_.getWheelbase()/2.0f;
 		float wheelsRatio = shorterDiameter / longerDiameter;
 		//printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
 
@@ -100,10 +100,10 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 
 		}
 		
-		chassis_->setSpeed(wheelsSpeed);
+		chassis_.setSpeed(wheelsSpeed);
 	
 		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		state = chassis_->getState();
+		state = chassis_.getState();
 	}
 }
 
@@ -117,7 +117,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			if(!target.outVectorAssig){
 				Checkpoint next;
 				if(checkpointsQueue_.tryFront(next)){
-					target.outVector = getOutputVector(chassis_->getState().position,next);
+					target.outVector = getOutputVector(chassis_.getState().position,next);
 				}
 			}
 			
@@ -128,7 +128,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 							target.outVector.y);
 
 			if(robotWaited){
-				State state = chassis_->getState();
+				State state = chassis_.getState();
 				last.position = state.position;
 				last.outVector = Vector(cos(state.angle),sin(state.angle));
 			}
@@ -138,7 +138,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			last = target;
 		}else{
 			if(!robotWaited){
-				chassis_->stop(true);
+				chassis_.stop(true);
 				robotWaited = true;
 			}
 
@@ -147,9 +147,9 @@ void checkpointMovementHermit::moveToCheckpoints() {
 	}
 }
 
-checkpointMovementHermit::checkpointMovementHermit(BasicDifferentialChassis* chassis) : chassis_(chassis) {
+checkpointMovementHermit::checkpointMovementHermit(BasicDifferentialChassis &chassis) : chassis_(chassis) {
 	end_ = false;
-	speed_ = chassis->getMaxSpeed();
+	speed_ = chassis.getMaxSpeed();
 	moveToCheckpointsThread_ = std::move(std::thread(&checkpointMovementHermit::moveToCheckpoints,this));
 }
 
@@ -161,10 +161,6 @@ void checkpointMovementHermit::addCheckpoint(const std::vector<Checkpoint>& chec
 	for(auto element : checkpoints){
 		checkpointsQueue_.push(element);
 	}
-}
-
-State checkpointMovementHermit::getActualState(){
-	return chassis_->getState();
 }
 
 void checkpointMovementHermit::clearCheckpoints(){

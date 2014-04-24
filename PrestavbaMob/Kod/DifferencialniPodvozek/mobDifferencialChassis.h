@@ -19,11 +19,6 @@ struct Distance {
 };
 
 class MobDifferentialChassis : public BasicDifferentialChassis {
-	double metersPerTick_;
-
-	PIValue PIParamLeft_;
-	PIValue PIParamRight_;
-
 	State robotState_;
 	WheelsDistance wheelsDistance_;
 	WheelsSpeed wheelsSpeed_;
@@ -47,7 +42,7 @@ class MobDifferentialChassis : public BasicDifferentialChassis {
 	void updateEncoders(const int period); // time in ms	
 public:
 
-	MobDifferentialChassis(const DiffChassisParam diffChassisParam);
+	MobDifferentialChassis(DiffChassisParam &diffChassisParam);
 	//! 
 	/*!
 	\param speed an struct Speed argument.

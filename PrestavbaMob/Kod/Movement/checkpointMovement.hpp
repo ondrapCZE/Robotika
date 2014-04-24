@@ -10,8 +10,6 @@ struct Checkpoint{
 	Position position;
 	Vector outVector;
 	
-	//Checkpoint(){;};
-	
 	Checkpoint(Position position = Position()) : position(position), 
 	outVectorAssig(false){};
 	
@@ -24,7 +22,6 @@ public:
 	virtual void addCheckpoint(const Checkpoint &checkpoint)=0;
 	virtual void addCheckpoint(const std::vector<Checkpoint> &checkpoints)=0;
 	
-	virtual State getActualState()=0;
 	virtual void clearCheckpoints()=0;
 };
 

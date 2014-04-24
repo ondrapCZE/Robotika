@@ -12,7 +12,7 @@
 
 class checkpointMovementHermit : public checkpointMovement{
 	tsqueue<Checkpoint> checkpointsQueue_;
-	BasicDifferentialChassis* chassis_;
+	BasicDifferentialChassis &chassis_;
 	
 	std::atomic<bool> end_;
 	std::thread moveToCheckpointsThread_;
@@ -30,11 +30,10 @@ class checkpointMovementHermit : public checkpointMovement{
 	void moveToPosition(const Position &target);
 	void moveToCheckpoints();
 public:
-	checkpointMovementHermit(BasicDifferentialChassis* chassis);
+	checkpointMovementHermit(BasicDifferentialChassis &chassis);
 	void addCheckpoint(const Checkpoint &checkpoint);
 	void addCheckpoint(const std::vector<Checkpoint> &checkpoints);
 	
-	State getActualState();
 	void clearCheckpoints();
 	~checkpointMovementHermit();
 };

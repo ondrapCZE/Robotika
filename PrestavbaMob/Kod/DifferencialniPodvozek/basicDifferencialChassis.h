@@ -6,28 +6,7 @@
 #include "../Encoder/encoder.hpp"
 #include "../MotorDriver/motorDriver.hpp"
 
-
-//! Serve for preserving basic chassis parameters.
-struct DiffChassisParam {
-	float wheelbase; /*!< Size between wheels in meters. */
-	float wheelRadius; /*!< Both wheels have same radius in meters. */
-	float maxSpeed; /*!< Chassis are can move only up to this speed in meters per second. */
-	float reductionRatio; /*!< Both wheels have same reduction ratio on motors. */
-	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
-
-	EncoderReader* encoder; /*!< Chassis have to have encoder on both wheels. */
-	MotorDriver* driver; /*!< Motor power driver on the chassis wheels. */
-
-	//! Constructor only assign input parameters in the variables.
-	DiffChassisParam(const float wheelBase = 0,const float wheelRadius = 0,const float maxSpeed = 0,
-		const float reductionRatio = 0,const unsigned int wheelTics = 0, EncoderReader* encoder = std::nullptr_t(),
-		MotorDriver* driver = std::nullptr_t()) : wheelbase(wheelbase), wheelRadius(wheelRadius),
-	maxSpeed(maxSpeed), reductionRatio(reductionRatio), wheelTics(wheelTics),
-	encoder(encoder), driver(driver) {
-	}; 
-};
-
-//! PI regulator values 
+//! PI regulator values
 struct PIValue {
 	int P; /*! Proportional part. */
 	int I; /*! Integral part. */
@@ -35,8 +14,44 @@ struct PIValue {
 	float ISum; /*! Sum all differences between actual speed and desire speed. */
 
 	//!  Constructor only assign input parameters in the variables.
-	PIValue(const int P = 90, const int I = 0) : P(P), I(I), ISum(0){
+	PIValue(const int P = 0, const int I = 0) : P(P), I(I), ISum(0){
 	};
+};
+
+//! Serve for preserving basic chassis parameters.
+struct DiffChassisParam {
+	float wheelbase; /*!< Size between wheels in meters. */
+	float wheelRadius; /*!< Both wheels have same radius in meters. */
+	float maxSpeed; /*!< Chassis are can move only up to this speed in meters per second. */
+	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
+
+	PIValue pidLeft;
+	PIValue pidRight;
+
+	EncoderReader* encoder; /*!< Chassis have to have encoder on both wheels. */
+	MotorDriver* driver; /*!< Motor power driver on the chassis wheels. */
+
+	double metersPerTick;
+
+	//! Constructor only assign input parameters in the variables.
+	DiffChassisParam(const float wheelBase = 0,
+			const float wheelRadius = 0,
+			const float maxSpeed = 0,
+			const unsigned int wheelTics = 0,
+			const PIValue pidLeft = PIValue(),
+			const PIValue pidRight = PIValue(),
+			EncoderReader* encoder = std::nullptr_t(),
+			MotorDriver* driver = std::nullptr_t()) :
+				wheelbase(wheelbase),
+				wheelRadius(wheelRadius),
+				maxSpeed(maxSpeed),
+				wheelTics(wheelTics),
+				pidLeft(pidLeft),
+				pidRight(pidRight),
+				encoder(encoder),
+				driver(driver) {
+		metersPerTick = (2 * M_PI * wheelRadius) / (float) wheelTics;
+	}; 
 };
 
 //! Traveled distance on both wheels in meters.
@@ -96,9 +111,9 @@ struct WheelsSpeed {
  //! Basic virtual differential chassis representation
 class BasicDifferentialChassis {
 protected:
-	DiffChassisParam diffChassisParam_;
+	DiffChassisParam &diffChassisParam_;
 public:
-	BasicDifferentialChassis(const DiffChassisParam diffChassisParam) : diffChassisParam_(diffChassisParam) {
+	BasicDifferentialChassis(DiffChassisParam &diffChassisParam) : diffChassisParam_(diffChassisParam) {
 	};
 	
 	

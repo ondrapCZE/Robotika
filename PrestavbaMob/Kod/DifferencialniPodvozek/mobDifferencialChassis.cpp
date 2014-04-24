@@ -17,19 +17,10 @@
 
 const unsigned int BUFFER_SIZE = 10;
 
-MobDifferentialChassis::MobDifferentialChassis(const DiffChassisParam diffChassisParam) : BasicDifferentialChassis(diffChassisParam) {
-	end_.store(false);
-	metersPerTick_ = (2 * M_PI * diffChassisParam.wheelRadius) / (float) diffChassisParam.wheelTics;
+MobDifferentialChassis::MobDifferentialChassis(DiffChassisParam &diffChassisParam) : BasicDifferentialChassis(diffChassisParam) {
+	end_ = false;
 
 	sendMotorPower(motorsPower(0, 0));
-
-	// Set PI regulator parameters for left wheel
-	PIParamLeft_.P = 200;
-	PIParamLeft_.I = 12;
-	
-	// Set PI regulator parameters for right wheel
-	PIParamRight_.P = 200;
-	PIParamRight_.I = 12;
 
 	loopPidThread_ = std::move(std::thread(&MobDifferentialChassis::updateEncoders,this,5));
 	// set thread higher priority and FIFO order
@@ -42,8 +33,8 @@ MobDifferentialChassis::MobDifferentialChassis(const DiffChassisParam diffChassi
 
 WheelsDistance MobDifferentialChassis::computeDistance(Encoders distance) {
 	WheelsDistance distanceInMeters;
-	distanceInMeters.left = distance.left * metersPerTick_;
-	distanceInMeters.right = distance.right * metersPerTick_;
+	distanceInMeters.left = distance.left * diffChassisParam_.metersPerTick;
+	distanceInMeters.right = distance.right * diffChassisParam_.metersPerTick;
 
 	return distanceInMeters;
 }
@@ -112,8 +103,8 @@ void MobDifferentialChassis::updateEncoders(const int period) {
 		speedMutex_.unlock();
 		
 		motorsPower valueMotors;
-		valueMotors.left = PIRegulator(actualSpeed.left, copyDesSpeed.left, PIParamLeft_);
-		valueMotors.right = PIRegulator(actualSpeed.right, copyDesSpeed.right, PIParamRight_);
+		valueMotors.left = PIRegulator(actualSpeed.left, copyDesSpeed.left, diffChassisParam_.pidLeft);
+		valueMotors.right = PIRegulator(actualSpeed.right, copyDesSpeed.right, diffChassisParam_.pidRight);
 		//printf("Desire speed left: %f right: %f \n\r", This->desireSpeed.left, This->desireSpeed.right);
 		
 		//printf("Send motor speed left: %i right: %i \n\r", valueMotors.left, valueMotors.right);		
@@ -156,8 +147,8 @@ void MobDifferentialChassis::stop(bool slow) {
 		diffChassisParam_.driver->stop();
 	}
 
-	PIParamLeft_.ISum = 0;
-	PIParamRight_.ISum = 0;
+	diffChassisParam_.pidLeft.ISum = 0;
+	diffChassisParam_.pidRight.ISum = 0;
 }
 
 void MobDifferentialChassis::setSpeed(const WheelsSpeed speed) {
