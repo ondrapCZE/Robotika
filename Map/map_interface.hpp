@@ -4,12 +4,28 @@
 #include "../obecne/basic.h"
 
 namespace map{
+
+	struct Size{
+		double x;
+		double y;
+		Size(const double x=0,const double y=0) :
+			x(x),y(y){};
+	};
+
+	enum OccupyValue{
+		OCCUPIED,
+		FREE,
+		UNKNOWN
+	};
+
 	class MapInterface{
 	public:
-		virtual bool occupied(const Position &point) = 0;
+		virtual OccupyValue occupied(const Position &point) = 0;
 		virtual double distanceToNearestObstacle(
 			const Position &point,
 			const double &alpha) = 0;
+		virtual Size size() = 0;
+		virtual double resolution() = 0; // for vector maps is 0
 	};
 }
 
