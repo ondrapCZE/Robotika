@@ -21,11 +21,12 @@ namespace map{
 	class MapInterface{
 	public:
 		virtual OccupyValue occupied(const Position &point) = 0;
-		virtual double distanceToNearestObstacle(
+		virtual float distanceToNearestObstacle(
 			const Position &point,
-			const double &alpha) = 0;
+			const float &alpha,
+			const float &maxDistance) = 0;
 		virtual Size size() = 0;
-		virtual double resolution() = 0; // for vector maps is 0
+		virtual float resolution() = 0; // for vector maps is 0
 	};
 }
 
