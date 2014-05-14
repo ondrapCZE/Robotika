@@ -5,7 +5,7 @@
 
 #ifdef DEBUG
 	#define TEST_BOUNDARY(X,Y,SIZE_X,SIZE_Y) \
-	if(X >= SIZE_X || Y >= SIZE_Y) { \
+	if(X<0 || Y<0 || X >= SIZE_X || Y >= SIZE_Y) { \
 		std::stringstream msg; \
 		msg << "Out of range [" << X << "," << Y << "]"; \
 		throw new std::out_of_range(msg.str());\
@@ -20,7 +20,7 @@ using namespace map::occupancy;
 
 const float OccupancyMap::IS_OCCUPIED_VALUE = 1e2;
 const float OccupancyMap::IS_FREE_VALUE = -1e2;
-const float DEFAULT_PROB = 0; // log(0.5/0.5)
+const float OccupancyMap::DEFAULT_PROB = 0; // log(0.5/0.5)
 
 //========== public functions ===========
 OccupancyMap::OccupancyMap(const float resolution,const Size size) :
@@ -39,17 +39,17 @@ OccupancyMap::~OccupancyMap(){
 	delete[] map_;
 }
 
-inline float OccupancyMap::map(const unsigned int &x, const unsigned &y){
+float OccupancyMap::map(const int &x, const int &y){
 	TEST_BOUNDARY(x,y,sizeX_,sizeY_)
 	return map_[y*sizeX_ + x];
 }
 
-inline void OccupancyMap::map(const unsigned int &x, const unsigned &y, const float &newValue){
+void OccupancyMap::map(const int &x, const int &y, const float &newValue){
 	TEST_BOUNDARY(x,y,sizeX_,sizeY_)
 	map_[y*sizeX_ + x] = newValue;
 }
 
-inline float OccupancyMap::defaultProb(){
+float OccupancyMap::defaultProb(){
 	return DEFAULT_PROB;
 }
 
@@ -70,14 +70,14 @@ float OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float yStep = sin(alpha);
 
 	// normalize steps
-	float maxStep = max(xStep,yStep);
+	float maxStep = std::abs(max(xStep,yStep));
 	xStep /= maxStep;
 	yStep /= maxStep;
 	float distanceStep = hypot(xStep,yStep)*resolution_;
 
 	float distance = 0;
-	float x = point.x;
-	float y = point.y;
+	float x = point.x/resolution_;
+	float y = point.y/resolution_;
 	while(distance < maxDistance){ // TODO: check distance
 		if(map(x,y) > OCCUPIED){
 			return distance;

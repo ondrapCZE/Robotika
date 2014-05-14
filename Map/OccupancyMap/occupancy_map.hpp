@@ -19,12 +19,11 @@ class OccupancyMap: virtual public MapInterface {
 
 	float *map_; // pointer to the map memory
 public:
-	OccupancyMap(const float resolution = 0.02, const Size size = Size(4, 4)); // size is in meters and will be recalculate in cells number
+	OccupancyMap(const float resolution = 0.05, const Size size = Size(10, 10)); // size is in meters and will be recalculate in cells number
 	~OccupancyMap();
-	inline float map(const unsigned int &x, const unsigned &y); // in map coordinates, return value from map
-	inline void map(const unsigned &x, const unsigned &y,
-			const float &newValue); // in map coordinates set, value in map
-	inline float defaultProb();
+	float map(const int &x, const int &y); // in map coordinates, return value from map
+	void map(const int &x, const int &y, const float &newValue); // in map coordinates, set value in map
+	float defaultProb();
 	OccupyValue occupied(const Position &point);
 	float distanceToNearestObstacle(const Position &point, const float &alpha,
 			const float &maxDistance);

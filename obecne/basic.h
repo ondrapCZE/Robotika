@@ -98,6 +98,13 @@ struct State{
 		return temp;
 	};
 
+	State& operator+=(const State &ob2){
+			position.x += ob2.position.x;
+			position.y += ob2.position.y;
+			angle += ob2.angle;
+			return *this;
+		};
+
 	State operator*(const State &ob2) const{
 		State temp(position.x * ob2.position.x, position.y * ob2.position.y, angle * ob2.angle);
 		return temp;

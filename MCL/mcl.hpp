@@ -34,7 +34,7 @@ template <class AdvancedParticle, class Visitor>
 double Mcl<AdvancedParticle, Visitor>::particlesWeightSum(){
     double weightSum = 0;
     for (auto particle : particles_){
-        weightSum += particle.weight_();
+        weightSum += particle.weight();
     }
 
     return weightSum;
@@ -57,6 +57,7 @@ void Mcl<AdvancedParticle, Visitor>::addParticle(AdvancedParticle particle){
 
 template <class AdvancedParticle, class Visitor>
 void Mcl<AdvancedParticle, Visitor>::visit(Visitor &visitor){
+	std::lock_guard<std::mutex> lock(mutex_);
 	for(int i=0; i < particles_.size(); ++i ){
 		particles_[i].accept(visitor);
 	}

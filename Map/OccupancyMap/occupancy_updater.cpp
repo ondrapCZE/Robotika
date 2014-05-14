@@ -5,8 +5,8 @@
 using namespace std;
 using namespace map::occupancy;
 
-const float FREE_PROB = log(0.95/0.05);
-const float OCCUPIED_PROB = log(0.05/0.95);
+const float OccupancyUpdater::FREE_PROB = log(0.95/0.05);
+const float OccupancyUpdater::OCCUPIED_PROB = log(0.05/0.95);
 
 //============= public functions ===============
 
@@ -25,8 +25,8 @@ void OccupancyUpdater::updateMap(OccupancyMap &map) {
 	float distanceStep = hypot(xStep,yStep)*map.resolution();
 
 	float distance=0;
-	float x = startPoint_.x;
-	float y = startPoint_.y;
+	float x = startPoint_.x/map.resolution();
+	float y = startPoint_.y/map.resolution();
 	while(distance < distanceToWall_){ // TODO: check map boundary
 		float oldValue = map.map(x,y);
 		map.map(x,y,oldValue + FREE_PROB - map.defaultProb());

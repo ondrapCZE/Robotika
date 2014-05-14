@@ -8,7 +8,7 @@ ADD_DEFINITIONS(
     # Other flags
 )
 
-file(GLOB SOURCES *.cpp)
-file(GLOB HEADERS *.hpp)
+file(GLOB SOURCES *.cpp ./particles/*.cpp ./visitors/*.cpp)
+file(GLOB HEADERS *.hpp ./particles/*.hpp ./visitors/*.hpp) 
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})

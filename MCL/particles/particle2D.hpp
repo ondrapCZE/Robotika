@@ -2,8 +2,8 @@
 #define PARTICLE_2D_H
 
 #include "particle.hpp"
-#include "visitor.hpp"
-#include "../obecne/basic.h"
+#include "../visitors/visitor.hpp"
+#include "../../obecne/basic.h"
 
 namespace mcl{
 
