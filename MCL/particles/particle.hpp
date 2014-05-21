@@ -7,7 +7,7 @@ class Particle{
     double weight_;
 public:
     Particle(double weight = 1.0){ weight_ = weight; };
-    void weight(double weight){ weight = weight_; };
+    void weight(const double &weight){ weight_ = weight; };
     double weight(){ return weight_; };
 };
 
