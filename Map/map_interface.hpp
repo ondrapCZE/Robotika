@@ -12,15 +12,9 @@ namespace map{
 			x(x),y(y){};
 	};
 
-	enum OccupyValue{
-		OCCUPIED,
-		FREE,
-		UNKNOWN
-	};
-
 	class MapInterface{
 	public:
-		virtual OccupyValue occupied(const Position &point) = 0;
+		virtual float occupied(const Position &point) = 0;
 		virtual float distanceToNearestObstacle(
 			const Position &point,
 			const float &alpha,

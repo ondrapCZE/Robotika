@@ -19,23 +19,26 @@ void OccupancyUpdater::updateMap(OccupancyMap &map) {
 	float xStep = cos(alpha_);
 	float yStep = sin(alpha_);
 	// normalize steps
-	float maxStep = max(xStep,yStep);
-	xStep /= maxStep;
-	yStep /= maxStep;
-	float distanceStep = hypot(xStep,yStep)*map.resolution();
+	float maxStep = std::max(std::abs(xStep),std::abs(yStep));
+	//printf("MaxStep %f xStep %f yStep %f\n",maxStep,xStep,yStep);
+	xStep = (xStep / maxStep)*map.resolution();
+	yStep = (yStep / maxStep)*map.resolution();
+	float distanceStep = hypot(xStep,yStep);
 
 	float distance=0;
-	float x = startPoint_.x/map.resolution();
-	float y = startPoint_.y/map.resolution();
-	while(distance < distanceToWall_){ // TODO: check map boundary
-		float oldValue = map.map(x,y);
-		map.map(x,y,oldValue + FREE_PROB - map.defaultProb());
+	float x = startPoint_.x;
+	float y = startPoint_.y;
+	//printf("Updater: stepX %f stepY %f stepDistance %f distanceToWall %f \n", xStep,yStep,distanceStep,distanceToWall_);
+	while(distance < distanceToWall_){
+		map.map(x,y) +=  FREE_PROB - map.defaultProb();
 
 		x += xStep;
 		y += yStep;
 		distance+=distanceStep;
+		//printf("Updater step [%f,%f] distance %f\n",x,y,distance);
 	}
 
-	float oldValue = map.map(x,y);
-	map.map(x,y,oldValue + OCCUPIED_PROB - map.defaultProb());
+	//printf("Previous map value: %f \n" , map.map(x,y));
+	map.map(x,y) += OCCUPIED_PROB - map.defaultProb();
+	//printf("Updated map value: %f \n" , map.map(x,y));
 }

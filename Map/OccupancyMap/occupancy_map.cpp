@@ -22,15 +22,20 @@ const float OccupancyMap::IS_OCCUPIED_VALUE = 1e2;
 const float OccupancyMap::IS_FREE_VALUE = -1e2;
 const float OccupancyMap::DEFAULT_PROB = 0; // log(0.5/0.5)
 
+float& OccupancyMap::innerMap(const int &x, const int &y){
+	TEST_BOUNDARY(x,y,sizeX_,sizeY_)
+	return map_[y*sizeX_ + x];
+}
+
 //========== public functions ===========
 OccupancyMap::OccupancyMap(const float resolution,const Size size) :
-	resolution_(resolution), sizeX_(size.x/resolution + 1), sizeY_(size.y/resolution){
+	resolution_(resolution), sizeX_(size.x/resolution + 1), sizeY_(size.y/resolution + 1){
 	map_ = new float[sizeX_*sizeY_];
 
 	// set zeros in all cells
 	for(unsigned int i=0; i<sizeX_; i++){
 		for(unsigned int j=0; j<sizeY_; j++){
-			map(i,j,0);
+			innerMap(i,j) = DEFAULT_PROB;
 		}
 	}
 }
@@ -39,29 +44,16 @@ OccupancyMap::~OccupancyMap(){
 	delete[] map_;
 }
 
-float OccupancyMap::map(const int &x, const int &y){
-	TEST_BOUNDARY(x,y,sizeX_,sizeY_)
-	return map_[y*sizeX_ + x];
-}
-
-void OccupancyMap::map(const int &x, const int &y, const float &newValue){
-	TEST_BOUNDARY(x,y,sizeX_,sizeY_)
-	map_[y*sizeX_ + x] = newValue;
+float& OccupancyMap::map(const double &x, const double &y){
+	return innerMap(x/resolution_,y/resolution_);
 }
 
 float OccupancyMap::defaultProb(){
 	return DEFAULT_PROB;
 }
 
-OccupyValue OccupancyMap::occupied(const Position &point) {
-	float mapValue = map(point.x,point.y);
-	if(mapValue > IS_OCCUPIED_VALUE){
-		return OCCUPIED;
-	}else if(mapValue < IS_FREE_VALUE){
-		return FREE;
-	}else{
-		return UNKNOWN;
-	}
+float OccupancyMap::occupied(const Position &point) { // TODO: use probabilistic value and return as double
+	return 1 - (1 / ( 1 + pow(M_E,map(point.x,point.y))));
 }
 
 float OccupancyMap::distanceToNearestObstacle(const Position &point,
@@ -70,7 +62,7 @@ float OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float yStep = sin(alpha);
 
 	// normalize steps
-	float maxStep = std::abs(max(xStep,yStep));
+	float maxStep = std::max(std::abs(xStep),std::abs(yStep));
 	xStep /= maxStep;
 	yStep /= maxStep;
 	float distanceStep = hypot(xStep,yStep)*resolution_;
@@ -78,20 +70,22 @@ float OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float distance = 0;
 	float x = point.x/resolution_;
 	float y = point.y/resolution_;
-	while(distance < maxDistance){ // TODO: check distance
-		if(map(x,y) > OCCUPIED){
+	while(distance < maxDistance){
+		if(innerMap(x,y) > IS_OCCUPIED_VALUE){
 			return distance;
 		}
+
 		x+= xStep;
 		y+= yStep;
 		distance += distanceStep;
+		//printf("Distance to nearest obstacle step [%f,%f] distance %f \n" , x, y,distance);
 	}
 
 	return maxDistance;
 }
 
 Size OccupancyMap::size(){
-	return Size(sizeX_*resolution_,sizeY_*resolution_);
+	return Size(((float)sizeX_-1)*resolution_,((float)sizeY_-1)*resolution_);
 }
 
 float OccupancyMap::resolution(){
