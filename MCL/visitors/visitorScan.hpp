@@ -43,9 +43,9 @@ VisitorScan<AdvancedParticle, Map>::VisitorScan(const Position &point,
 		const float &minAngle, const float &maxAngle, const unsigned int &step,
 		const float &deviation, Map &map) :
 		point_(point), alpha_(alpha), laserScan_(laserScan), minAngle_(
-				basic_robotic_fce::valueInRange(minAngle,
-						laserScan->angle_min)), maxAngle_(
-				basic_robotic_fce::valueInRange(maxAngle,
+				basic_robotic_fce::valueInRange(minAngle, laserScan->angle_min,
+						laserScan->angle_max)), maxAngle_(
+				basic_robotic_fce::valueInRange(maxAngle, laserScan->angle_min,
 						laserScan->angle_max)), step_(step), deviation_(
 				deviation), map_(map) {
 
@@ -64,20 +64,20 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 	State laser = state;
 // move particle frame in laser frame
 	laser.position.x += point_.x * cos(state.angle)
-			+ point_.y * sin(state.angle);
-	laser.position.y += -point_.x * sin(state.angle)
+			- point_.y * sin(state.angle);
+	laser.position.y += point_.x * sin(state.angle)
 			+ point_.y * cos(state.angle);
 	laser.angle = basic_robotic_fce::normAngle(state.angle + alpha_);
 
 	// TODO: use all scan or some of them
-	int index = (minAngle_ - laserScan_->angle_min)
+	int index = (laserScan_->angle_max - maxAngle_)
 			/ laserScan_->angle_increment;
-	int stopIndex = (laserScan_->angle_max - laserScan_->angle_min)
+	int stopIndex = (laserScan_->angle_max - minAngle_)
 			/ laserScan_->angle_increment;
 
 	for (; index < stopIndex; index += step_) {
-		float angle = laserScan_->angle_min
-				+ index * laserScan_->angle_increment;
+		float angle = laserScan_->angle_max
+				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction
 		float obstacleDistance = map_.distanceToNearestObstacle(laser.position,
 				laser.angle + angle, laserScan_->range_max);

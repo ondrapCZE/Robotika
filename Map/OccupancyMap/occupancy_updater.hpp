@@ -11,12 +11,13 @@ class OccupancyUpdater {
 	static const float FREE_PROB;
 	static const float OCCUPIED_PROB;
 
-	Position startPoint_;
-	float alpha_;
-	float distanceToWall_;
+	const Position startPoint_;
+	const float alpha_;
+	const float distanceToWall_;
+	const float maxRange_;
 public:
 	OccupancyUpdater(const Position &startPoint, const float &alpha,
-			const float &distanceToWall);
+			const float &distanceToWall, const float &maxRange);
 	void updateMap(OccupancyMap &map);
 };
 

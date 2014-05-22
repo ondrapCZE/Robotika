@@ -8,6 +8,7 @@
 	if(X<0 || Y<0 || X >= SIZE_X || Y >= SIZE_Y) { \
 		std::stringstream msg; \
 		msg << "Out of range [" << X << "," << Y << "]"; \
+		printf(msg.str().c_str()); \
 		throw new std::out_of_range(msg.str());\
 	}
 #else
