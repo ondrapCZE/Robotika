@@ -6,15 +6,11 @@
 #include "../../../obecne/basic.h"
 
 struct Checkpoint{
-	bool outVectorAssig;
 	Position position;
 	Vector outVector;
 	
-	Checkpoint(Position position = Position()) : position(position), 
-	outVectorAssig(false){};
-	
-	Checkpoint(Position position, Vector outVector) : position(position), 
-	outVector(outVector), outVectorAssig(true){};
+	Checkpoint(Position position = Position(), Vector outVector = Vector()) : position(position),
+	outVector(outVector){};
 };
 
 class checkpointMovement{

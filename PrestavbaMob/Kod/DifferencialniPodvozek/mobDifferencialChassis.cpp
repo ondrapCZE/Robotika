@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <sys/time.h>
+#include <sys/mman.h>
 #include <pthread.h>
 #include <fcntl.h>
 
@@ -28,6 +29,10 @@ MobDifferentialChassis::MobDifferentialChassis(DiffChassisParam &diffChassisPara
 	param.__sched_priority = 90;
 	pthread_setschedparam(loopPidThread_.native_handle(),SCHED_FIFO,&param);
 	
+	if(mlockall(MCL_FUTURE|MCL_CURRENT)){
+		fprintf(stderr,"Warning: Failed to lock memory \n");
+	}
+
 	//pthread_create(&updateEncodersThreadHandler, NULL, &updateEncodersThread, (void*) this);
 }
 
@@ -139,9 +144,8 @@ void MobDifferentialChassis::stop(bool slow) {
 			}
 
 			setSpeed(desire);
-			//printf("Actual speed [%f,%f] desire speed [%f,%f]\n", std::abs(wheelsSpeed_.left), std::abs(wheelsSpeed_.right), desire.left, desire.right);
 			std::this_thread::sleep_for(std::chrono::milliseconds(10));
-		}while(std::abs(wheelsSpeed_.left) > 0.001 &&  std::abs(wheelsSpeed_.right) > 0.001);
+		}while(std::abs(wheelsSpeed_.left) > 1e-5 ||  std::abs(wheelsSpeed_.right) > 1e-5);
 	}else{
 		setSpeed(WheelsSpeed(0, 0));
 		diffChassisParam_.driver->stop();

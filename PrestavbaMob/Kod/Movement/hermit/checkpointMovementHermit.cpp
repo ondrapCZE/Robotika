@@ -113,14 +113,6 @@ void checkpointMovementHermit::moveToCheckpoints() {
 	while(!end_){
 		Checkpoint target;
 		if(checkpointsQueue_.tryPop(target)){
-			
-			if(!target.outVectorAssig){
-				Checkpoint next;
-				if(checkpointsQueue_.tryFront(next)){
-					target.outVector = getOutputVector(chassis_.getState().position,next);
-				}
-			}
-			
 			printf("Move to the [%f,%f] with the output vector [%f,%f] \n", 
 							target.position.x, 
 							target.position.y,
@@ -138,11 +130,12 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			last = target;
 		}else{
 			if(!robotWaited){
+				printf("Robot is waiting for next checkpoint.\n");
 				chassis_.stop(true);
 				robotWaited = true;
 			}
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(40));
+			std::this_thread::sleep_for(std::chrono::milliseconds(20));
 		}
 	}
 }
