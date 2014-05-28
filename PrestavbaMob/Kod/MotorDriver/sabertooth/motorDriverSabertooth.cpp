@@ -51,8 +51,8 @@ int MotorDriverSabertooth::setMotorsPower(const int left, const int right) {
 int MotorDriverSabertooth::setMotorsPower(const motorsPower power) {
 	int returnState = 0;
 
-	buffer_[0] = basic_robotic_fce::valueInRange<int>(power.left, MAX_POWER) + 64;
-	buffer_[1] = basic_robotic_fce::valueInRange<int>(power.right, MAX_POWER) + 192;
+	buffer_[0] = rob_fce::valueInRange<int>(power.left, MAX_POWER) + 64;
+	buffer_[1] = rob_fce::valueInRange<int>(power.right, MAX_POWER) + 192;
 	if (write(serialDevice_, buffer_, 2) != 2) {
 		printf("Cannot write to motor module \n\r");
 		returnState = 1; // error state

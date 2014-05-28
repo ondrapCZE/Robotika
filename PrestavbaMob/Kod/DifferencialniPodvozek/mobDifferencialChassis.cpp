@@ -80,7 +80,7 @@ int MobDifferentialChassis::PIRegulator(const float actualSpeed,const float desi
 	int speed = PIParam.P * speedDifference + PIParam.I * PIParam.ISum;
 
 	// set in boundaries
-	return basic_robotic_fce::valueInRange<int>(speed, diffChassisParam_.driver->getMaxPower());
+	return rob_fce::valueInRange<int>(speed, diffChassisParam_.driver->getMaxPower());
 }
 
 void MobDifferentialChassis::updateEncoders(const int period) {
@@ -132,15 +132,15 @@ void MobDifferentialChassis::stop(bool slow) {
 		do{
 			WheelsSpeed desire;
 			if(wheelsSpeed_.left > 0){
-				desire.left = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.left - 0.1, 0.0 , wheelsSpeed_.left);
+				desire.left = rob_fce::valueInRange<float>(wheelsSpeed_.left - 0.1, 0.0 , wheelsSpeed_.left);
 			}else{
-				desire.left = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.left + 0.1, wheelsSpeed_.left, 0.0);
+				desire.left = rob_fce::valueInRange<float>(wheelsSpeed_.left + 0.1, wheelsSpeed_.left, 0.0);
 			}
 
 			if(wheelsSpeed_.right > 0){
-				desire.right = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.right - 0.1, 0.0 , wheelsSpeed_.right);
+				desire.right = rob_fce::valueInRange<float>(wheelsSpeed_.right - 0.1, 0.0 , wheelsSpeed_.right);
 			}else{
-				desire.right = basic_robotic_fce::valueInRange<float>(wheelsSpeed_.right + 0.1, wheelsSpeed_.right, 0.0);
+				desire.right = rob_fce::valueInRange<float>(wheelsSpeed_.right + 0.1, wheelsSpeed_.right, 0.0);
 			}
 
 			setSpeed(desire);
@@ -157,8 +157,8 @@ void MobDifferentialChassis::stop(bool slow) {
 
 void MobDifferentialChassis::setSpeed(const WheelsSpeed speed) {
 	WheelsSpeed safeSpeed;
-	safeSpeed.left = basic_robotic_fce::valueInRange(speed.left, diffChassisParam_.maxSpeed);
-	safeSpeed.right = basic_robotic_fce::valueInRange(speed.right, diffChassisParam_.maxSpeed);
+	safeSpeed.left = rob_fce::valueInRange(speed.left, diffChassisParam_.maxSpeed);
+	safeSpeed.right = rob_fce::valueInRange(speed.right, diffChassisParam_.maxSpeed);
 	
 	std::lock_guard<std::mutex> lock(speedMutex_);
 	wheelsDesireSpeed_ = safeSpeed;

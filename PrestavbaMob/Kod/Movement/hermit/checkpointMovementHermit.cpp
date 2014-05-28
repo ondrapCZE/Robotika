@@ -35,13 +35,13 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 }
 
 Vector checkpointMovementHermit::getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness){
-	float checkedTightness = basic_robotic_fce::valueInRange(tightness, 0.0f, 1.0f);
+	float checkedTightness = rob_fce::valueInRange(tightness, 0.0f, 1.0f);
 	Position temp = (next.position - prev.position)*checkedTightness;
 	return Vector(temp.x,temp.y);
 }
 
 Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual, const Checkpoint& target, const float inter) {
-	float checkedInter = basic_robotic_fce::valueInRange(inter,0.0f,1.0f);
+	float checkedInter = rob_fce::valueInRange(inter,0.0f,1.0f);
 	float powInter2 = checkedInter*checkedInter;
 	float powInter3 = powInter2*checkedInter;
 	
@@ -74,8 +74,8 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		float wheelsRatio = shorterDiameter / longerDiameter;
 		//printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
 
-		float targetAngle = basic_robotic_fce::angle(state.position, target);
-		float finalAngle = basic_robotic_fce::normAngle(targetAngle - state.angle);
+		float targetAngle = rob_fce::angle(state.position, target);
+		float finalAngle = rob_fce::normAngle(targetAngle - state.angle);
 		//printf("Angle target %f final %f \n", targetAngle, finalAngle);
 
 

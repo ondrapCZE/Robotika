@@ -43,9 +43,9 @@ VisitorScan<AdvancedParticle, Map>::VisitorScan(const Position &point,
 		const float &minAngle, const float &maxAngle, const unsigned int &step,
 		const float &deviation, Map &map) :
 		point_(point), alpha_(alpha), laserScan_(laserScan), minAngle_(
-				basic_robotic_fce::valueInRange(minAngle, laserScan->angle_min,
+				rob_fce::valueInRange(minAngle, laserScan->angle_min,
 						laserScan->angle_max)), maxAngle_(
-				basic_robotic_fce::valueInRange(maxAngle, laserScan->angle_min,
+				rob_fce::valueInRange(maxAngle, laserScan->angle_min,
 						laserScan->angle_max)), step_(step), deviation_(
 				deviation), map_(map) {
 
@@ -67,7 +67,7 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 			- point_.y * sin(state.angle);
 	laser.position.y += point_.x * sin(state.angle)
 			+ point_.y * cos(state.angle);
-	laser.angle = basic_robotic_fce::normAngle(state.angle + alpha_);
+	laser.angle = rob_fce::normAngle(state.angle + alpha_);
 
 	int index = (laserScan_->angle_max - maxAngle_)
 			/ laserScan_->angle_increment;

@@ -49,7 +49,7 @@ void VisitorMove<AdvancedParticle>::visit(AdvancedParticle *particle) {
 	State updatedState = particle->state();
 
 	//updatedState.angle = basic_robotic_fce::normAngle(updatedState.angle + alpha_);
-	updatedState.angle = basic_robotic_fce::normAngle(
+	updatedState.angle = rob_fce::normAngle(
 			updatedState.angle + alpha_
 					+ normDistr_(randomGenerator_) * alphaError_ * alphaError_);
 
@@ -60,7 +60,7 @@ void VisitorMove<AdvancedParticle>::visit(AdvancedParticle *particle) {
 	updatedState.position.y += sin(updatedState.angle) * distanceNoised;
 
 	//updatedState.angle = basic_robotic_fce::normAngle(updatedState.angle + beta_);
-	updatedState.angle = basic_robotic_fce::normAngle(
+	updatedState.angle = rob_fce::normAngle(
 			updatedState.angle + beta_
 					+ normDistr_(randomGenerator_) * betaError_ * betaError_);
 

@@ -121,15 +121,7 @@ struct Circle{
 	double radius;
 };
 
-namespace basic_robotic_fce {
-
-	//!	Function for random number witch use normal distribution.
-	/*!
-		\param Mu an double argument. Mu is center of normal distribution.
-		\param Sigma an double argument. Sigma describe dispersion.
-		\return Random number with normal distribution with center Mu and Sigma.
-	 */
-	//double randn_notrig(double Mu=0.0, double Sigma=1.0);
+namespace rob_fce{
 
 	//!	Function returns normalized input angle in range -Pi to Pi
 	/*!	

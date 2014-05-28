@@ -52,7 +52,7 @@ int EncoderAtmel::readEncodersToBuffer() {
 bool EncoderAtmel::checkBufferValidity(const unsigned int size) {
 	uint8_t crc = 0;
 	for (uint8_t i = 0; i < (size - 1); ++i) {
-		crc = basic_robotic_fce::crc8(crc, buffer_[i]);
+		crc = rob_fce::crc8(crc, buffer_[i]);
 	}
 
 	bool crcCheck = (crc == buffer_[(size - 1)]);

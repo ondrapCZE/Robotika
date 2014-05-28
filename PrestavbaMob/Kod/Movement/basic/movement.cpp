@@ -49,7 +49,7 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 		float currentRatio = minDistance / maxDistance;
 		//printf("Current ratio: %f Default ratio: %f \n\r", currentRatio, wheelsRatio);
 		
-		float speed = basic_robotic_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxSpeed());
+		float speed = rob_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxSpeed());
 		
 		if(circleDirection == LEFT){
 			chassis->setSpeed(WheelsSpeed(currentRatio*speed, speed));
@@ -57,7 +57,7 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 			chassis->setSpeed(WheelsSpeed(speed, currentRatio*speed));
 		}
 		
-		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}while(std::hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 	
@@ -75,7 +75,7 @@ void Movement::moveStraight(const float &meter){
 		difference = finalWheelDistance - wheelDistance;
 		float meanDifference = (difference.left + difference.right) / 2.0f;
 
-		float speed = basic_robotic_fce::valueInRange(meanDifference * maxSpeed * 15, maxSpeed);
+		float speed = rob_fce::valueInRange(meanDifference * maxSpeed * 15, maxSpeed);
 		//printf("Basic speed %f MaxSpeed %f  \n",speed,maxSpeed);
 		// slow down whell with greater distance and speed up wheel with smaller distance
 
@@ -85,7 +85,7 @@ void Movement::moveStraight(const float &meter){
 
 		chassis->setSpeed(WheelsSpeed(speedLeft, speedRight));
 
-		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 
 		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", difference.left, difference.right, speedLeft, speedRight);
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
@@ -101,7 +101,7 @@ void Movement::rotate(const float &angle){
 	float maxSpeed = SPEED_STEP;
 	//printf("Angle difference: %f epsilon: %f \n", angleDifference, EPSILON_ANGLE);
 	while (std::abs(angleDifference) > EPSILON_ANGLE) {
-		float motorSpeed = basic_robotic_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
+		float motorSpeed = rob_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 
 		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
@@ -110,7 +110,7 @@ void Movement::rotate(const float &angle){
 		angleDifference = chassisState.angle - finalState.angle;
 
 		// create increased ramp
-		maxSpeed = basic_robotic_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
 
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}

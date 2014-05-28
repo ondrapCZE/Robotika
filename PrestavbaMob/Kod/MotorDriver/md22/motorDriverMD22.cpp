@@ -55,7 +55,7 @@ int MotorDriverMD22::setMotorsPower(motorsPower power) {
 	int returnState = 0;
 
 	buffer_[0] = 1;
-	buffer_[1] = basic_robotic_fce::valueInRange<int>(power.left, MAX_POWER) + 128;
+	buffer_[1] = rob_fce::valueInRange<int>(power.left, MAX_POWER) + 128;
 
 	if (write(i2cDevice_, buffer_, 2) != 2) {
 		printf("Cannot write to motor module \n\r");
@@ -63,7 +63,7 @@ int MotorDriverMD22::setMotorsPower(motorsPower power) {
 	} else {
 
 		buffer_[0] = 2;
-		buffer_[1] = basic_robotic_fce::valueInRange<int>(power.right, MAX_POWER) + 128;
+		buffer_[1] = rob_fce::valueInRange<int>(power.right, MAX_POWER) + 128;
 
 		if (write(i2cDevice_, buffer_, 2) != 2) {
 			printf("Cannot write to motor module \n\r");
