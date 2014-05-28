@@ -19,8 +19,8 @@ using namespace std;
 using namespace map;
 using namespace map::occupancy;
 
-const float OccupancyMap::IS_OCCUPIED_VALUE = 1e2;
-const float OccupancyMap::IS_FREE_VALUE = -1e2;
+const float OccupancyMap::IS_OCCUPIED_VALUE = -30;
+const float OccupancyMap::IS_FREE_VALUE = 30;
 const float OccupancyMap::DEFAULT_PROB = 0; // log(0.5/0.5)
 
 float& OccupancyMap::innerMap(const int &x, const int &y){
@@ -72,7 +72,8 @@ float OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float x = point.x/resolution_;
 	float y = point.y/resolution_;
 	while(distance < maxDistance){
-		if(innerMap(x,y) > IS_OCCUPIED_VALUE){
+		//printf("innerMap[%i,%i] = %f\n",(int)x,(int)y,innerMap(x,y));
+		if(innerMap(x,y) < IS_OCCUPIED_VALUE){
 			return distance;
 		}
 

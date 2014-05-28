@@ -20,7 +20,7 @@ class OccupancyMap: virtual public MapInterface {
 	float *map_; // pointer to the map memory
 	float& innerMap(const int &x, const int &y);
 public:
-	OccupancyMap(const float resolution = 0.02, const Size size = Size(10, 10)); // size is in meters and will be recalculate in cells number
+	OccupancyMap(const float resolution = 0.01, const Size size = Size(40, 40)); // size is in meters and will be recalculate in cells number
 	~OccupancyMap();
 	float& map(const double &x, const double &y); // in global coordinates, return value from map
 	float defaultProb();

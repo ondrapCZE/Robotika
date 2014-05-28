@@ -35,7 +35,7 @@ public:
 };
 
 template<class AdvancedParticle, class Map>
-const float VisitorScan<AdvancedParticle, Map>::EPSILON = 1e-20; // TODO: set appropriate epsilon
+const float VisitorScan<AdvancedParticle, Map>::EPSILON = 1e-40; // TODO: set appropriate epsilon
 
 template<class AdvancedParticle, class Map>
 VisitorScan<AdvancedParticle, Map>::VisitorScan(const Position &point,
@@ -69,7 +69,6 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 			+ point_.y * cos(state.angle);
 	laser.angle = basic_robotic_fce::normAngle(state.angle + alpha_);
 
-	// TODO: use all scan or some of them
 	int index = (laserScan_->angle_max - maxAngle_)
 			/ laserScan_->angle_increment;
 	int stopIndex = (laserScan_->angle_max - minAngle_)
@@ -82,12 +81,14 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		float obstacleDistance = map_.distanceToNearestObstacle(laser.position,
 				laser.angle + angle, laserScan_->range_max);
 		float error = (laserScan_->ranges[index] - obstacleDistance);
+		printf("Error %f Scan %f Distance %f\n", error,laserScan_->ranges[index],obstacleDistance);
 
 // weight particle according to the error
 		float weight = computeWeight(error, deviation_);
-		if (weight < EPSILON)
-			weight = EPSILON;
 		particle->weight(particle->weight() * weight);
+
+		if (particle->weight() < EPSILON)
+			particle->weight(EPSILON);
 	}
 }
 

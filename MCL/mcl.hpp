@@ -68,14 +68,15 @@ void Mcl<AdvancedParticle, Visitor>::resample(int count){
     std::lock_guard<std::mutex> lock(mutex_);
 
     double weightSum = particlesWeightSum();
-    double step = weightSum / (double)particles_.size();
+    double step = weightSum / (double)count;
     double shift = step * realDistr_(randomGenerator_);
     
     double weightCount = 0;
     double weightIndex = shift;
-    std::vector<AdvancedParticle> newParticles(count);
+    std::vector<AdvancedParticle> newParticles;
     for (auto particle : particles_){
         weightCount += particle.weight();
+        printf("Particle weight %f\n", particle.weight());
         particle.weight(1);
         while (weightCount >= weightIndex){
             newParticles.push_back(particle);
