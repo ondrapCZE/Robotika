@@ -63,11 +63,11 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 	const State& state = particle->state();
 	State laser = state;
 // move particle frame in laser frame
-	laser.position.x += point_.x * cos(state.angle)
-			- point_.y * sin(state.angle);
-	laser.position.y += point_.x * sin(state.angle)
-			+ point_.y * cos(state.angle);
-	laser.angle = rob_fce::normAngle(state.angle + alpha_);
+	laser.x += point_.x * cos(state.theta)
+			- point_.y * sin(state.theta);
+	laser.y += point_.x * sin(state.theta)
+			+ point_.y * cos(state.theta);
+	laser.theta = rob_fce::normAngle(state.theta + alpha_);
 
 	int index = (laserScan_->angle_max - maxAngle_)
 			/ laserScan_->angle_increment;
@@ -78,10 +78,9 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction
-		float obstacleDistance = map_.distanceToNearestObstacle(laser.position,
-				laser.angle + angle, laserScan_->range_max);
+		float obstacleDistance = map_.distanceToNearestObstacle(laser,
+				laser.theta + angle, laserScan_->range_max);
 		float error = (laserScan_->ranges[index] - obstacleDistance);
-		printf("Error %f Scan %f Distance %f\n", error,laserScan_->ranges[index],obstacleDistance);
 
 // weight particle according to the error
 		float weight = computeWeight(error, deviation_);

@@ -1,10 +1,7 @@
 #ifndef VISITOR_STATE_VARIANCE_H
 #define VISITOR_STATE_VARIANCE_H
 
-namespace mcl{
-
-#include "../obecne/basic.h"
-
+#include "../../obecne/basic.h"
 namespace mcl{
 
 template <class AdvancedParticle>
@@ -27,13 +24,13 @@ count_(0){
 
 template <class AdvancedParticle>
 void VisitorStateVariance<AdvancedParticle>::visit(AdvancedParticle *particle){
-	stateVariance_ +=  (state - particle->state()) * (state - particle->state());
+	stateVariance_ +=  (state_ - particle->state()) * (state_ - particle->state());
 	++count_;
 }
 
 template <class AdvancedParticle>
 State VisitorStateVariance<AdvancedParticle>::stateVariance(){
-	return stateVariance_ / (double) count;
+	return stateVariance_ / (double) count_;
 }
 
 }

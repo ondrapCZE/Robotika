@@ -37,17 +37,17 @@ inline State VisitorState<AdvancedParticle>::state(){
 
 template <class AdvancedParticle>
 inline float VisitorState<AdvancedParticle>::x(){
-	return state_.position.x / (double) count_;
+	return state_.x / (double) count_;
 }
 
 template <class AdvancedParticle>
 inline float VisitorState<AdvancedParticle>::y(){
-	return state_.position.y / (double) count_;
+	return state_.y / (double) count_;
 }
 
 template <class AdvancedParticle>
 inline float VisitorState<AdvancedParticle>::theta(){
-	return state_.angle / (double) count_;
+	return state_.theta / (double) count_;
 }
 
 }

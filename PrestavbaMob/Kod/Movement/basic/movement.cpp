@@ -94,10 +94,10 @@ void Movement::moveStraight(const float &meter){
 
 void Movement::rotate(const float &angle){
 	finalState = chassis->getState();
-	finalState.angle += angle;
+	finalState.theta += angle;
 
 	State chassisState = chassis->getState();
-	float angleDifference = chassisState.angle - finalState.angle;
+	float angleDifference = chassisState.theta - finalState.theta;
 	float maxSpeed = SPEED_STEP;
 	//printf("Angle difference: %f epsilon: %f \n", angleDifference, EPSILON_ANGLE);
 	while (std::abs(angleDifference) > EPSILON_ANGLE) {
@@ -107,7 +107,7 @@ void Movement::rotate(const float &angle){
 		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
 
 		chassisState = chassis->getState();
-		angleDifference = chassisState.angle - finalState.angle;
+		angleDifference = chassisState.theta - finalState.theta;
 
 		// create increased ramp
 		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());

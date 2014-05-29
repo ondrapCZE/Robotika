@@ -14,6 +14,7 @@ namespace mcl{
 		void state(const State &state);
 		State state();
 		void accept(Visitor<Particle2D> &visitor);
+		void copy(const Particle2D& particle);
 	};
 
 }

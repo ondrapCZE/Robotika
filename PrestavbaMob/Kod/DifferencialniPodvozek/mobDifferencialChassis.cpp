@@ -60,9 +60,9 @@ void MobDifferentialChassis::changeRobotState(WheelsDistance change) {
 	wheelsDistance_.left += change.left;
 	wheelsDistance_.right += change.right;
 
-	robotState_.position.x += distanceChange * cos(robotState_.angle + (angleChange / 2.0f));
-	robotState_.position.y += distanceChange * sin(robotState_.angle + (angleChange / 2.0f));
-	robotState_.angle += angleChange;
+	robotState_.x += distanceChange * cos(robotState_.theta + (angleChange / 2.0f));
+	robotState_.y += distanceChange * sin(robotState_.theta + (angleChange / 2.0f));
+	robotState_.theta += angleChange;
 }
 
 Encoders MobDifferentialChassis::getChangeOfEncoders() {

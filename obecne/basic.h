@@ -81,37 +81,36 @@ struct Position {
 	\struct state
 	\brief State for robot. Inherit x,y from position structure.
  */
-struct State{
-	Position position;
-	double angle;
+struct State : public Position{
+	double theta;
 
-	State(double X = 0, double Y = 0, double Angle = 0) : position(X, Y), angle(Angle) {
+	State(double X = 0, double Y = 0, double Angle = 0) : Position(X,Y), theta(Angle) {
 	};
 
 	State operator-(const State &ob2) const{
-		State temp(position.x - ob2.position.x, position.y - ob2.position.y, angle - ob2.angle);
+		State temp(x - ob2.x, y - ob2.y, theta - ob2.theta);
 		return temp;
 	};
 
 	State operator+(const State &ob2) const{
-		State temp(position.x + ob2.position.x, position.y + ob2.position.y, angle + ob2.angle);
+		State temp(x + ob2.x, y + ob2.y, theta + ob2.theta);
 		return temp;
 	};
 
 	State& operator+=(const State &ob2){
-			position.x += ob2.position.x;
-			position.y += ob2.position.y;
-			angle += ob2.angle;
+			x += ob2.x;
+			y += ob2.y;
+			theta += ob2.theta;
 			return *this;
 		};
 
 	State operator*(const State &ob2) const{
-		State temp(position.x * ob2.position.x, position.y * ob2.position.y, angle * ob2.angle);
+		State temp(x * ob2.x, y * ob2.y, theta * ob2.theta);
 		return temp;
 	};
 
 	State operator/(const double a) const{
-		State temp(position.x / a, position.y / a, angle / a);
+		State temp(x / a, y / a, theta / a);
 		return temp;
 	};
 };

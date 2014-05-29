@@ -32,8 +32,8 @@ template<class AdvancedParticle>
 VisitorMove<AdvancedParticle>::VisitorMove(double alpha, double distance,
 		double beta) :
 		alpha_(alpha), distance_(distance), beta_(beta), alphaError_(
-				alpha * 0.01), distanceError_(distance * 0.01), betaError_(
-				beta * 0.01) {
+				alpha * 0.02), distanceError_(distance * 0.02), betaError_(
+				beta * 0.02) {
 }
 
 template<class AdvancedParticle>
@@ -49,20 +49,20 @@ void VisitorMove<AdvancedParticle>::visit(AdvancedParticle *particle) {
 	State updatedState = particle->state();
 
 	//updatedState.angle = basic_robotic_fce::normAngle(updatedState.angle + alpha_);
-	updatedState.angle = rob_fce::normAngle(
-			updatedState.angle + alpha_
-					+ normDistr_(randomGenerator_) * alphaError_ * alphaError_);
+	updatedState.theta = rob_fce::normAngle(
+			updatedState.theta + alpha_
+					+ normDistr_(randomGenerator_) * alphaError_);
 
 	//double distanceNoised = distance_;
 	double distanceNoised = distance_
-			+ normDistr_(randomGenerator_) * distanceError_ * distanceError_;
-	updatedState.position.x += cos(updatedState.angle) * distanceNoised;
-	updatedState.position.y += sin(updatedState.angle) * distanceNoised;
+			+ normDistr_(randomGenerator_) * distanceError_;
+	updatedState.x += cos(updatedState.theta) * distanceNoised;
+	updatedState.y += sin(updatedState.theta) * distanceNoised;
 
 	//updatedState.angle = basic_robotic_fce::normAngle(updatedState.angle + beta_);
-	updatedState.angle = rob_fce::normAngle(
-			updatedState.angle + beta_
-					+ normDistr_(randomGenerator_) * betaError_ * betaError_);
+	updatedState.theta = rob_fce::normAngle(
+			updatedState.theta + beta_
+					+ normDistr_(randomGenerator_) * betaError_);
 
 	//printf("Updated position [%f,%f,%f] \n", updatedState.position.x, updatedState.position.y, updatedState.angle);
 	particle->state(updatedState);
