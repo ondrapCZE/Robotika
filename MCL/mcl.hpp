@@ -111,7 +111,7 @@ void Mcl<AdvancedParticle, Visitor>::resample(int count) {
 		ParticlePtr particle = particles_.front();
 
 		weightCount += particle->weight();
-		printf("Particle weight %f\n", particle->weight());
+		//printf("Particle weight %f\n", particle->weight());
 		particle->weight(1);
 		while (weightCount >= weightIndex) {
 			if(!used){

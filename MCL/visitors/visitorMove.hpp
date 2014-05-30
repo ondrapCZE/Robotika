@@ -32,8 +32,8 @@ template<class AdvancedParticle>
 VisitorMove<AdvancedParticle>::VisitorMove(double alpha, double distance,
 		double beta) :
 		alpha_(alpha), distance_(distance), beta_(beta), alphaError_(
-				alpha * 0.02), distanceError_(distance * 0.02), betaError_(
-				beta * 0.02) {
+				alpha * 0.01), distanceError_(distance * 0.02), betaError_(
+				beta * 0.01) {
 }
 
 template<class AdvancedParticle>

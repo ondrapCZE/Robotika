@@ -39,7 +39,7 @@ void VisitorUpdateMap<AdvancedParticle>::visit(AdvancedParticle *particle) {
 			- sin(state.theta) * laserState_.y;
 	state.y += sin(state.theta) * laserState_.x
 			+ cos(state.theta) * laserState_.y;
-	state.theta += laserState_.theta;
+	state.theta = rob_fce::normAngle(state.theta + laserState_.theta);
 
 	::map::occupancy::OccupancyUpdater updater(state, laserScan_, -M_PI_2,
 			M_PI_2);
