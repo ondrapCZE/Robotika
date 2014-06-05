@@ -36,6 +36,13 @@ struct Vector{
 	};
 };
 
+struct Size{
+		double x;
+		double y;
+		Size(const double x=0,const double y=0) :
+			x(x),y(y){};
+	};
+
 /*!
 	\struct position
 	\brief Position structure for robot or object in 2D world.

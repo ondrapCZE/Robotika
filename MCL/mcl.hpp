@@ -19,6 +19,7 @@ public:
 	void addParticle(ParticlePtr particle);
 	void visit(Visitor &visitor);
 	void resample(int count = -1);
+	ParticlePtr bestParticle();
 private:
 	typedef std::forward_list<ParticlePtr> List;
 	typedef std::list<ParticlePtr> Container;
@@ -48,7 +49,7 @@ typename Mcl<AdvancedParticle, Visitor>::ParticlePtr Mcl<AdvancedParticle,
 	ParticlePtr copiedParticle;
 	if (!unusedParticles_.empty()) { // we have some old particles which we can reuse
 		copiedParticle = unusedParticles_.front();
-		copiedParticle->copy(*particle);
+		*copiedParticle = *particle;
 		unusedParticles_.pop_front();
 	} else { // We have to allocate new particle
 		copiedParticle = ParticlePtr(new AdvancedParticle(*particle));
@@ -132,7 +133,20 @@ void Mcl<AdvancedParticle, Visitor>::resample(int count) {
 
 	particles_ = newParticles;
 }
-;
+
+template<class AdvancedParticle, class Visitor>
+typename Mcl<AdvancedParticle, Visitor>::ParticlePtr Mcl<AdvancedParticle, Visitor>::bestParticle(){
+	std::lock_guard < std::mutex > lock(mutex_);
+	ParticlePtr bestParticle = particles_.front();
+
+	for(auto particle : particles_){
+		if(bestParticle->weight() < particle->weight()){
+			bestParticle = particle;
+		}
+	}
+
+	return ParticlePtr(new AdvancedParticle(bestParticle));
+}
 
 }
 #endif

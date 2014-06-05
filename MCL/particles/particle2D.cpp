@@ -20,8 +20,3 @@ State Particle2D::state(){
 void Particle2D::accept(Visitor<Particle2D> &visitor){
 	visitor.visit(this);
 }
-
-void Particle2D::copy(const Particle2D& particle){
-	Particle::copy(particle);
-	state_ = particle.state_;
-}

@@ -5,13 +5,6 @@
 
 namespace map{
 
-	struct Size{
-		double x;
-		double y;
-		Size(const double x=0,const double y=0) :
-			x(x),y(y){};
-	};
-
 	class MapInterface{
 	public:
 		virtual float occupied(const Position &point) = 0;

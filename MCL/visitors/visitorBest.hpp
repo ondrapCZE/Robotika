@@ -18,7 +18,7 @@ public:
 template <class AdvancedParticle>
 void VisitorBest<AdvancedParticle>::visit(AdvancedParticle* particle){
 	if(particle_.weight() < particle->weight()){
-		particle_.copy(*particle);
+		particle_ = *particle;
 	}
 }
 
