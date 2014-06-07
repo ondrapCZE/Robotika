@@ -145,7 +145,7 @@ typename Mcl<AdvancedParticle, Visitor>::ParticlePtr Mcl<AdvancedParticle, Visit
 		}
 	}
 
-	return ParticlePtr(new AdvancedParticle(bestParticle));
+	return ParticlePtr(new AdvancedParticle(*bestParticle));
 }
 
 }

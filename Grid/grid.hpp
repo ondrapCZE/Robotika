@@ -42,7 +42,7 @@ public:
 	Grid& operator=(const Grid& grid);
 	~Grid();
 
-	void setAllTypes(const Type value);
+	void setAllValues(const Type value);
 
 	inline Type& value(const unsigned int &x, const unsigned int &y) {
 		TEST_BOUNDARY(x, y, width_, height_)
@@ -73,7 +73,7 @@ Grid<Type>::Grid(const unsigned int width, const unsigned int height,
 
 	values_ = new Type[width_ * height_];
 	// set zero in all cells
-	setAllTypes(initialType);
+	setAllValues(initialType);
 }
 
 template<class Type>
@@ -110,7 +110,7 @@ Grid<Type>::~Grid() {
 }
 
 template<class Type>
-void Grid<Type>::setAllTypes(const Type value) {
+void Grid<Type>::setAllValues(const Type value) {
 	for (unsigned int i = 0; i < height_ * width_; ++i) {
 		values_[i] = value;
 	}

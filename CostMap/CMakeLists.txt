@@ -8,8 +8,8 @@ ADD_DEFINITIONS(
     # Other flags
 )
 
-file(GLOB SOURCES *.cpp PayoffObjects/*.cpp Movements/*.cpp)
-file(GLOB HEADERS *.hpp PayoffObjects/*.hpp Movements/*.cpp) 
+file(GLOB SOURCES *.cpp PayoffObjects/*.cpp)
+file(GLOB HEADERS *.hpp PayoffObjects/*.hpp) 
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS})
 

@@ -2,12 +2,15 @@
 
 using namespace costMap;
 
-PayoffCircle::PayoffCircle(const Position center, const float radius) :
-		center_(center), radius_(radius) {
+PayoffCircle::PayoffCircle(const Position center, const float radius, const float payoff) :
+		center_(center), radius_(radius), payoff_(payoff) {
 
 }
 
-void PayoffCircle::updatePayoffTable(Table table, const unsigned int width,
-		const unsigned int height, const float resolution) { // TODO: use midpointCircle or simple circle algorithm
+void PayoffCircle::updatePayoffTable(Table table, float resolution) { // TODO: use midpointCircle or simple circle algorithm
 
+}
+
+int PayoffCircle::getMinPayoff(){
+	return payoff_;
 }

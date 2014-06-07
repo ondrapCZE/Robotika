@@ -20,7 +20,7 @@ OccupancyMap::OccupancyMap(const Size size, const float resolution) :
 
 OccupancyMap::OccupancyMap(const OccupancyMap& map) :
 		size_(map.size_), resolution_(map.resolution_),
-		grid_((map.size_.x/map.resolution_) + 1, (map.size_.y/map.resolution_) + 1)  {
+		grid_(map.grid_)  {
 }
 
 OccupancyMap& OccupancyMap::operator=(const OccupancyMap& map){

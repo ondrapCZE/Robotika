@@ -1,13 +1,16 @@
 #ifndef PAYOFF_OBJECT_H
 #define PAYOFF_OBJECT_H
 
+#include "../../Grid/grid.hpp"
+
 namespace costMap{
 
-typedef float* Table;
+typedef grid::Grid<int>& Table;
 
 class PayoffObject{
 public:
-	virtual void updatePayoffTable(Table table, const unsigned int width, const unsigned int height, const float resolution) = 0;
+	virtual void updatePayoffTable(Table table, float resolution) = 0;
+	virtual int getMinPayoff() = 0;
 };
 
 }
