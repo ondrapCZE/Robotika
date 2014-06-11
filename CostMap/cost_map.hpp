@@ -40,8 +40,19 @@ public:
 	void addPayoffObject(Payoff payoffObject, bool store = true);
 	void updatePayoffTable();
 	void recalculate(unsigned int maxCycle = 20);
-
 	Position getBestMove(const Position position);
+
+	inline Size size(){
+		return size_;
+	}
+
+	inline float resolution(){
+		return resolution_;
+	}
+
+	inline float value(const unsigned int x, const unsigned int y){
+		return costMap_.value(x,y);
+	}
 };
 
 }
