@@ -37,7 +37,7 @@ class CostMap {
 public:
 	CostMap(Size size = Size(5,5), const float resolution = 0.05);
 
-	void addPayoffObject(Payoff payoffObject, bool store = true);
+	void addPayoffObject(Payoff payoffObject, bool store = false);
 	void updatePayoffTable();
 	void recalculate(unsigned int maxCycle = 20);
 	Position getBestMove(const Position position);

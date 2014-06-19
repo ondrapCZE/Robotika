@@ -58,6 +58,10 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 	float distance = start.position.distance(end.position);
 	float step  = 1.0f / (distance*pointsOnMeter);
 	for(float i = step; i <= 1.0f; i+=step){
+		if(pause_){
+			checkpointsQueue_.push_front(end);
+			break;
+		}
 		Position positionHermit = getPointHermit(start,end,i);
 		moveToPosition(positionHermit);
 	}
@@ -66,7 +70,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 void checkpointMovementHermit::moveToPosition(const Position& target){
 	State state = chassis_.getState();
 	
-	while(target.distance(state) > epsilon_){
+	while((target.distance(state) > epsilon_) && !pause_){
 		Circle circle = getCircle(state,target);
 		//printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
 		float shorterDiameter = circle.radius - chassis_.getWheelbase()/2.0f;
@@ -112,7 +116,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 	bool robotWaited = true;
 	while(!end_){
 		Checkpoint target;
-		if(checkpointsQueue_.tryPop(target)){
+		if(!pause_ && checkpointsQueue_.tryPop(target)){
 			printf("Move to the [%f,%f] with the output vector [%f,%f] \n", 
 							target.position.x, 
 							target.position.y,
@@ -142,22 +146,31 @@ void checkpointMovementHermit::moveToCheckpoints() {
 
 checkpointMovementHermit::checkpointMovementHermit(BasicDifferentialChassis &chassis) : chassis_(chassis) {
 	end_ = false;
+	pause_ = false;
 	speed_ = chassis.getMaxSpeed();
 	moveToCheckpointsThread_ = std::move(std::thread(&checkpointMovementHermit::moveToCheckpoints,this));
 }
 
 void checkpointMovementHermit::addCheckpoint(const Checkpoint& checkpoint){
-	checkpointsQueue_.push(checkpoint);
+	checkpointsQueue_.push_back(checkpoint);
 }
 
 void checkpointMovementHermit::addCheckpoint(const std::vector<Checkpoint>& checkpoints){
 	for(auto element : checkpoints){
-		checkpointsQueue_.push(element);
+		checkpointsQueue_.push_back(element);
 	}
 }
 
 void checkpointMovementHermit::clearCheckpoints(){
 	checkpointsQueue_.clear();
+}
+
+void checkpointMovementHermit::pause(){
+	pause_ = true;
+}
+
+void checkpointMovementHermit::resume(){
+	pause_ = false;
 }
 
 checkpointMovementHermit::~checkpointMovementHermit(){

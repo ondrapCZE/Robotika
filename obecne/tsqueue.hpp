@@ -12,12 +12,18 @@ class tsqueue{
 	std::mutex lck;
 	std::condition_variable emptyCondition;
 public:
-	void push(T element){
+	void push_back(T element){
 		std::lock_guard<std::mutex> guard(lck);
 		dataDeque.push_back(element);
 		emptyCondition.notify_one();
 	};
 	
+	void push_front(T element){
+		std::lock_guard<std::mutex> guard(lck);
+		dataDeque.push_front(element);
+		emptyCondition.notify_one();
+	};
+
 	bool tryPop(T &element){
 		std::lock_guard<std::mutex> guard(lck);		
 		if(dataDeque.empty())

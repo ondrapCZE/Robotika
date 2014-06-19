@@ -19,6 +19,8 @@ public:
 	virtual void addCheckpoint(const std::vector<Checkpoint> &checkpoints)=0;
 	
 	virtual void clearCheckpoints()=0;
+	virtual void pause()=0;
+	virtual void resume()=0;
 };
 
 #endif

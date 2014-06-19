@@ -8,8 +8,8 @@ using namespace grid;
 using namespace map;
 using namespace map::occupancy;
 
-const float OccupancyMap::IS_OCCUPIED_VALUE = log(0.05 / 0.95);
-const float OccupancyMap::IS_FREE_VALUE = log(0.95 / 0.05);
+const float OccupancyMap::IS_OCCUPIED_VALUE = log(0.95 / 0.05);
+const float OccupancyMap::IS_FREE_VALUE = log(0.05 / 0.95);
 const float OccupancyMap::DEFAULT_PROB = 0; // log(0.5/0.5)
 
 //========== public functions ===========

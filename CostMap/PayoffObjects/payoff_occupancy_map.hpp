@@ -6,7 +6,7 @@
 
 namespace costMap {
 
-class PayoffOccupancyMap {
+class PayoffOccupancyMap : public PayoffObject{
 	const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap_;
 	const int wallPayoff_;
 	const int unknownPayoff_;
@@ -17,9 +17,9 @@ class PayoffOccupancyMap {
 
 	int payoff(unsigned int x, unsigned int y);
 public:
-	PayoffOccupancyMap(nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
-			const int wallPayoff = -10, const int unknownPayoff = 0,
-			const int freePayoff = 0, const int transX = 0, const int transY = 0);
+	PayoffOccupancyMap(const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
+			const int wallPayoff = -50, const int unknownPayoff = 0,
+			const int freePayoff = 5, const int transX = 0, const int transY = 0);
 	void updatePayoffTable(Table table, float resolution);
 	int getMinPayoff();
 };

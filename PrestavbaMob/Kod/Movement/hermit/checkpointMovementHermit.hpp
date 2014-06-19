@@ -15,6 +15,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	BasicDifferentialChassis &chassis_;
 	
 	std::atomic<bool> end_;
+	std::atomic<bool> pause_;
 	std::thread moveToCheckpointsThread_;
 	
 	const float epsilon_ = 0.01;
@@ -35,6 +36,8 @@ public:
 	void addCheckpoint(const std::vector<Checkpoint> &checkpoints);
 	
 	void clearCheckpoints();
+	void pause();
+	void resume();
 	~checkpointMovementHermit();
 };
 

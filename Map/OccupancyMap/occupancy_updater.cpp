@@ -5,8 +5,8 @@
 using namespace std;
 using namespace ::map::occupancy;
 
-const float OccupancyUpdater::FREE_PROB = log(0.95 / 0.05);
-const float OccupancyUpdater::OCCUPIED_PROB = log(0.05 / 0.95);
+const float OccupancyUpdater::FREE_PROB = log(0.05 / 0.95);
+const float OccupancyUpdater::OCCUPIED_PROB = log(0.95 / 0.05);
 
 //============= public functions ===============
 

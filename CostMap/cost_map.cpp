@@ -7,7 +7,7 @@ using namespace grid;
 float CostMap::getPayoffFromMove(const unsigned int x, const unsigned int y,
 		const unsigned int move) {
 	float payoff = payoffTable_.value(x + moves_[move][1].x,
-			y + moves_[move][1].y) - 1;
+			y + moves_[move][1].y)-1;
 	payoff += 0.05
 			* costMap_.value(x + moves_[move][0].x, y + moves_[move][0].y);
 	payoff += 0.9
@@ -30,7 +30,7 @@ CostMap::CostMap(Size size, const float resolution) :
 						-1) }, { Move(0, -1), Move(1, -1), Move(1, 0) } } {
 
 	minPayoff_ = -1;
-	gamma_ = 0.95;
+	gamma_ = 0.99;
 }
 
 void CostMap::addPayoffObject(Payoff payoffObject, bool store) {
@@ -47,7 +47,7 @@ void CostMap::addPayoffObject(Payoff payoffObject, bool store) {
 
 void CostMap::updatePayoffTable() {
 	minPayoff_ = -1;
-	payoffTable_.setAllValues(minPayoff_);
+	payoffTable_.setAllValues(0);
 
 	for (auto payoff : payoffObjects_) {
 		if (minPayoff_ > payoff->getMinPayoff()) {
