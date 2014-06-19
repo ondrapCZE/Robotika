@@ -46,7 +46,7 @@ public:
 	}
 	;
 
-	float distanceToNearestObstacle(const Position &point, const float &alpha,
+	Interval distanceToNearestObstacle(const Position &point, const float &alpha,
 			const float &maxDistance);
 };
 

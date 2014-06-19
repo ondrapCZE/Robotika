@@ -30,7 +30,7 @@ OccupancyMap& OccupancyMap::operator=(const OccupancyMap& map){
 	return *this;
 }
 
-float OccupancyMap::distanceToNearestObstacle(const Position &point,
+Interval OccupancyMap::distanceToNearestObstacle(const Position &point,
 		const float &alpha, const float &maxDistance) { // TODO: rewrite
 	float xStep = cos(alpha);
 	float yStep = sin(alpha);
@@ -46,7 +46,7 @@ float OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float y = point.y / resolution_;
 	while (distance < maxDistance) {
 		if (grid_.value(x, y) <= IS_OCCUPIED_VALUE) {
-			return distance;
+			return Interval(distance - (resolution_/2.0),distance + (resolution_/2.0));
 		}
 
 		x += xStep;
@@ -54,5 +54,5 @@ float OccupancyMap::distanceToNearestObstacle(const Position &point,
 		distance += distanceStep;
 	}
 
-	return maxDistance;
+	return Interval(maxDistance - (resolution_/2.0),maxDistance + (resolution_/2.0));
 }

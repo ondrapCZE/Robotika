@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <sensor_msgs/LaserScan.h>
+#include "../../Map/map_interface.hpp"
 
 namespace mcl {
 
@@ -29,7 +30,7 @@ public:
 			const float &minAngle, const float &maxAngle,
 			const float &deviation, const unsigned int &step,
 			const unsigned int shift = 0);
-	inline double computeWeight(const double mean, const double deviation);
+	inline double computeWeight(const double mean, const double variance);
 	void visit(AdvancedParticle *particle);
 };
 
@@ -51,9 +52,9 @@ VisitorScan<AdvancedParticle, Map>::VisitorScan(const State &state,
 
 template<class AdvancedParticle, class Map>
 inline double VisitorScan<AdvancedParticle, Map>::computeWeight(
-		const double mean, const double deviation) {
-	return (pow(M_E, -(mean * mean) / (2 * deviation)))
-			/ (sqrt(2 * M_PI * deviation));
+		const double mean, const double variance) {
+	return (pow(M_E, -(mean * mean) / (2 * variance)))
+			/ (sqrt(2 * M_PI * variance));
 }
 
 template<class AdvancedParticle, class Map>
@@ -75,9 +76,11 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction
-		float obstacleDistance = particle->map().distanceToNearestObstacle(
+		map::Interval obstacleDistance = particle->map().distanceToNearestObstacle(
 				state, state.theta + angle, laserScan_->range_max);
-		float error = (laserScan_->ranges[index] - obstacleDistance);
+		float error = (std::min(
+				laserScan_->ranges[index] - obstacleDistance.begin,
+				laserScan_->ranges[index] - obstacleDistance.end));
 
 // weight particle according to the error
 		double weight = computeWeight(error, deviation_);

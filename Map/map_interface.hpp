@@ -5,10 +5,17 @@
 
 namespace map{
 
+	struct Interval{
+		float begin;
+		float end;
+
+		Interval(const float begin = 0,const float end = 0) : begin(begin), end(end) {};
+	};
+
 	class MapInterface{
 	public:
 		virtual float occupied(const Position &point) = 0;
-		virtual float distanceToNearestObstacle(
+		virtual Interval distanceToNearestObstacle(
 			const Position &point,
 			const float &alpha,
 			const float &maxDistance) = 0;
