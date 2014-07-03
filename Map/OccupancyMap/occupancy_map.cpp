@@ -8,8 +8,8 @@ using namespace grid;
 using namespace map;
 using namespace map::occupancy;
 
-const float OccupancyMap::IS_OCCUPIED_VALUE = log(0.95 / 0.05);
-const float OccupancyMap::IS_FREE_VALUE = log(0.05 / 0.95);
+const float OccupancyMap::IS_OCCUPIED_VALUE = log(0.75 / 0.25);
+const float OccupancyMap::IS_FREE_VALUE = log(0.25 / 0.75);
 const float OccupancyMap::DEFAULT_PROB = 0; // log(0.5/0.5)
 
 //========== public functions ===========
@@ -31,7 +31,7 @@ OccupancyMap& OccupancyMap::operator=(const OccupancyMap& map){
 }
 
 Interval OccupancyMap::distanceToNearestObstacle(const Position &point,
-		const float &alpha, const float &maxDistance) { // TODO: rewrite
+		const float &alpha, const float &maxDistance) {
 	float xStep = cos(alpha);
 	float yStep = sin(alpha);
 
@@ -45,7 +45,7 @@ Interval OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float x = point.x / resolution_;
 	float y = point.y / resolution_;
 	while (distance < maxDistance) {
-		if (grid_.value(x, y) <= IS_OCCUPIED_VALUE) {
+		if (grid_.value(x, y) >= DEFAULT_PROB) {
 			return Interval(distance - (resolution_/2.0),distance + (resolution_/2.0));
 		}
 

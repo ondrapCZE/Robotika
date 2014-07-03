@@ -78,9 +78,7 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 // get distance to the nearest wall in beam direction
 		map::Interval obstacleDistance = particle->map().distanceToNearestObstacle(
 				state, state.theta + angle, laserScan_->range_max);
-		float error = (std::min(
-				laserScan_->ranges[index] - obstacleDistance.begin,
-				laserScan_->ranges[index] - obstacleDistance.end));
+		float error = laserScan_->ranges[index] - ((obstacleDistance.begin + obstacleDistance.end) /2.0);
 
 // weight particle according to the error
 		double weight = computeWeight(error, deviation_);
@@ -89,6 +87,7 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		if (particle->weight() < EPSILON)
 			particle->weight(EPSILON);
 	}
+	printf("Particle weight %f\n", particle->weight());
 }
 
 }
