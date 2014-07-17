@@ -32,6 +32,10 @@ void OccupancyUpdater::oneScanUpdate(OccupancyMap &map,
 	float x = state_.x;
 	float y = state_.y;
 	while (distance < distanceToWall) {
+		if(!map.inMap(Position(x,y))){
+			return;
+		}
+
 		map.map(x, y) += FREE_PROB - map.defaultProb();
 
 		x += xStep;

@@ -14,6 +14,7 @@ namespace map{
 
 	class MapInterface{
 	public:
+		virtual bool inMap(const Position &point) = 0;
 		virtual float occupied(const Position &point) = 0;
 		virtual Interval distanceToNearestObstacle(
 			const Position &point,

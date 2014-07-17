@@ -45,6 +45,10 @@ Interval OccupancyMap::distanceToNearestObstacle(const Position &point,
 	float x = point.x / resolution_;
 	float y = point.y / resolution_;
 	while (distance < maxDistance) {
+		if(!grid_.inGrid(x,y)){
+			break;
+		}
+
 		if (grid_.value(x, y) >= DEFAULT_PROB) {
 			return Interval(distance - (resolution_/2.0),distance + (resolution_/2.0));
 		}
@@ -54,5 +58,6 @@ Interval OccupancyMap::distanceToNearestObstacle(const Position &point,
 		distance += distanceStep;
 	}
 
-	return Interval(maxDistance - (resolution_/2.0),maxDistance + (resolution_/2.0));
+	return Interval(-1,-1);
+	// return Interval(maxDistance - (resolution_/2.0),maxDistance + (resolution_/2.0));
 }

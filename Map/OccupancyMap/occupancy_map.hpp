@@ -32,9 +32,17 @@ public:
 		return DEFAULT_PROB;
 	}
 	;
+
+	inline bool inMap(const Position &point){
+		return grid_.inGrid(point.x / resolution_, point.y / resolution_);
+	};
+
 	inline float occupied(const Position &point) {
-		return 1-(1 / (1 + pow(M_E,grid_.value(point.x / resolution_,
+		if(inMap(point))
+			return 1-(1 / (1 + pow(M_E,grid_.value(point.x / resolution_,
 					point.y / resolution_))));
+		else
+			return -1;
 	}
 	;
 	inline Size size() {

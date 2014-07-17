@@ -44,6 +44,10 @@ public:
 
 	void setAllValues(const Type value);
 
+	inline bool inGrid(const int &x, const int &y){
+		return x >= 0 && x < width_ && y >= 0 && y < height_;
+	};
+
 	inline Type& value(const unsigned int &x, const unsigned int &y) {
 		TEST_BOUNDARY(x, y, width_, height_)
 		return values_[y * width_ + x];
