@@ -69,9 +69,12 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 }
 
 void checkpointMovementHermit::moveToPosition(const Position& target){
-
+	timeval timer[2];
 	State state = chassis_.getState();
 	while((target.distance(state) > epsilon_) && !pause_){
+		gettimeofday(&timer[0], NULL);
+		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
+
 		state = chassis_.getState();
 		Circle circle = getCircle(state,target);
 
@@ -105,6 +108,14 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		}
 		
 		chassis_.setSpeed(wheelsSpeed);
+
+		gettimeofday(&timer[1], NULL);
+		long int microStop = (timer[1].tv_sec * 1000000) + (timer[1].tv_usec);
+		long int sleepMicro = PERIOD * 1000 - (microStop - microStart);
+		lastMicroTime = microStart;
+
+		//printf("Usleep time: %li \n\r", sleepMicro);
+		std::this_thread::sleep_for(std::chrono::microseconds(sleepMicro));
 	}
 }
 

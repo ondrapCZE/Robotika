@@ -29,7 +29,7 @@ MobDifferentialChassis::MobDifferentialChassis(DiffChassisParam &diffChassisPara
 	param.__sched_priority = 90;
 	pthread_setschedparam(loopPidThread_.native_handle(),SCHED_FIFO,&param);
 	
-	if(mlockall(MCL_FUTURE|MCL_CURRENT)){
+	if(mlockall(MCL_CURRENT)){
 		fprintf(stderr,"Warning: Failed to lock memory \n");
 	}
 

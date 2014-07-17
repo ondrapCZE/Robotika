@@ -19,6 +19,7 @@ class checkpointMovementHermit : public checkpointMovement{
 
 	std::thread moveToCheckpointsThread_;
 	
+	const unsigned int PERIOD = 10;
 	const float epsilon_ = 0.01;
 	const float epsilonZero_ = 1.0e-10;
 	float speed_ = 0.3f;
