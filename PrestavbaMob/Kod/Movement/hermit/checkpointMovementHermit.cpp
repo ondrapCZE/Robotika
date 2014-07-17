@@ -24,12 +24,13 @@ Circle checkpointMovementHermit::getCircle(const State& state, const Position& p
 	if(std::abs(scale) > epsilonZero_){
 		circle.center.x = (b*c_chassis - c*b_chassis) / scale;
 		circle.center.y = (c*a_chassis - a*c_chassis) / scale;
+		circle.radius = circle.center.distance(state);
 	}else{ // center is in the infinity, lines are parallel
 		circle.center.x = std::numeric_limits<int>::max();
 		circle.center.y = std::numeric_limits<int>::max();
+		circle.radius = std::numeric_limits<int>::max();
 	}
 	
-	circle.radius = circle.center.distance(state);
 	//printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
 	return circle;
 }
@@ -68,22 +69,26 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,const Ch
 }
 
 void checkpointMovementHermit::moveToPosition(const Position& target){
+
 	State state = chassis_.getState();
-	
 	while((target.distance(state) > epsilon_) && !pause_){
+		state = chassis_.getState();
 		Circle circle = getCircle(state,target);
-		//printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
-		float shorterDiameter = circle.radius - chassis_.getWheelbase()/2.0f;
-		float longerDiameter = circle.radius + chassis_.getWheelbase()/2.0f;
-		float wheelsRatio = shorterDiameter / longerDiameter;
-		//printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
+
+		float wheelsRatio = 1;
+		if(circle.radius != std::numeric_limits<int>::max()){
+			//printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
+			float shorterDiameter = circle.radius - chassis_.getWheelbase()/2.0f;
+			float longerDiameter = circle.radius + chassis_.getWheelbase()/2.0f;
+			float wheelsRatio = shorterDiameter / longerDiameter;
+			//printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
+		}
 
 		float targetAngle = rob_fce::angle(state, target);
 		float finalAngle = rob_fce::normAngle(targetAngle - state.theta);
 		//printf("Angle target %f final %f \n", targetAngle, finalAngle);
 
 
-		//TODO: fix backward movement if angle is bigger than M_PI_2 !!!
 		WheelsSpeed wheelsSpeed;
 		if(finalAngle >= 0 && finalAngle <= M_PI_2){
 				wheelsSpeed.left = speed_*wheelsRatio;
@@ -99,15 +104,7 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 			wheelsSpeed.right = -speed_*wheelsRatio;
 		}
 		
-		if(std::abs(finalAngle) > M_PI_2){
-			printf("We test backward motion. \n");
-
-		}
-		
 		chassis_.setSpeed(wheelsSpeed);
-	
-		std::this_thread::sleep_for(std::chrono::milliseconds(2));
-		state = chassis_.getState();
 	}
 }
 
