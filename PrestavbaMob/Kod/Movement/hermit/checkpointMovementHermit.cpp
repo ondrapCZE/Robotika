@@ -2,6 +2,9 @@
 #include <cmath>
 #include <utility>
 #include <limits>
+#include <chrono>
+
+#include <sys/time.h>
 
 #include "checkpointMovementHermit.hpp"
 //#include "movement.h"
@@ -112,7 +115,6 @@ void checkpointMovementHermit::moveToPosition(const Position& target){
 		gettimeofday(&timer[1], NULL);
 		long int microStop = (timer[1].tv_sec * 1000000) + (timer[1].tv_usec);
 		long int sleepMicro = PERIOD * 1000 - (microStop - microStart);
-		lastMicroTime = microStart;
 
 		//printf("Usleep time: %li \n\r", sleepMicro);
 		std::this_thread::sleep_for(std::chrono::microseconds(sleepMicro));
