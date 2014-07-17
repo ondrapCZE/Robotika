@@ -16,6 +16,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	
 	std::atomic<bool> end_;
 	std::atomic<bool> pause_;
+
 	std::thread moveToCheckpointsThread_;
 	
 	const float epsilon_ = 0.01;
