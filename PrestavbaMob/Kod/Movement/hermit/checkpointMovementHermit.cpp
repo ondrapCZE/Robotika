@@ -71,9 +71,9 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 	float distance = start.position.distance(end.position);
 	float step = 1.0f / (distance * pointsOnMeter);
 
-	float s = 0;
+	float s = step;
 	timeval timer[2];
-	while (chassis_.getState().distance(end.position) > epsilon_) {
+	while(chassis_.getState().distance(end.position) > epsilon_) {
 		printf("Move to checkpoint loop\n");
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
@@ -84,7 +84,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		}
 
 		Position interPosition = getPointHermit(start, end, s);
-		while (chassis_.getState().distance(end.position)
+		while(chassis_.getState().distance(end.position)
 				> predictDistance_
 				&& chassis_.getState().distance(interPosition)
 						< predictDistance_) {
@@ -97,9 +97,10 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		distance = chassis_.getState().distance(interPosition);
 		float angle = chassis_.getState().angle(interPosition);
 		float diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
+		printf("Diff angle %f distance %f \n", diffAngle, distance);
 
 		printf("Call setVelocity \n");
-		chassis_.setVelocity(distance,angle);
+		chassis_.setVelocity(distance,diffAngle);
 
 		gettimeofday(&timer[1], NULL);
 		long int microStop = (timer[1].tv_sec * 1000000) + (timer[1].tv_usec);
