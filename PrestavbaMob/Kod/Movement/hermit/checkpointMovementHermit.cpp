@@ -100,7 +100,11 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		printf("Diff angle %f distance %f \n", diffAngle, distance);
 
 		printf("Call setVelocity \n");
-		chassis_.setVelocity(distance,diffAngle);
+		if(std::abs(diffAngle) > M_PI_4){
+			chassis_.setVelocity(0,diffAngle);
+		}else{
+			chassis_.setVelocity(distance,diffAngle);
+		}
 
 		gettimeofday(&timer[1], NULL);
 		long int microStop = (timer[1].tv_sec * 1000000) + (timer[1].tv_usec);
