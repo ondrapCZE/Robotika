@@ -170,9 +170,9 @@ void MobDifferentialChassis::setVelocity(const float distance, const float angle
 		velocity.left = diffChassisParam_.maxVelocity;
 		velocity.right = diffChassisParam_.maxVelocity;
 	}else{
-		float radius = std::abs(distance) / std::abs(angle);
+		float radius = std::abs(distance / angle);
 		float ratio = (radius - diffChassisParam_.wheelbase / 2.0) / (radius + diffChassisParam_.wheelbase / 2.0);
-		if(angle > 0){
+		if(angle >= 0){
 			velocity.left = diffChassisParam_.maxVelocity*ratio;
 			velocity.right = diffChassisParam_.maxVelocity;
 		}else if(angle < 0){

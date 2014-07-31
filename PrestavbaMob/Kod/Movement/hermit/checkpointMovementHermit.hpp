@@ -31,7 +31,6 @@ class checkpointMovementHermit : public checkpointMovement{
 	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);
 	
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);
-	void moveToPosition(const Position &target);
 	void moveToCheckpoints();
 public:
 	checkpointMovementHermit(BasicDifferentialChassis &chassis);

@@ -66,12 +66,15 @@ Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual,
 
 void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		const Checkpoint &end) {
+
+	printf("Move to checkpoint \n");
 	float distance = start.position.distance(end.position);
 	float step = 1.0f / (distance * pointsOnMeter);
 
 	float s = 0;
 	timeval timer[2];
 	while (chassis_.getState().distance(end.position) > epsilon_) {
+		printf("Move to checkpoint loop\n");
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
@@ -85,6 +88,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 				> predictDistance_
 				&& chassis_.getState().distance(interPosition)
 						< predictDistance_) {
+			printf("Generate interPosition \n");
 			s += step;
 			interPosition = getPointHermit(start, end, s);
 		};
@@ -94,58 +98,8 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		float angle = chassis_.getState().angle(interPosition);
 		float diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
 
+		printf("Call setVelocity \n");
 		chassis_.setVelocity(distance,angle);
-
-		gettimeofday(&timer[1], NULL);
-		long int microStop = (timer[1].tv_sec * 1000000) + (timer[1].tv_usec);
-		long int sleepMicro = TIME * 1000 - (microStop - microStart);
-
-		//printf("Usleep time: %li \n\r", sleepMicro);
-		std::this_thread::sleep_for(std::chrono::microseconds(sleepMicro));
-	}
-}
-
-void checkpointMovementHermit::moveToPosition(const Position& target) {
-	timeval timer[2];
-	State state = chassis_.getState();
-	while ((target.distance(state) > epsilon_) && !pause_) {
-		gettimeofday(&timer[0], NULL);
-		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
-
-		state = chassis_.getState();
-		Circle circle = getCircle(state, target);
-
-		float wheelsRatio = 1;
-		if (circle.radius != std::numeric_limits<int>::max()) {
-			//printf("Circle [%f,%f] with radius %f \n", circle.center.x , circle.center.y, circle.radius);
-			float shorterDiameter = circle.radius
-					- chassis_.getWheelbase() / 2.0f;
-			float longerDiameter = circle.radius
-					+ chassis_.getWheelbase() / 2.0f;
-			float wheelsRatio = shorterDiameter / longerDiameter;
-			//printf("Diameters shorter %f longer %f ratio %f \n", shorterDiameter, longerDiameter, wheelsRatio);
-		}
-
-		float targetAngle = rob_fce::angle(state, target);
-		float finalAngle = rob_fce::normAngle(targetAngle - state.theta);
-		//printf("Angle target %f final %f \n", targetAngle, finalAngle);
-
-		VelocityWheels wheelsSpeed;
-		if (finalAngle >= 0 && finalAngle <= M_PI_2) {
-			wheelsSpeed.left = speed_ * wheelsRatio;
-			wheelsSpeed.right = speed_;
-		} else if (finalAngle < 0 && finalAngle >= -M_PI_2) { // move to the right on the circle
-			wheelsSpeed.left = speed_;
-			wheelsSpeed.right = speed_ * wheelsRatio;
-		} else if (finalAngle > M_PI_2 && finalAngle < M_PI) {
-			wheelsSpeed.left = -speed_ * wheelsRatio;
-			wheelsSpeed.right = -speed_;
-		} else if (finalAngle < -M_PI_2 && finalAngle > -M_PI) {
-			wheelsSpeed.left = -speed_;
-			wheelsSpeed.right = -speed_ * wheelsRatio;
-		}
-
-		chassis_.setVelocity(wheelsSpeed);
 
 		gettimeofday(&timer[1], NULL);
 		long int microStop = (timer[1].tv_sec * 1000000) + (timer[1].tv_usec);
