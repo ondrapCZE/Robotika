@@ -19,10 +19,12 @@ struct Distance {
 };
 
 class MobDifferentialChassis : public BasicDifferentialChassis {
+	const float EPSILON = 1e-10;
+
 	State robotState_;
-	WheelsDistance wheelsDistance_;
-	WheelsSpeed wheelsSpeed_;
-	WheelsSpeed wheelsDesireSpeed_;
+	DistanceWheels wheelsDistance_;
+	VelocityWheels wheelsSpeed_;
+	VelocityWheels wheelsDesireSpeed_;
 	
 	std::atomic<bool> end_;
 	std::thread loopPidThread_;
@@ -30,10 +32,10 @@ class MobDifferentialChassis : public BasicDifferentialChassis {
 	std::mutex stateMutex_;
 	std::mutex speedMutex_;
 
-	WheelsDistance computeDistance(Encoders distance);
-	WheelsSpeed computeSpeed(WheelsDistance distance, float time); // distance in m and time in sec
+	DistanceWheels computeDistance(Encoders distance);
+	VelocityWheels computeSpeed(DistanceWheels distance, float time); // distance in m and time in sec
 
-	void changeRobotState(WheelsDistance change);
+	void changeRobotState(DistanceWheels change);
 
 	int sendMotorPower(struct motorsPower speedMotors);
 	int PIRegulator(const float actualSpeed, const float desireSpeed, PIValue &PIParam);
@@ -49,16 +51,16 @@ public:
 	 */
 	void stop(bool slow = false);
 
-	void setSpeed(const WheelsSpeed speed);
-	void setSpeed(const float left, const float right){ setSpeed(WheelsSpeed(left,right)); };
+	void setVelocity(const VelocityWheels speed);
+	void setVelocity(const float distance, const float angle);
 	//! 
 	/*!
 	\return actual state of the chassis
 	 */
 	State getState();
 
-	WheelsDistance getWheelDistance();
-	WheelsSpeed getSpeed();
+	DistanceWheels getDistanceWheels();
+	VelocityWheels getVelocityWheels();
 	
 	~MobDifferentialChassis();
 };

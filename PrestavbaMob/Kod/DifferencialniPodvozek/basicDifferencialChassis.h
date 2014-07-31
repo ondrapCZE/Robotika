@@ -22,7 +22,7 @@ struct PIValue {
 struct DiffChassisParam {
 	float wheelbase; /*!< Size between wheels in meters. */
 	float wheelRadius; /*!< Both wheels have same radius in meters. */
-	float maxSpeed; /*!< Chassis are can move only up to this speed in meters per second. */
+	float maxVelocity; /*!< Chassis can move only up to this speed in meters per second. */
 	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
 
 	PIValue pidLeft;
@@ -44,7 +44,7 @@ struct DiffChassisParam {
 			MotorDriver* driver = std::nullptr_t()) :
 				wheelbase(wheelbase),
 				wheelRadius(wheelRadius),
-				maxSpeed(maxSpeed),
+				maxVelocity(maxSpeed),
 				wheelTics(wheelTics),
 				pidLeft(pidLeft),
 				pidRight(pidRight),
@@ -55,12 +55,12 @@ struct DiffChassisParam {
 };
 
 //! Traveled distance on both wheels in meters.
-struct WheelsDistance {
+struct DistanceWheels {
 	float left; /*! traveled distance on the left wheel in meters */
 	float right; /*! traveled distance on the right wheel in meters */
 
 	//! Constructor only assign input parameters in the variables.
-	WheelsDistance(const float left = 0, const float right = 0) : left(left), right(right) {
+	DistanceWheels(const float left = 0, const float right = 0) : left(left), right(right) {
 	};
 	
 	//! Addition between WheelsDistance.
@@ -69,8 +69,8 @@ struct WheelsDistance {
 	 \return new WheelsDistance where parameters are equal 
 	  to the addition between same parameter from both WheelsDistance
 	 */
-	WheelsDistance operator+(const WheelsDistance &ob2) const {
-		WheelsDistance temp(left + ob2.left, right + ob2.right);
+	DistanceWheels operator+(const DistanceWheels &ob2) const {
+		DistanceWheels temp(left + ob2.left, right + ob2.right);
 		return temp;
 	};
 	
@@ -80,20 +80,20 @@ struct WheelsDistance {
 	 \return new WheelsDistance where parameters are equal 
 	  to the subtraction between same parameter from both WheelsDistance
 	 */
-	WheelsDistance operator-(const WheelsDistance &ob2) const{
-		WheelsDistance temp(left - ob2.left, right - ob2.right);
+	DistanceWheels operator-(const DistanceWheels &ob2) const{
+		DistanceWheels temp(left - ob2.left, right - ob2.right);
 		return temp;
 	};
 };
 
 
  //! Serve for storage speed on the wheels.
-struct WheelsSpeed {
+struct VelocityWheels {
 	float left; /*! Speed on the left wheel in meters per second. */
 	float right; /*! Speed on the right wheel in meters per second. */
 
 	//! Constructor only assign input parameters in the PIValue variables.
-	WheelsSpeed(float left = 0, float right = 0) : left(left), right(right) {
+	VelocityWheels(float left = 0, float right = 0) : left(left), right(right) {
 	};
 
 	//! Subtraction between WheelsSpeed.
@@ -102,8 +102,8 @@ struct WheelsSpeed {
 	 \return new WheelsSpeed where parameters are equal 
 	  to the subtraction between same parameter from both WheelsSpeed
 	 */
-	WheelsSpeed operator-(WheelsSpeed ob2) {
-		WheelsSpeed temp(left - ob2.left, right - ob2.right);
+	VelocityWheels operator-(VelocityWheels ob2) {
+		VelocityWheels temp(left - ob2.left, right - ob2.right);
 		return temp;
 	};
 };
@@ -118,12 +118,12 @@ public:
 	
 	
 	virtual void stop(bool slow) = 0;
-	virtual void setSpeed(const WheelsSpeed speed) = 0;
-	virtual void setSpeed(const float left, const float right) = 0;
+	virtual void setVelocity(const VelocityWheels speed) = 0;
+	virtual void setVelocity(const float distance, const float angle) = 0;
 	virtual State getState() = 0;
-	virtual WheelsDistance getWheelDistance() = 0;
-	virtual WheelsSpeed getSpeed() = 0;
-	virtual float getMaxSpeed(){ return diffChassisParam_.maxSpeed; };
+	virtual DistanceWheels getDistanceWheels() = 0;
+	virtual VelocityWheels getVelocityWheels() = 0;
+	virtual float getMaxVelocity(){ return diffChassisParam_.maxVelocity; };
 	virtual float getWheelbase(){ return diffChassisParam_.wheelbase; };
 };
 

@@ -26,7 +26,7 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 	float longerDiameter = diameter/2.0f + chassis->getWheelbase()/2.0f;
 	float wheelsRatio = shorterDiameter / longerDiameter;
 	
-	WheelsDistance finalWheelsDistance = chassis->getWheelDistance();
+	DistanceWheels finalWheelsDistance = chassis->getDistanceWheels();
 	switch(circleDirection){
 		case LEFT:
 			finalWheelsDistance.left += shorterDiameter*angle;
@@ -41,37 +41,37 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 	}
 	
 	float maxSpeed = SPEED_STEP;
-	WheelsDistance difference;
+	DistanceWheels difference;
 	do{
-		difference = finalWheelsDistance - chassis->getWheelDistance();
+		difference = finalWheelsDistance - chassis->getDistanceWheels();
 		float minDistance = std::min(difference.left, difference.right);
 		float maxDistance = std::max(difference.left, difference.right);
 		float currentRatio = minDistance / maxDistance;
 		//printf("Current ratio: %f Default ratio: %f \n\r", currentRatio, wheelsRatio);
 		
-		float speed = rob_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxSpeed());
+		float speed = rob_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxVelocity());
 		
 		if(circleDirection == LEFT){
-			chassis->setSpeed(WheelsSpeed(currentRatio*speed, speed));
+			chassis->setVelocity(VelocityWheels(currentRatio*speed, speed));
 		}else{
-			chassis->setSpeed(WheelsSpeed(speed, currentRatio*speed));
+			chassis->setVelocity(VelocityWheels(speed, currentRatio*speed));
 		}
 		
-		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxVelocity());
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}while(std::hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 	
 }
 
 void Movement::moveStraight(const float &meter){
-	WheelsDistance finalWheelDistance = chassis->getWheelDistance();
+	DistanceWheels finalWheelDistance = chassis->getDistanceWheels();
 	finalWheelDistance.left += meter;
 	finalWheelDistance.right += meter;
 
 	float maxSpeed = SPEED_STEP;
-	WheelsDistance difference;
+	DistanceWheels difference;
 	do{
-		WheelsDistance wheelDistance = chassis->getWheelDistance();
+		DistanceWheels wheelDistance = chassis->getDistanceWheels();
 		difference = finalWheelDistance - wheelDistance;
 		float meanDifference = (difference.left + difference.right) / 2.0f;
 
@@ -83,9 +83,9 @@ void Movement::moveStraight(const float &meter){
 		float speedRight = speed + (difference.right - meanDifference) / (SLEEP_TIME / 1000000.0f);
 		//printf("Speed [%f,%f] \n", speedLeft, speedRight);
 
-		chassis->setSpeed(WheelsSpeed(speedLeft, speedRight));
+		chassis->setVelocity(VelocityWheels(speedLeft, speedRight));
 
-		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxVelocity());
 
 		//printf("Wheel distance [%f,%f], speed[%f,%f] \n", difference.left, difference.right, speedLeft, speedRight);
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
@@ -104,13 +104,13 @@ void Movement::rotate(const float &angle){
 		float motorSpeed = rob_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 
 		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
-		chassis->setSpeed(WheelsSpeed(motorSpeed, -motorSpeed));
+		chassis->setVelocity(VelocityWheels(motorSpeed, -motorSpeed));
 
 		chassisState = chassis->getState();
 		angleDifference = chassisState.theta - finalState.theta;
 
 		// create increased ramp
-		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxSpeed());
+		maxSpeed = rob_fce::valueInRange(maxSpeed + SPEED_STEP,chassis->getMaxVelocity());
 
 		std::this_thread::sleep_for(std::chrono::microseconds(SLEEP_TIME));
 	}

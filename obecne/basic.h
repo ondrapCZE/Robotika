@@ -54,10 +54,14 @@ struct Position {
 	Position(double x = 0, double y = 0) : x(x), y(y){
 	};
 	
-	double distance(const Position &position) const{
+	float distance(const Position &position) const{
 		return std::hypot(x - position.x, y - position.y);
 	}
 	
+	float angle(const Position &position) const{
+		return std::atan2(position.y - y,position.x - x);
+	}
+
 	Position operator-(const Position &ob2) const{
 		Position temp(x - ob2.x, y - ob2.y);
 		return temp;

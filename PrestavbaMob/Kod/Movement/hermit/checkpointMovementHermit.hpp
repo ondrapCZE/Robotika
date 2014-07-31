@@ -19,11 +19,12 @@ class checkpointMovementHermit : public checkpointMovement{
 
 	std::thread moveToCheckpointsThread_;
 	
-	const unsigned int PERIOD = 10;
-	const float epsilon_ = 0.01;
+	const unsigned int TIME = 10;
+	const float epsilon_ = 0.02;
+	const float predictDistance_ = 0.05;
 	const float epsilonZero_ = 1.0e-10;
 	float speed_ = 0.3f;
-	const unsigned int pointsOnMeter = 100;
+	const unsigned int pointsOnMeter = 1000;
 	
 	Circle getCircle(const State &state, const Position &point);
 	Vector getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness = 0.5f);
