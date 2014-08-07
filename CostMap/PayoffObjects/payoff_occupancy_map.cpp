@@ -8,12 +8,12 @@ int PayoffOccupancyMap::payoff(unsigned int x, unsigned int y) { // TODO: change
 		return 0;
 	}
 	else if(value <= 25){ // free space
-		return (-freePayoff_/25.0)*value + freePayoff_;
+		return freePayoff_ - value*(freePayoff_/25.0);
 	}else if(value <= 75){ // unknown
 		int temp = std::abs(value - 50);
-		return (-unknownPayoff_/25.0)*temp + unknownPayoff_;
+		return unknownPayoff_ - value*(unknownPayoff_/25.0);
 	}else{ // occupied space
-		return (wallPayoff_/25.0)*value - 3*wallPayoff_;
+		return value*(wallPayoff_/25.0) - 3*wallPayoff_;
 	}
 }
 
@@ -41,14 +41,14 @@ void PayoffOccupancyMap::updatePayoffTable(Table table, float resolution) {
 		unsigned int stepX = std::min(occuMaxX, table.widht()) - std::max(0, transX_);
 		unsigned int stepY = std::min(occuMaxY, table.height()) - std::max(0, transY_);
 
-		printf("Table \n\n\n\n\n");
+		//printf("Table \n\n\n\n\n");
 		for (unsigned int x = 0; x < stepX; ++x) {
 			for (unsigned int y = 0; y < stepY; ++y) {
 				table.value(x + costX, y + costY) += payoff(x + occuX,
 						y + occuY);
-				printf("%i\t",table.value(x + costX, y + costY));
+				//printf("%i\t",table.value(x + costX, y + costY));
 			}
-			printf("\n");
+			//printf("\n");
 		}
 
 	}

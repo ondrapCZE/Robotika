@@ -18,8 +18,8 @@ class PayoffOccupancyMap : public PayoffObject{
 	int payoff(unsigned int x, unsigned int y);
 public:
 	PayoffOccupancyMap(const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
-			const int wallPayoff = -50, const int unknownPayoff = 0,
-			const int freePayoff = 5, const int transX = 0, const int transY = 0);
+			const int wallPayoff = 0, const int unknownPayoff = 0,
+			const int freePayoff = 0, const int transX = 0, const int transY = 0);
 	void updatePayoffTable(Table table, float resolution);
 	int getMinPayoff();
 };

@@ -20,19 +20,12 @@
 
 namespace grid {
 
-template<class Type> class GridIterator;
-
 template<class Type>
 class Grid {
-	typedef class GridIterator<Type> Iterator;
-	typedef class GridIterator<const Type> ConstIterator;
-
 	unsigned int width_;
 	unsigned int height_;
 
 	Type* values_;
-
-	friend Iterator;
 public:
 	Grid(const unsigned int width, const unsigned int height,
 			const Type initialType = Type());
@@ -61,13 +54,6 @@ public:
 		return height_;
 	}
 	;
-
-	//return iterator
-	Iterator begin();
-	Iterator end();
-
-	ConstIterator cbegin();
-	ConstIterator cend();
 };
 
 template<class Type>
@@ -118,27 +104,6 @@ void Grid<Type>::setAllValues(const Type value) {
 	for (unsigned int i = 0; i < height_ * width_; ++i) {
 		values_[i] = value;
 	}
-}
-
-//return iterator
-template<class Type>
-typename Grid<Type>::Iterator Grid<Type>::begin() {
-	return GridIterator<Type>(*this, 0);
-}
-
-template<class Type>
-typename Grid<Type>::Iterator Grid<Type>::end() {
-	return Iterator(*this, width_ * height_);
-}
-
-template<class Type>
-typename Grid<Type>::ConstIterator Grid<Type>::cbegin() {
-	return ConstIterator(*this, 0);
-}
-
-template<class Type>
-typename Grid<Type>::ConstIterator Grid<Type>::cend() {
-	return ConstIterator(*this, width_ * height_);
 }
 
 }

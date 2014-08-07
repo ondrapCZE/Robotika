@@ -7,27 +7,34 @@ using namespace grid;
 float CostMap::getPayoffFromMove(const unsigned int x, const unsigned int y,
 		const unsigned int move) {
 	float payoff = payoffTable_.value(x + moves_[move][1].x,
-			y + moves_[move][1].y)-1;
+			y + moves_[move][1].y) - 1;
+
 	payoff += 0.05
 			* costMap_.value(x + moves_[move][0].x, y + moves_[move][0].y);
 	payoff += 0.9
 			* costMap_.value(x + moves_[move][1].x, y + moves_[move][1].y);
 	payoff += 0.05
 			* costMap_.value(x + moves_[move][2].x, y + moves_[move][2].y);
+
+	//printf("Payoff [%i,%i] = %f\n", x,y,payoff);
+	//printf("Move from [%i,%i] to [%i,%i]\n",x,y,x + moves_[move][1].x,y + moves_[move][1].y);
 	return payoff;
 }
 
 CostMap::CostMap(Size size, const float resolution) :
 		size_(size), resolution_(resolution), costMap_(
 				(size.x / resolution) + 1, (size.y / resolution) + 1), payoffTable_(
-				(size.x / resolution) + 1, (size.y / resolution) + 1, 0), moves_ {
-				{ Move(-1, 0), Move(-1, 1), Move(0, 1) }, { Move(-1, 1), Move(0,
-						1), Move(1, 1) },
-				{ Move(0, 1), Move(1, 1), Move(1, 0) }, { Move(-1, -1), Move(-1,
-						0), Move(-1, 1) },
-				{ Move(1, 1), Move(1, 0), Move(1, -1) }, { Move(-1, 0), Move(-1,
-						-1), Move(0, -1) }, { Move(-1, -1), Move(0, -1), Move(1,
-						-1) }, { Move(0, -1), Move(1, -1), Move(1, 0) } } {
+				(size.x / resolution) + 1, (size.y / resolution) + 1, 0),
+				moves_ {
+					{ Move(-1, 0), Move(-1, 1), Move( 0, 1) },
+					{ Move(-1, 1), Move( 0, 1), Move( 1, 1) },
+					{ Move( 0, 1), Move( 1, 1), Move( 1, 0) },
+					{ Move(-1,-1), Move(-1, 0), Move(-1, 1) },
+					{ Move( 1, 1), Move( 1, 0), Move( 1,-1) },
+					{ Move( 0,-1), Move(-1,-1), Move(-1, 0) },
+					{ Move( 1,-1), Move( 0,-1), Move(-1,-1) },
+					{ Move( 1, 0), Move( 1,-1), Move( 0,-1) }
+				} {
 
 	minPayoff_ = -1;
 	gamma_ = 0.99;
@@ -66,12 +73,15 @@ void CostMap::recalculate(unsigned int maxCycle) {
 
 	// recalculate all values in costMap until values not converges or counter is greater than maxCycle
 	do {
-		for (int x = 1; x < costMap_.widht() - 1; ++x) { // walk through all values
-			for (int y = 1; y < costMap_.height() - 1; ++y) {
+		for (int y = 1; y < costMap_.height() - 1; ++y) { // walk through all values
+			for (int x = 1; x < costMap_.widht() - 1; ++x) {
 
-				float payoff = getPayoffFromMove(x, y, 0);
-				for (unsigned int index = 1; index < 8; ++index) {
-					payoff = std::max(payoff, getPayoffFromMove(x, y, index));
+				float payoff = std::numeric_limits<float>::min();
+				for (unsigned int index = 0; index < 8; ++index) {
+					float tempPayoff = getPayoffFromMove(x, y, index);
+					if(payoff < tempPayoff){
+						payoff = tempPayoff;
+					}
 				}
 				costMap_.value(x, y) = gamma_ * payoff;
 
