@@ -2,28 +2,101 @@
 #include <algorithm>
 using namespace costMap;
 
-int PayoffOccupancyMap::payoff(unsigned int x, unsigned int y) { // TODO: change this payoff function
-	int value = occupancyMap_->data[y * occupancyMap_->info.width + x];
-	if(value < 0 && value > 100){
+const int PayoffOccupancyMap::FREE = 0;
+const int PayoffOccupancyMap::UNKNOWN = 1;
+const int PayoffOccupancyMap::WALL = 2;
+const int PayoffOccupancyMap::WRONG = 255;
+
+int PayoffOccupancyMap::payoff(Grid& map, unsigned int x, unsigned int y) {
+	switch (map.value(x, y)) {
+	case FREE: // free value < 25
+		return freePayoff_;
+		break;
+	case UNKNOWN: // unknown value > 25 && value < 75
+		return unknownPayoff_;
+		break;
+	case WALL: // wall value > 75
+		return wallPayoff_;
+		break;
+	default: // wrong value greater than 100 or less than 0
 		return 0;
+		break;
 	}
-	else if(value <= 25){ // free space
-		return (-freePayoff_/25.0)*value + freePayoff_;
-	}else if(value <= 75){ // unknown
-		int temp = std::abs(value - 50);
-		return (-unknownPayoff_/25.0)*temp + unknownPayoff_;
-	}else{ // occupied space
-		return (wallPayoff_/25.0)*value - 3*wallPayoff_;
+}
+
+void PayoffOccupancyMap::updateMap(Grid& map,
+		const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap, const int shiftX,
+		const int shiftY) {
+	for (unsigned int y = 0; y < map.widht(); ++y) {
+		int shiftOccup = (y + shiftY) * occupancyMap_->info.width;
+		for (unsigned int x = 0; x < map.height(); ++x) {
+			uint8_t valueOcc = occupancyMap_->data[shiftOccup + x + shiftX];
+			map.value(x, y) = (valueOcc < 0 && valueOcc > 100) ? WRONG :
+								(valueOcc <= 25) ? FREE :
+								(valueOcc <= 75) ? UNKNOWN : WALL;
+		}
+	}
+}
+
+void PayoffOccupancyMap::updateRows(Grid& map, const int step) {
+	for (unsigned int y = 0; y < map.widht(); ++y) {
+		int wall = 0;
+		int distance = 0;
+		for (unsigned int x = 0; x < map.height(); ++x) {
+			if (map.value(x, y) == WALL) {
+				wall = step + 1;
+
+				// go back and mark free and unknown space as wall
+				distance = std::min(distance, step);
+				for (int j = 1; j <= distance; ++j) {
+					map.value(x - j, y) = WALL;
+				}
+				distance = 0;
+			}
+
+			if (wall > 0) {
+				map.value(x, y) = WALL;
+			}
+
+			--wall;
+			++distance;
+		}
+	}
+}
+
+void PayoffOccupancyMap::updateColumns(Grid& map, const int step) {
+	for (unsigned int x = 0; x < map.height(); ++x) {
+		int wall = 0;
+		int distance = 0;
+		for (unsigned int y = 0; y < map.widht(); ++y) {
+
+			if (map.value(x, y) == WALL) {
+				wall = step + 1;
+
+				distance = std::min(distance, step);
+				for (int j = 1; j <= distance; ++j) {
+					map.value(x, y - j) = WALL;
+				}
+				distance = 0;
+			}
+
+			if (wall > 0) {
+				map.value(x, y) = WALL;
+			}
+
+			--wall;
+			++distance;
+		}
 	}
 }
 
 PayoffOccupancyMap::PayoffOccupancyMap(
 		const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
-		const int wallPayoff, const int unknownPayoff, const int freePayoff,
-		const int transX, const int transY) :
-		occupancyMap_(occupancyMap), wallPayoff_(wallPayoff), unknownPayoff_(
-				unknownPayoff), freePayoff_(freePayoff), transX_(transX), transY_(
-				transY) {
+		const Size robotSize, const int wallPayoff, const int unknownPayoff,
+		const int freePayoff, const int transX, const int transY) :
+		occupancyMap_(occupancyMap), robotSize_(robotSize), wallPayoff_(
+				wallPayoff), unknownPayoff_(unknownPayoff), freePayoff_(
+				freePayoff), transX_(transX), transY_(transY) {
 
 }
 
@@ -38,17 +111,32 @@ void PayoffOccupancyMap::updatePayoffTable(Table table, float resolution) {
 		unsigned int costY = (transY_ >= 0 ? transY_ : 0);
 		unsigned int occuY = (transY_ >= 0 ? 0 : -transY_);
 
-		unsigned int stepX = std::min(occuMaxX, table.widht()) - std::max(0, transX_);
-		unsigned int stepY = std::min(occuMaxY, table.height()) - std::max(0, transY_);
+		unsigned int stepX = std::min(occuMaxX, table.widht())
+				- std::max(0, transX_);
+		unsigned int stepY = std::min(occuMaxY, table.height())
+				- std::max(0, transY_);
 
-		printf("Table \n\n\n\n\n");
+		unsigned int robotX = robotSize_.x / resolution;
+		unsigned int robotY = robotSize_.y / resolution;
+
+		Grid map(stepX, stepY, 0);
+		updateMap(map, occupancyMap_, occuX, occuY);
+
+		if (robotX > 0) {
+			updateRows(map, robotX);
+		}
+
+		if (robotY > 0) {
+			updateColumns(map, robotY);
+		}
+
+		//printf("Table \n\n\n\n\n");
 		for (unsigned int x = 0; x < stepX; ++x) {
 			for (unsigned int y = 0; y < stepY; ++y) {
-				table.value(x + costX, y + costY) += payoff(x + occuX,
-						y + occuY);
-				printf("%i\t",table.value(x + costX, y + costY));
+				table.value(x + costX, y + costY) += payoff(map, x, y);
+				//printf("%i\t",table.value(x + costX, y + costY));
 			}
-			printf("\n");
+			//printf("\n");
 		}
 
 	}

@@ -39,7 +39,7 @@ public:
 
 	void addPayoffObject(Payoff payoffObject, bool store = false);
 	void updatePayoffTable();
-	void recalculate(unsigned int maxCycle = 20);
+	void recalculate(unsigned int maxCycle = 50);
 	Position getBestMove(const Position position);
 
 	inline Size size(){
