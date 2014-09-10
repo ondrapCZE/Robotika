@@ -69,6 +69,12 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 
 	if (chassis_.getState().distance(end.position) <= epsilon_) {
 		checkpointsQueue_.pop_front();
+
+		if(checkpointsQueue_.empty()){
+			callback_(REACHED);
+		}else{
+			callback_(REACHED_LAST_ONE);
+		}
 	}
 }
 
@@ -122,6 +128,13 @@ checkpointMovementHermit::checkpointMovementHermit(
 			std::thread(&checkpointMovementHermit::moveToCheckpoints, this));
 }
 
+checkpointMovementHermit::~checkpointMovementHermit() {
+	end_ = true;
+	if (moveToCheckpointsThread_.joinable()) {
+		moveToCheckpointsThread_.join();
+	}
+}
+
 void checkpointMovementHermit::addCheckpoint(const Checkpoint& checkpoint,
 bool front) {
 	if (front) {
@@ -165,9 +178,6 @@ void checkpointMovementHermit::resume() {
 	pause_ = false;
 }
 
-checkpointMovementHermit::~checkpointMovementHermit() {
-	end_ = true;
-	if (moveToCheckpointsThread_.joinable()) {
-		moveToCheckpointsThread_.join();
-	}
+void checkpointMovementHermit::setCallback(Callback fce){
+	callback_ = fce;
 }

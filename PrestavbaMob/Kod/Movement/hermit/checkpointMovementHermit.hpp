@@ -23,6 +23,8 @@ class checkpointMovementHermit : public checkpointMovement{
 
 	std::thread moveToCheckpointsThread_;
 	
+	Callback callback_;
+
 	const unsigned int TIME = 10;
 	const float epsilon_ = 0.02;
 	const float predictDistance_ = 0.05;
@@ -36,6 +38,8 @@ class checkpointMovementHermit : public checkpointMovement{
 	void moveToCheckpoints();
 public:
 	checkpointMovementHermit(BasicDifferentialChassis &chassis);
+	~checkpointMovementHermit();
+
 	void addCheckpoint(const Checkpoint &checkpoint, bool front=false);
 	void addCheckpoint(const std::vector<Checkpoint> &checkpoints, bool front=false);
 	
@@ -44,7 +48,8 @@ public:
 	void clearCheckpoints();
 	void pause();
 	void resume();
-	~checkpointMovementHermit();
+
+	void setCallback(Callback fce);
 };
 
 #endif

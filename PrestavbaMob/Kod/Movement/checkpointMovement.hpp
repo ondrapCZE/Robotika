@@ -2,6 +2,7 @@
 #define STATE_MOVEMENT_H
 
 #include <vector>
+#include <functional>
 
 #include "../../../obecne/basic.h"
 
@@ -12,6 +13,14 @@ struct Checkpoint{
 	Checkpoint(Position position = Position(), Vector outVector = Vector()) : position(position),
 	outVector(outVector){};
 };
+
+enum CheckpointReachedState{
+	NO_REACHED = 0,
+	REACHED = 1,
+	REACHED_LAST_ONE = 2
+};
+
+typedef std::function<void(CheckpointReachedState)> Callback;
 
 class checkpointMovement{
 public:
@@ -24,6 +33,8 @@ public:
 	virtual void clearCheckpoints()=0;
 	virtual void pause()=0;
 	virtual void resume()=0;
+
+	virtual void setCallback(Callback fce)=0;
 };
 
 #endif
