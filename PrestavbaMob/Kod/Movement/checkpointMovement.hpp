@@ -15,9 +15,12 @@ struct Checkpoint{
 
 class checkpointMovement{
 public:
-	virtual void addCheckpoint(const Checkpoint &checkpoint)=0;
-	virtual void addCheckpoint(const std::vector<Checkpoint> &checkpoints)=0;
+	virtual ~checkpointMovement(){};
+
+	virtual void addCheckpoint(const Checkpoint &checkpoint, bool front=false)=0;
+	virtual void addCheckpoint(const std::vector<Checkpoint> &checkpoints, bool front=false)=0;
 	
+	virtual void skipActualCheckpoint()=0;
 	virtual void clearCheckpoints()=0;
 	virtual void pause()=0;
 	virtual void resume()=0;

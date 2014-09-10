@@ -3,6 +3,7 @@
 
 #include <thread>
 #include <atomic>
+#include <mutex>
 
 #include "../../DifferencialniPodvozek/basicDifferencialChassis.h"
 #include "../checkpointMovement.hpp"
@@ -16,6 +17,9 @@ class checkpointMovementHermit : public checkpointMovement{
 	
 	std::atomic<bool> end_;
 	std::atomic<bool> pause_;
+	std::atomic<bool> frontChange_;
+
+	std::mutex frontMutex_;
 
 	std::thread moveToCheckpointsThread_;
 	
@@ -26,17 +30,17 @@ class checkpointMovementHermit : public checkpointMovement{
 	float speed_ = 0.3f;
 	const unsigned int pointsOnMeter = 1000;
 	
-	Circle getCircle(const State &state, const Position &point);
-	Vector getOutputVector(const Checkpoint &prev, const Checkpoint &next, const float tightness = 0.5f);
 	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);
 	
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);
 	void moveToCheckpoints();
 public:
 	checkpointMovementHermit(BasicDifferentialChassis &chassis);
-	void addCheckpoint(const Checkpoint &checkpoint);
-	void addCheckpoint(const std::vector<Checkpoint> &checkpoints);
+	void addCheckpoint(const Checkpoint &checkpoint, bool front=false);
+	void addCheckpoint(const std::vector<Checkpoint> &checkpoints, bool front=false);
 	
+	void skipActualCheckpoint();
+
 	void clearCheckpoints();
 	void pause();
 	void resume();

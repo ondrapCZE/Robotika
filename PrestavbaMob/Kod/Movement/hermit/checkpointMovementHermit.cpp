@@ -11,43 +11,6 @@
 #include "checkpointMovementHermit.hpp"
 //#include "movement.h"
 
-Circle checkpointMovementHermit::getCircle(const State& state,
-		const Position& point) {
-	// compute line on which is placed all circle centers
-	Position average = ((Position) state + point) / 2;
-	float a = point.x - state.x;
-	float b = point.y - state.y;
-	float c = -a * average.x - b * average.y;
-
-	// compute tanget line to the state
-	float a_chassis = cos(state.theta);
-	float b_chassis = sin(state.theta);
-	float c_chassis = -a_chassis * state.x - b_chassis * state.y;
-
-	float scale = a * b_chassis - b * a_chassis;
-	//printf("Scale %f abs(Scale) %f \n", scale, std::abs(scale));
-	Circle circle;
-	if (std::abs(scale) > epsilonZero_) {
-		circle.center.x = (b * c_chassis - c * b_chassis) / scale;
-		circle.center.y = (c * a_chassis - a * c_chassis) / scale;
-		circle.radius = circle.center.distance(state);
-	} else { // center is in the infinity, lines are parallel
-		circle.center.x = std::numeric_limits<int>::max();
-		circle.center.y = std::numeric_limits<int>::max();
-		circle.radius = std::numeric_limits<int>::max();
-	}
-
-	//printf("Circle [%f,%f] with radius %f \n", circle.center.x, circle.center.y,circle.radius);
-	return circle;
-}
-
-Vector checkpointMovementHermit::getOutputVector(const Checkpoint &prev,
-		const Checkpoint &next, const float tightness) {
-	float checkedTightness = rob_fce::valueInRange(tightness, 0.0f, 1.0f);
-	Position temp = (next.position - prev.position) * checkedTightness;
-	return Vector(temp.x, temp.y);
-}
-
 Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual,
 		const Checkpoint& target, const float inter) {
 	float checkedInter = rob_fce::valueInRange(inter, 0.0f, 1.0f);
@@ -72,18 +35,13 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 
 	float s = step;
 	timeval timer[2];
-	while(chassis_.getState().distance(end.position) > epsilon_) {
+	while (chassis_.getState().distance(end.position) > epsilon_
+			&& !frontChange_ && !pause_) {
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
-		if (pause_) {
-			checkpointsQueue_.push_front(end);
-			break;
-		}
-
 		Position interPosition = getPointHermit(start, end, s);
-		while(chassis_.getState().distance(end.position)
-				> predictDistance_
+		while (chassis_.getState().distance(end.position) > predictDistance_
 				&& chassis_.getState().distance(interPosition)
 						< predictDistance_) {
 			s += step;
@@ -95,10 +53,10 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		float angle = chassis_.getState().angle(interPosition);
 		float diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
 
-		if(std::abs(diffAngle) > M_PI_4){
-			chassis_.setVelocity(0,diffAngle);
-		}else{
-			chassis_.setVelocity(distance,diffAngle);
+		if (std::abs(diffAngle) > M_PI_4) {
+			chassis_.setVelocity(0, diffAngle);
+		} else {
+			chassis_.setVelocity(distance, diffAngle);
 		}
 
 		gettimeofday(&timer[1], NULL);
@@ -108,6 +66,10 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		//printf("Usleep time: %li \n\r", sleepMicro);
 		std::this_thread::sleep_for(std::chrono::microseconds(sleepMicro));
 	}
+
+	if (chassis_.getState().distance(end.position) <= epsilon_) {
+		checkpointsQueue_.pop_front();
+	}
 }
 
 void checkpointMovementHermit::moveToCheckpoints() {
@@ -115,7 +77,15 @@ void checkpointMovementHermit::moveToCheckpoints() {
 	bool robotWaited = true;
 	while (!end_) {
 		Checkpoint target;
-		if (!pause_ && checkpointsQueue_.tryPop(target)) {
+
+		bool newCheckpoint;
+		{
+			std::lock_guard < std::mutex > lock(frontMutex_);
+			newCheckpoint = checkpointsQueue_.try_front(target);
+			frontChange_ = false;
+		}
+
+		if (!pause_ && newCheckpoint) {
 			printf("Move to the [%f,%f] with the output vector [%f,%f] \n",
 					target.position.x, target.position.y, target.outVector.x,
 					target.outVector.y);
@@ -123,7 +93,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			if (robotWaited) {
 				State state = chassis_.getState();
 				last.position = state;
-				last.outVector = Vector(cos(state.theta), sin(state.theta));
+				//last.outVector = Vector(cos(state.theta), sin(state.theta));
 			}
 
 			moveToCheckpoint(last, target);
@@ -146,20 +116,41 @@ checkpointMovementHermit::checkpointMovementHermit(
 		chassis_(chassis) {
 	end_ = false;
 	pause_ = false;
+	frontChange_ = false;
 	speed_ = chassis.getMaxVelocity();
 	moveToCheckpointsThread_ = std::move(
 			std::thread(&checkpointMovementHermit::moveToCheckpoints, this));
 }
 
-void checkpointMovementHermit::addCheckpoint(const Checkpoint& checkpoint) {
-	checkpointsQueue_.push_back(checkpoint);
+void checkpointMovementHermit::addCheckpoint(const Checkpoint& checkpoint,
+bool front) {
+	if (front) {
+		std::lock_guard < std::mutex > lock(frontMutex_);
+		checkpointsQueue_.push_front(checkpoint);
+		frontChange_ = true;
+	} else {
+		checkpointsQueue_.push_back(checkpoint);
+	}
 }
 
 void checkpointMovementHermit::addCheckpoint(
-		const std::vector<Checkpoint>& checkpoints) {
-	for (auto element : checkpoints) {
-		checkpointsQueue_.push_back(element);
+		const std::vector<Checkpoint>& checkpoints, bool front) {
+	if (front) {
+		std::lock_guard < std::mutex > lock(frontMutex_);
+		for (auto element : checkpoints) {
+			checkpointsQueue_.push_front(element);
+		}
+	} else {
+		for (auto element : checkpoints) {
+			checkpointsQueue_.push_back(element);
+		}
 	}
+}
+
+void checkpointMovementHermit::skipActualCheckpoint() {
+	std::lock_guard < std::mutex > lock(frontMutex_);
+	checkpointsQueue_.pop_front();
+	frontChange_ = true;
 }
 
 void checkpointMovementHermit::clearCheckpoints() {
@@ -176,5 +167,7 @@ void checkpointMovementHermit::resume() {
 
 checkpointMovementHermit::~checkpointMovementHermit() {
 	end_ = true;
-	moveToCheckpointsThread_.join();
+	if (moveToCheckpointsThread_.joinable()) {
+		moveToCheckpointsThread_.join();
+	}
 }

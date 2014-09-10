@@ -24,26 +24,25 @@ public:
 		emptyCondition.notify_one();
 	};
 
-	bool tryPop(T &element){
+	bool pop_front(){
+		std::lock_guard<std::mutex> guard(lck);		
+		if(dataDeque.empty())
+			return false;
+		
+		dataDeque.pop_front();
+		return true;
+	}
+	
+	bool try_front(T &element){
 		std::lock_guard<std::mutex> guard(lck);		
 		if(dataDeque.empty())
 			return false;
 		
 		element = dataDeque.front();
-		dataDeque.pop_front();
 		return true;
 	}
 	
-	bool tryFront(T &element){
-		std::lock_guard<std::mutex> guard(lck);		
-		if(dataDeque.empty())
-			return false;
-		
-		element = std::move(dataDeque.front());
-		return true;
-	}
-	
-	T pop(){
+	T front(){
 		std::unique_lock<std::mutex> uq_lck(lck);
 		emptyCondition.wait(uq_lck,[this]{return !dataDeque.empty();});
 		T copy = dataDeque.front();
