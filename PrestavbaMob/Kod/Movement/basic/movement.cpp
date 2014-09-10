@@ -1,5 +1,5 @@
 #include "movement.h"
-#include "../../../obecne/basic.h"
+#include "../../../../obecne/basic.h"
 
 #include <stdio.h>
 
