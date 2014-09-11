@@ -9,6 +9,7 @@ typedef grid::Grid<int>& Table;
 
 class PayoffObject{
 public:
+	virtual ~PayoffObject(){};
 	virtual void updatePayoffTable(Table table, float resolution) = 0;
 	virtual int getMinPayoff() = 0;
 };
