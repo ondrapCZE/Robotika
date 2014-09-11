@@ -23,6 +23,8 @@ class CostMap {
 	grid::Grid<float> costMap_;
 	grid::Grid<int> payoffTable_;
 
+	static const float EPSILON;
+
 	Payoffs payoffObjects_;
 	Move moves_[8][3];
 
@@ -39,7 +41,7 @@ public:
 
 	void addPayoffObject(Payoff payoffObject, bool store = false);
 	void updatePayoffTable();
-	void recalculate(unsigned int maxCycle = 50);
+	void recalculate(unsigned int maxCycle = 100);
 	Position getBestMove(const Position position);
 
 	inline Size size(){
