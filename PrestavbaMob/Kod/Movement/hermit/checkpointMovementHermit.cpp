@@ -70,10 +70,12 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 	if (chassis_.getState().distance(end.position) <= epsilon_) {
 		checkpointsQueue_.pop_front();
 
-		if(checkpointsQueue_.empty()){
-			callback_(REACHED);
-		}else{
-			callback_(REACHED_LAST_ONE);
+		if (callback_) {
+			if (checkpointsQueue_.empty()) {
+				callback_(REACHED);
+			} else {
+				callback_(REACHED_LAST_ONE);
+			}
 		}
 	}
 }
@@ -178,6 +180,6 @@ void checkpointMovementHermit::resume() {
 	pause_ = false;
 }
 
-void checkpointMovementHermit::setCallback(Callback fce){
+void checkpointMovementHermit::setCallback(Callback fce) {
 	callback_ = fce;
 }
