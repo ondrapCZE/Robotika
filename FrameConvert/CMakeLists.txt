@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-set(PROJECT_NAME FrameConverter)
+set(PROJECT_NAME frame_converter)
 project(${PROJECT_NAME})
 
 ADD_DEFINITIONS(
