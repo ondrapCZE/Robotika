@@ -1,5 +1,6 @@
 #include "cost_map.hpp"
 #include <limits>
+#include <chrono>
 
 using namespace costMap;
 using namespace grid;
@@ -34,21 +35,79 @@ CostMap::Type CostMap::getPayoffFromMove(const unsigned int x,
 	return payoff;
 }
 
+void CostMap::recalculateWorker() {
+
+	while (!end_) {
+		if (recalculation_) {
+			tempCostMap_->setAllValues(minPayoff_);
+
+			unsigned int counter = 0;
+			bool change = false;
+
+			// recalculate all values in costMap until values not converges or counter is greater than maxCycle
+			Type error = 0;
+			do {
+				error = 0;
+				for (int y = 0; y < tempCostMap_->height(); ++y) { // walk through all values
+					for (int x = 0; x < tempCostMap_->widht(); ++x) {
+
+						Type payoff = std::numeric_limits<Type>::min();
+						for (int index = 0; index < 9; ++index) {
+							Type tempPayoff = getPayoffFromMove(x, y, index,
+									tempCostMap_);
+							if (payoff < tempPayoff) {
+								payoff = tempPayoff;
+							}
+						}
+
+						Type newValue = gamma_ * payoff;
+						error += std::abs(newValue - tempCostMap_->value(x, y));
+						tempCostMap_->value(x, y) = newValue;
+
+					}
+				}
+
+				if (error > EPSILON) {
+					change = true;
+				}
+
+			} while (counter++ < cycles_ && change);
+
+			std::lock_guard < std::mutex > lock(costMapMutex_);
+			costMap_.swap(tempCostMap_);
+			recalculation_ = false;
+		} else {
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		}
+	}
+
+}
+
 CostMap::CostMap(Size size, const float resolution) :
 		size_(size), resolution_(resolution), payoffTable_(
 				(size.x / resolution), (size.y / resolution), 0), moves_ { {
-				Move(-1, 0), Move(-1, 1), Move(0, 1) }, { Move(-1, 1), Move(0,
-				1), Move(1, 1) }, { Move(0, 1), Move(1, 1), Move(1, 0) }, {
-				Move(-1, -1), Move(-1, 0), Move(-1, 1) }, { Move(1, 1), Move(1,
-				0), Move(1, -1) }, { Move(0, -1), Move(-1, -1), Move(-1, 0) }, {
-				Move(1, -1), Move(0, -1), Move(-1, -1) }, { Move(1, 0), Move(1,
-				-1), Move(0, -1) } } {
+				Move(0, 0), Move(0, 0), Move(0, 0) }, { Move(-1, 0), Move(-1,
+				1), Move(0, 1) }, { Move(-1, 1), Move(0, 1), Move(1, 1) }, {
+				Move(0, 1), Move(1, 1), Move(1, 0) }, { Move(-1, -1), Move(-1,
+				0), Move(-1, 1) }, { Move(1, 1), Move(1, 0), Move(1, -1) }, {
+				Move(0, -1), Move(-1, -1), Move(-1, 0) }, { Move(1, -1), Move(0,
+				-1), Move(-1, -1) }, { Move(1, 0), Move(1, -1), Move(0, -1) } }, recalculateThread_(
+				&CostMap::recalculateWorker, this) {
 
+	end_ = false;
+	recalculation_ = false;
 	costMap_ = GridPtr(new Grid((size.x / resolution), (size.y / resolution)));
 	tempCostMap_ = GridPtr(
 			new Grid((size.x / resolution), (size.y / resolution)));
 	minPayoff_ = -1;
 	gamma_ = 0.99;
+}
+
+CostMap::~CostMap() {
+	end_ = true;
+	if (recalculateThread_.joinable()) {
+		recalculateThread_.join();
+	}
 }
 
 void CostMap::addPayoffObject(Payoff payoffObject, bool store) {
@@ -80,50 +139,12 @@ void CostMap::updatePayoffTable() {
 	}
 }
 
-void CostMap::recalculate(unsigned int maxCycle) {
-	tempCostMap_->setAllValues(minPayoff_);
-
-	unsigned int counter = 0;
-	bool change = false;
-
-	// recalculate all values in costMap until values not converges or counter is greater than maxCycle
-	Type error = 0;
-	do {
-		error = 0;
-		for (int y = 0; y < tempCostMap_->height(); ++y) { // walk through all values
-			for (int x = 0; x < tempCostMap_->widht(); ++x) {
-
-				Type payoff = std::numeric_limits<Type>::min();
-				for (int index = 0; index < 8; ++index) {
-					Type tempPayoff = getPayoffFromMove(x, y, index, tempCostMap_);
-					if (payoff < tempPayoff) {
-						payoff = tempPayoff;
-					}
-				}
-
-				Type newValue = gamma_ * payoff;
-				error += std::abs(newValue - tempCostMap_->value(x, y));
-				tempCostMap_->value(x, y) = newValue;
-
-			}
-		}
-
-		if (error > EPSILON) {
-			change = true;
-		}
-
-	} while (counter++ < maxCycle && change);
-
-	std::lock_guard<std::mutex> lock(costMapMutex_);
-	costMap_.swap(tempCostMap_);
-}
-
 Position CostMap::getBestMove(const Position position) {
-	std::lock_guard<std::mutex> lock(costMapMutex_);
+	std::lock_guard < std::mutex > lock(costMapMutex_);
 	unsigned int move = 0;
 	float payoff = getPayoffFromMove(position.x / resolution_,
 			position.y / resolution_, 0, costMap_);
-	for (unsigned int index = 1; index < 8; ++index) {
+	for (unsigned int index = 1; index < 9; ++index) {
 		float tempPayoff = getPayoffFromMove(position.x / resolution_,
 				position.y / resolution_, index, costMap_);
 
