@@ -132,15 +132,15 @@ void MobDifferentialChassis::stop(bool slow) {
 		do{
 			VelocityWheels desire;
 			if(wheelsSpeed_.left > 0){
-				desire.left = rob_fce::valueInRange<float>(wheelsSpeed_.left - 0.1, 0.0 , wheelsSpeed_.left);
+				desire.left = rob_fce::valueInRange<float>(wheelsSpeed_.left - STOP_SPEED, 0.0 , wheelsSpeed_.left);
 			}else{
-				desire.left = rob_fce::valueInRange<float>(wheelsSpeed_.left + 0.1, wheelsSpeed_.left, 0.0);
+				desire.left = rob_fce::valueInRange<float>(wheelsSpeed_.left + STOP_SPEED, wheelsSpeed_.left, 0.0);
 			}
 
 			if(wheelsSpeed_.right > 0){
-				desire.right = rob_fce::valueInRange<float>(wheelsSpeed_.right - 0.1, 0.0 , wheelsSpeed_.right);
+				desire.right = rob_fce::valueInRange<float>(wheelsSpeed_.right - STOP_SPEED, 0.0 , wheelsSpeed_.right);
 			}else{
-				desire.right = rob_fce::valueInRange<float>(wheelsSpeed_.right + 0.1, wheelsSpeed_.right, 0.0);
+				desire.right = rob_fce::valueInRange<float>(wheelsSpeed_.right + STOP_SPEED, wheelsSpeed_.right, 0.0);
 			}
 
 			setVelocity(desire);

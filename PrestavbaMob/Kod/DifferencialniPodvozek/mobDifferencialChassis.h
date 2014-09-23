@@ -20,6 +20,7 @@ struct Distance {
 
 class MobDifferentialChassis : public BasicDifferentialChassis {
 	const float EPSILON = 1e-10;
+	const float STOP_SPEED = 0.05;
 
 	State robotState_;
 	DistanceWheels wheelsDistance_;
