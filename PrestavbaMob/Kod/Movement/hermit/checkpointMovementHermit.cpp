@@ -120,8 +120,8 @@ void checkpointMovementHermit::moveToCheckpoints() {
 }
 
 checkpointMovementHermit::checkpointMovementHermit(
-		BasicDifferentialChassis &chassis) :
-		chassis_(chassis) {
+		BasicDifferentialChassis &chassis, Callback reachedCheckpointCallback) :
+		chassis_(chassis), callback_(reachedCheckpointCallback) {
 	end_ = false;
 	pause_ = false;
 	frontChange_ = false;

@@ -37,7 +37,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);
 	void moveToCheckpoints();
 public:
-	checkpointMovementHermit(BasicDifferentialChassis &chassis);
+	checkpointMovementHermit(BasicDifferentialChassis &chassis, Callback reachedCheckpointCallback = Callback());
 	~checkpointMovementHermit();
 
 	void addCheckpoint(const Checkpoint &checkpoint, bool front=false);
