@@ -25,12 +25,12 @@ int PayoffOccupancyMap::payoff(Grid& map, unsigned int x, unsigned int y) {
 }
 
 void PayoffOccupancyMap::updateMap(Grid& map,
-		const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap, const int shiftX,
+		const nav_msgs::OccupancyGrid& occupancyMap, const int shiftX,
 		const int shiftY) {
 	for (unsigned int y = 0; y < map.widht(); ++y) {
-		int shiftOccup = (y + shiftY) * occupancyMap_->info.width;
+		int shiftOccup = (y + shiftY) * occupancyMap_.info.width;
 		for (unsigned int x = 0; x < map.height(); ++x) {
-			uint8_t valueOcc = occupancyMap_->data[shiftOccup + x + shiftX];
+			uint8_t valueOcc = occupancyMap_.data[shiftOccup + x + shiftX];
 			map.value(x, y) = (valueOcc < 0 && valueOcc > 100) ? WRONG :
 								(valueOcc <= 25) ? FREE :
 								(valueOcc <= 75) ? UNKNOWN : WALL;
@@ -91,7 +91,7 @@ void PayoffOccupancyMap::updateColumns(Grid& map, const int step) {
 }
 
 PayoffOccupancyMap::PayoffOccupancyMap(
-		const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
+		const nav_msgs::OccupancyGrid& occupancyMap,
 		const Size robotSize, const int wallPayoff, const int unknownPayoff,
 		const int freePayoff, const int transX, const int transY) :
 		occupancyMap_(occupancyMap), robotSize_(robotSize), wallPayoff_(
@@ -101,8 +101,8 @@ PayoffOccupancyMap::PayoffOccupancyMap(
 }
 
 void PayoffOccupancyMap::updatePayoffTable(Table table, float resolution) {
-	const unsigned int occuMaxX = occupancyMap_->info.width + transX_;
-	const unsigned int occuMaxY = occupancyMap_->info.height + transY_;
+	const unsigned int occuMaxX = occupancyMap_.info.width + transX_;
+	const unsigned int occuMaxY = occupancyMap_.info.height + transY_;
 	if (transX_ < table.widht() && transY_ < table.height() && occuMaxX > 0
 			&& occuMaxY > 0) {
 

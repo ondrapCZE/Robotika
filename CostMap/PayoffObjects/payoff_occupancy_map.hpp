@@ -16,7 +16,7 @@ class PayoffOccupancyMap: public PayoffObject {
 	static const int WALL;
 	static const int WRONG;
 
-	const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap_;
+	const nav_msgs::OccupancyGrid& occupancyMap_;
 	const Size robotSize_;
 	const int wallPayoff_;
 	const int unknownPayoff_;
@@ -27,12 +27,12 @@ class PayoffOccupancyMap: public PayoffObject {
 
 	int payoff(Grid& map, unsigned int x, unsigned int y);
 	void updateMap(Grid& map,
-			const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
+			const nav_msgs::OccupancyGrid& occupancyMap,
 			const int shiftX, const int shiftY);
 	void updateRows(Grid& map, const int step);
 	void updateColumns(Grid& map, const int step);
 public:
-	PayoffOccupancyMap(const nav_msgs::OccupancyGrid::ConstPtr& occupancyMap,
+	PayoffOccupancyMap(const nav_msgs::OccupancyGrid& occupancyMap,
 			const Size robotSize = Size(0, 0), const int wallPayoff = -1000000,
 			const int unknownPayoff = 5, const int freePayoff = 0,
 			const int transX = 0, const int transY = 0);
