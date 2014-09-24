@@ -86,6 +86,10 @@ struct Position {
 		Position temp(x / a, y / a);
 		return temp;
 	};
+
+	bool operator==(const Position& ob2) const{
+		return ob2.x == x && ob2.y == y;
+	}
 };
 
 /*!
