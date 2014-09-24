@@ -18,13 +18,14 @@ class OccupancyUpdater {
 	const State state_;
 	const float minAngle_;
 	const float maxAngle_;
+	const float maxRange_;
 
 	void oneScanUpdate(OccupancyMap &map, const float &distanceToWall,
 			const float &angle);
 public:
 	OccupancyUpdater(const State &state,
 			const sensor_msgs::LaserScan::ConstPtr& laserScan,
-			const float &minAngle, const float &maxAngle);
+			const float &minAngle, const float &maxAngle, const float &maxRange = -1);
 	void update(OccupancyMap &map);
 };
 

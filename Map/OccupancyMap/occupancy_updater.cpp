@@ -12,9 +12,11 @@ const float OccupancyUpdater::OCCUPIED_PROB = log(0.8 / 0.2);
 
 OccupancyUpdater::OccupancyUpdater(const State &state,
 		const sensor_msgs::LaserScan::ConstPtr& laserScan,
-		const float &minAngle, const float &maxAngle) :
+		const float &minAngle, const float &maxAngle, const float &maxRange) :
 		laserScan_(laserScan), state_(state), minAngle_(minAngle), maxAngle_(
-				maxAngle) {
+				maxAngle), maxRange_(maxRange < 0 || maxRange > laserScan_->range_max ?
+						laserScan_->range_max : maxRange) {
+
 }
 
 void OccupancyUpdater::oneScanUpdate(OccupancyMap &map,
@@ -32,7 +34,7 @@ void OccupancyUpdater::oneScanUpdate(OccupancyMap &map,
 	float x = state_.x;
 	float y = state_.y;
 	while (distance < distanceToWall) {
-		if(!map.inMap(Position(x,y))){
+		if (!map.inMap(Position(x, y))) {
 			return;
 		}
 
@@ -43,7 +45,7 @@ void OccupancyUpdater::oneScanUpdate(OccupancyMap &map,
 		distance += distanceStep;
 	}
 
-	if (distance < laserScan_->range_max) {
+	if (map.inMap(Position(x, y)) && distance < maxRange_) {
 		map.map(x, y) += OCCUPIED_PROB - map.defaultProb();
 	}
 }
