@@ -7,6 +7,7 @@ void FrameConverter::setRotationTranslation(const State global,
 	global_ = global;
 	relative_ = relative;
 	rotation_ = relative.theta - global.theta;
+	initialized_ = true;
 }
 
 Position FrameConverter::globalToRelative(const Position position) {

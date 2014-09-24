@@ -7,10 +7,14 @@ class FrameConverter {
 	Position global_;
 	Position relative_;
 	double rotation_;
+
+	bool initialized_;
 public:
+	FrameConverter(){initialized_ = false;};
 	void setRotationTranslation(const State global, const State relative);
 	Position globalToRelative(const Position position);
 	Position relativeToGlobal(const Position position);
+	bool isInitialized(){ return initialized_;};
 };
 
 #endif
