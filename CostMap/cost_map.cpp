@@ -5,7 +5,7 @@
 using namespace costMap;
 using namespace grid;
 
-const float CostMap::EPSILON = 1e-10;
+const float CostMap::EPSILON = 1e-2;
 
 CostMap::Type CostMap::getPayoffFromMove(const unsigned int x,
 		const unsigned int y, const unsigned int move, GridPtr costMap) {
@@ -73,8 +73,10 @@ void CostMap::recalculateWorker() {
 
 			} while (counter++ < cycles_ && change);
 
-			std::lock_guard < std::mutex > lock(costMapMutex_);
-			costMap_.swap(tempCostMap_);
+			{
+				std::lock_guard < std::mutex > lock(costMapMutex_);
+				costMap_.swap(tempCostMap_);
+			}
 			recalculation_ = false;
 		} else {
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -144,6 +146,7 @@ Position CostMap::getBestMove(const Position position) {
 	unsigned int move = 0;
 	float payoff = getPayoffFromMove(position.x / resolution_,
 			position.y / resolution_, 0, costMap_);
+
 	for (unsigned int index = 1; index < 9; ++index) {
 		float tempPayoff = getPayoffFromMove(position.x / resolution_,
 				position.y / resolution_, index, costMap_);
@@ -153,6 +156,7 @@ Position CostMap::getBestMove(const Position position) {
 			payoff = tempPayoff;
 		}
 	}
+	printf("\n");
 
 	return Position(position.x + moves_[move][1].x * resolution_,
 			position.y + moves_[move][1].y * resolution_);
