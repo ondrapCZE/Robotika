@@ -16,20 +16,21 @@ class VisitorUpdateMap: public Visitor<AdvancedParticle> {
 	// adjust VisitorScan weighting parameters
 	const float minAngle_;
 	const float maxAngle_;
+	const float maxRange_;
 public:
 	VisitorUpdateMap(const State laserState,
 			const sensor_msgs::LaserScan::ConstPtr& laserScan,
-			const float &minAngle, const float &maxAngle);
+			const float &minAngle, const float &maxAngle,
+			const float &maxRange = -1);
 	void visit(AdvancedParticle *particle);
 };
 
 template<class AdvancedParticle>
 VisitorUpdateMap<AdvancedParticle>::VisitorUpdateMap(const State laserState,
 		const sensor_msgs::LaserScan::ConstPtr& laserScan,
-		const float &minAngle, const float &maxAngle) :
+		const float &minAngle, const float &maxAngle, const float &maxRange) :
 		laserState_(laserState), laserScan_(laserScan), minAngle_(minAngle), maxAngle_(
-				maxAngle) {
-
+				maxAngle), maxRange_(maxRange) {
 }
 
 template<class AdvancedParticle>
@@ -41,8 +42,8 @@ void VisitorUpdateMap<AdvancedParticle>::visit(AdvancedParticle *particle) {
 			+ cos(state.theta) * laserState_.y;
 	state.theta = rob_fce::normAngle(state.theta + laserState_.theta);
 
-	::map::occupancy::OccupancyUpdater updater(state, laserScan_, -M_PI_2,
-			M_PI_2);
+	::map::occupancy::OccupancyUpdater updater(state, laserScan_, minAngle_,
+			maxAngle_, maxRange_);
 
 	particle->updateMap(updater);
 }

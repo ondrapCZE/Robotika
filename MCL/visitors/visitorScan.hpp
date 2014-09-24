@@ -21,6 +21,7 @@ class VisitorScan: virtual public Visitor<AdvancedParticle> {
 	// adjust VisitorScan weighting parameters
 	const float minAngle_;
 	const float maxAngle_;
+	const float maxRange_;
 	const unsigned int step_;
 	const unsigned int shift_;
 
@@ -29,7 +30,7 @@ public:
 			const sensor_msgs::LaserScan::ConstPtr& laserScan,
 			const float &minAngle, const float &maxAngle,
 			const float &deviation, const unsigned int &step,
-			const unsigned int shift = 0);
+			const float maxRange = -1, const unsigned int shift = 0);
 	inline double computeWeight(const double mean, const double variance);
 	void visit(AdvancedParticle *particle);
 };
@@ -41,13 +42,17 @@ template<class AdvancedParticle, class Map>
 VisitorScan<AdvancedParticle, Map>::VisitorScan(const State &state,
 		const sensor_msgs::LaserScan::ConstPtr& laserScan,
 		const float &minAngle, const float &maxAngle, const float &deviation,
-		const unsigned int &step, const unsigned int shift) :
+		const unsigned int &step, const float maxRange,
+		const unsigned int shift) :
 		relativeState_(state), laserScan_(laserScan), minAngle_(
 				rob_fce::valueInRange(minAngle, laserScan->angle_min,
 						laserScan->angle_max)), maxAngle_(
 				rob_fce::valueInRange(maxAngle, laserScan->angle_min,
 						laserScan->angle_max)), deviation_(deviation), step_(
-				step), shift_(shift) {
+				step), maxRange_(
+				maxRange < 0 || maxRange > laserScan->range_max ?
+						laserScan->range_max : maxRange), shift_(shift) {
+
 }
 
 template<class AdvancedParticle, class Map>
@@ -76,16 +81,19 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction
-		map::Interval obstacleDistance = particle->map().distanceToNearestObstacle(
-				state, state.theta + angle, laserScan_->range_max);
+		map::Interval obstacleDistance =
+				particle->map().distanceToNearestObstacle(state,
+						state.theta + angle, maxRange_);
 
-		if(obstacleDistance.begin < 0){ // we cannot get some distance
+		if (obstacleDistance.begin < 0) { // we cannot get some distance
 			continue;
 		}
 
 		float error = 0;
-		if(laserScan_->ranges[index] < obstacleDistance.begin || laserScan_->ranges[index] > obstacleDistance.end){
-			error = laserScan_->ranges[index] - ((obstacleDistance.begin + obstacleDistance.end) / 2.0);
+		if (laserScan_->ranges[index] < obstacleDistance.begin
+				|| laserScan_->ranges[index] > obstacleDistance.end) {
+			error = laserScan_->ranges[index]
+					- ((obstacleDistance.begin + obstacleDistance.end) / 2.0);
 		}
 
 // weight particle according to the error
