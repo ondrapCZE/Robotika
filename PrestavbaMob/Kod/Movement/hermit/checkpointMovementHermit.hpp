@@ -32,6 +32,13 @@ class checkpointMovementHermit : public checkpointMovement{
 	float speed_ = 0.3f;
 	const unsigned int pointsOnMeter = 1000;
 	
+	enum Direction{
+		FORWARD,
+		BACKWARD,
+		LEFT,
+		RIGHT
+	};
+
 	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);
 	
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);

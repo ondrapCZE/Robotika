@@ -36,6 +36,8 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 	float s = step;
 	timeval timer[2];
 	bool change = checkpointChanged_ | pause_ | end_;
+	Direction dir = FORWARD;
+
 	while (chassis_.getState().distance(end.position) > epsilon_ && !change) {
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
@@ -53,12 +55,33 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		float angle = chassis_.getState().angle(interPosition);
 		float diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
 
-		if (std::abs(diffAngle) > M_PI_4) {
-			printf("Rotate %f\n",diffAngle);
-			chassis_.setVelocity(0, diffAngle);
-		} else {
-			printf("Go straight %f Rotate %f\n",distance, diffAngle);
+		if (dir == FORWARD) {
+			if (diffAngle < M_PI_2 && diffAngle > -M_PI_2) {
+				dir = FORWARD;
+			} else if (diffAngle > M_PI_2) {
+				dir = LEFT;
+			} else if (diffAngle < -M_PI_2) {
+				dir = RIGHT;
+			}
+		}else{
+			if(std::abs(diffAngle) < (M_PI / 8.0)){
+				dir = FORWARD;
+			}
+		}
+
+		switch (dir) {
+		case FORWARD:
+			printf("Go straight %f Rotate %f\n", distance, diffAngle);
 			chassis_.setVelocity(distance, diffAngle);
+			break;
+		case LEFT:
+			printf("Rotate left\n");
+			chassis_.setVelocity(0, M_PI_2);
+			break;
+		case RIGHT:
+			printf("Rotate right\n");
+			chassis_.setVelocity(0, -M_PI_2);
+			break;
 		}
 
 		gettimeofday(&timer[1], NULL);
@@ -116,7 +139,8 @@ void checkpointMovementHermit::moveToCheckpoints() {
 				incorrectLast = false;
 			}
 
-			printf("Last checkpoint [%f,%f] with output vector [%f,%f]\n",last.position.x, last.position.y, last.outVector.x,
+			printf("Last checkpoint [%f,%f] with output vector [%f,%f]\n",
+					last.position.x, last.position.y, last.outVector.x,
 					last.outVector.y);
 			moveToCheckpoint(last, target);
 			stopRobot = true;
