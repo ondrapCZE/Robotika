@@ -59,9 +59,9 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 			if (diffAngle < M_PI_2 && diffAngle > -M_PI_2) {
 				dir = FORWARD;
 			} else if (diffAngle > M_PI_2) {
-				dir = LEFT;
-			} else if (diffAngle < -M_PI_2) {
 				dir = RIGHT;
+			} else if (diffAngle < -M_PI_2) {
+				dir = LEFT;
 			}
 		}else{
 			if(std::abs(diffAngle) < (M_PI / 8.0)){
@@ -71,15 +71,12 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 
 		switch (dir) {
 		case FORWARD:
-			printf("Go straight %f Rotate %f\n", distance, diffAngle);
 			chassis_.setVelocity(distance, diffAngle);
 			break;
 		case LEFT:
-			printf("Rotate left\n");
 			chassis_.setVelocity(0, M_PI_2);
 			break;
 		case RIGHT:
-			printf("Rotate right\n");
 			chassis_.setVelocity(0, -M_PI_2);
 			break;
 		}
@@ -123,9 +120,9 @@ void checkpointMovementHermit::moveToCheckpoints() {
 		}
 
 		if (!pause_ && newCheckpoint) {
-			printf("Move to the [%f,%f] with the output vector [%f,%f] \n",
-					target.position.x, target.position.y, target.outVector.x,
-					target.outVector.y);
+//			printf("Move to the [%f,%f] with the output vector [%f,%f] \n",
+//					target.position.x, target.position.y, target.outVector.x,
+//					target.outVector.y);
 
 			if (incorrectLast) {
 				State state = chassis_.getState();
@@ -139,9 +136,9 @@ void checkpointMovementHermit::moveToCheckpoints() {
 				incorrectLast = false;
 			}
 
-			printf("Last checkpoint [%f,%f] with output vector [%f,%f]\n",
-					last.position.x, last.position.y, last.outVector.x,
-					last.outVector.y);
+//			printf("Last checkpoint [%f,%f] with output vector [%f,%f]\n",
+//					last.position.x, last.position.y, last.outVector.x,
+//					last.outVector.y);
 			moveToCheckpoint(last, target);
 			stopRobot = true;
 
@@ -152,7 +149,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			}
 		} else {
 			if (stopRobot) {
-				printf("Robot is waiting for next checkpoint.\n");
+//				printf("Robot is waiting for next checkpoint.\n");
 				chassis_.stop(true);
 				incorrectLast = true;
 				stopRobot = false;
