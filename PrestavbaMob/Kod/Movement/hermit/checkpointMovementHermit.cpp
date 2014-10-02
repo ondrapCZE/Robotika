@@ -35,8 +35,9 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 
 	float s = step;
 	timeval timer[2];
+	bool change = checkpointChanged_ | pause_ | end_;
 	while (chassis_.getState().distance(end.position) > epsilon_
-			&& !frontChange_ && !pause_) {
+			&& !change) {
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
@@ -68,50 +69,69 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 	}
 
 	if (chassis_.getState().distance(end.position) <= epsilon_) {
+		printf("Robot reached checkpoint [%f,%f]\n", end.position.x,
+				end.position.y);
 		checkpointsQueue_.pop_front();
 
 		if (callback_) {
 			if (checkpointsQueue_.empty()) {
-				callback_(REACHED);
-			} else {
 				callback_(REACHED_LAST_ONE);
+			} else {
+				callback_(REACHED);
 			}
 		}
 	}
 }
 
 void checkpointMovementHermit::moveToCheckpoints() {
+	Checkpoint target;
 	Checkpoint last;
-	bool robotWaited = true;
-	while (!end_) {
-		Checkpoint target;
+	bool incorrectLast = true;
+	bool stopRobot = true;
 
-		bool newCheckpoint;
-		{
-			std::lock_guard < std::mutex > lock(frontMutex_);
-			newCheckpoint = checkpointsQueue_.try_front(target);
-			frontChange_ = false;
+	while (!end_) {
+
+		if (!pause) {
+			bool newCheckpoint;
+			{
+				std::lock_guard < std::mutex > lock(frontMutex_);
+				newCheckpoint = checkpointsQueue_.try_front(target);
+				checkpointChanged_ = false;
+			}
 		}
 
-		if (!pause_ && newCheckpoint) {
+		if (!pause && newCheckpoint) {
 			printf("Move to the [%f,%f] with the output vector [%f,%f] \n",
 					target.position.x, target.position.y, target.outVector.x,
 					target.outVector.y);
 
-			if (robotWaited) {
+			if (incorrectLast) {
 				State state = chassis_.getState();
+				VelocityWheels velocityWheels = chassis_.getVelocityWheels();
+				float velocity = (velocityWheels.left + velocityWheels.right)
+						/ 2.0;
+
 				last.position = state;
-				//last.outVector = Vector(cos(state.theta), sin(state.theta));
+				last.outVector = Vector(cos(state.theta) * velocity,
+						sin(state.theta) * velocity);
+				incorrectLast = false;
 			}
 
 			moveToCheckpoint(last, target);
-			robotWaited = false;
-			last = target;
+
+			if (checkpointChanged_) {
+				incorrectLast = true;
+			} else {
+				last = target;
+			}
+
+			stopRobot = true;
 		} else {
-			if (!robotWaited) {
+			if (!stopRobot) {
 				printf("Robot is waiting for next checkpoint.\n");
 				chassis_.stop(true);
-				robotWaited = true;
+				incorrectLast = true;
+				stopRobot = false;
 			}
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(20));
@@ -124,7 +144,7 @@ checkpointMovementHermit::checkpointMovementHermit(
 		chassis_(chassis), callback_(reachedCheckpointCallback) {
 	end_ = false;
 	pause_ = false;
-	frontChange_ = false;
+	checkpointChanged_ = false;
 	speed_ = chassis.getMaxVelocity();
 	moveToCheckpointsThread_ = std::move(
 			std::thread(&checkpointMovementHermit::moveToCheckpoints, this));
@@ -142,7 +162,7 @@ bool front) {
 	if (front) {
 		std::lock_guard < std::mutex > lock(frontMutex_);
 		checkpointsQueue_.push_front(checkpoint);
-		frontChange_ = true;
+		checkpointChanged_ = true;
 	} else {
 		checkpointsQueue_.push_back(checkpoint);
 	}
@@ -165,7 +185,7 @@ void checkpointMovementHermit::addCheckpoint(
 void checkpointMovementHermit::skipActualCheckpoint() {
 	std::lock_guard < std::mutex > lock(frontMutex_);
 	checkpointsQueue_.pop_front();
-	frontChange_ = true;
+	checkpointChanged_ = true;
 }
 
 void checkpointMovementHermit::clearCheckpoints() {

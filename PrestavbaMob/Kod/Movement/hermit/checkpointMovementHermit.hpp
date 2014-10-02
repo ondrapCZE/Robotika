@@ -17,7 +17,7 @@ class checkpointMovementHermit : public checkpointMovement{
 	
 	std::atomic<bool> end_;
 	std::atomic<bool> pause_;
-	std::atomic<bool> frontChange_;
+	std::atomic<bool> checkpointChanged_;
 
 	std::mutex frontMutex_;
 
