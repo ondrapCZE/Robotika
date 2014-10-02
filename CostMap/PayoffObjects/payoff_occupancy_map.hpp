@@ -34,7 +34,7 @@ class PayoffOccupancyMap: public PayoffObject {
 public:
 	PayoffOccupancyMap(const nav_msgs::OccupancyGrid& occupancyMap,
 			const Size robotSize = Size(0, 0), const int wallPayoff = -1000000,
-			const int unknownPayoff = 5, const int freePayoff = 0,
+			const int unknownPayoff = 0, const int freePayoff = 0,
 			const int transX = 0, const int transY = 0);
 	void updatePayoffTable(Table table, float resolution);
 	int getMinPayoff();
