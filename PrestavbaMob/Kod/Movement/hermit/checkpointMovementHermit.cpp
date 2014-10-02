@@ -36,8 +36,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 	float s = step;
 	timeval timer[2];
 	bool change = checkpointChanged_ | pause_ | end_;
-	while (chassis_.getState().distance(end.position) > epsilon_
-			&& !change) {
+	while (chassis_.getState().distance(end.position) > epsilon_ && !change) {
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
@@ -91,16 +90,14 @@ void checkpointMovementHermit::moveToCheckpoints() {
 
 	while (!end_) {
 
-		if (!pause) {
-			bool newCheckpoint;
-			{
-				std::lock_guard < std::mutex > lock(frontMutex_);
-				newCheckpoint = checkpointsQueue_.try_front(target);
-				checkpointChanged_ = false;
-			}
+		bool newCheckpoint = false;
+		if (!pause_) {
+			std::lock_guard < std::mutex > lock(frontMutex_);
+			newCheckpoint = checkpointsQueue_.try_front(target);
+			checkpointChanged_ = false;
 		}
 
-		if (!pause && newCheckpoint) {
+		if (!pause_ && newCheckpoint) {
 			printf("Move to the [%f,%f] with the output vector [%f,%f] \n",
 					target.position.x, target.position.y, target.outVector.x,
 					target.outVector.y);
