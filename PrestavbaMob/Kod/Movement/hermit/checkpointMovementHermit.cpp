@@ -175,6 +175,7 @@ void checkpointMovementHermit::addCheckpoint(
 		for (auto element : checkpoints) {
 			checkpointsQueue_.push_front(element);
 		}
+		checkpointChanged_ = true;
 	} else {
 		for (auto element : checkpoints) {
 			checkpointsQueue_.push_back(element);
