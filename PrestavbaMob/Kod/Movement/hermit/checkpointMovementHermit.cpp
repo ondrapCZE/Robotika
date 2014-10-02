@@ -54,8 +54,10 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		float diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
 
 		if (std::abs(diffAngle) > M_PI_4) {
+			printf("Rotate %f\n",diffAngle);
 			chassis_.setVelocity(0, diffAngle);
 		} else {
+			printf("Go straight %f Rotate %f\n",distance, diffAngle);
 			chassis_.setVelocity(distance, diffAngle);
 		}
 
@@ -114,6 +116,8 @@ void checkpointMovementHermit::moveToCheckpoints() {
 				incorrectLast = false;
 			}
 
+			printf("Last checkpoint [%f,%f] with output vector [%f,%f]\n",last.position.x, last.position.y, last.outVector.x,
+					last.outVector.y);
 			moveToCheckpoint(last, target);
 			stopRobot = true;
 
