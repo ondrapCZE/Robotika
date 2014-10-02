@@ -115,16 +115,15 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			}
 
 			moveToCheckpoint(last, target);
+			stopRobot = true;
 
 			if (checkpointChanged_) {
 				incorrectLast = true;
 			} else {
 				last = target;
 			}
-
-			stopRobot = true;
 		} else {
-			if (!stopRobot) {
+			if (stopRobot) {
 				printf("Robot is waiting for next checkpoint.\n");
 				chassis_.stop(true);
 				incorrectLast = true;
