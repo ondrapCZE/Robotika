@@ -59,6 +59,6 @@ void OccupancyUpdater::update(OccupancyMap &map) {
 	for (; index < stopIndex; ++index) {
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
-		oneScanUpdate(map, laserScan_->ranges[index], angle + state_.theta);
+		oneScanUpdate(map, std::min(laserScan_->ranges[index], maxRange_) , angle + state_.theta);
 	}
 }

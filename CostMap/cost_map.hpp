@@ -14,12 +14,16 @@
 namespace costMap {
 
 typedef std::shared_ptr<PayoffObject> Payoff;
-typedef std::list<Payoff> Payoffs;
+typedef std::pair<Payoff, int> PayoffID;
+typedef std::list<PayoffID> Payoffs;
 
-struct Move{
+struct Move {
 	int x;
 	int y;
-	Move(const int x=0,const int y=0) : x(x), y(y){};
+	Move(const int x = 0, const int y = 0) :
+			x(x), y(y) {
+	}
+	;
 };
 
 class CostMap {
@@ -27,6 +31,7 @@ class CostMap {
 	typedef grid::Grid<Type> Grid;
 	typedef std::shared_ptr<Grid> GridPtr;
 
+	int id_;
 	unsigned int cycles_;
 	GridPtr costMap_;
 	GridPtr tempCostMap_;
@@ -50,29 +55,39 @@ class CostMap {
 	int minPayoff_;
 	float gamma_;
 
-	Type getPayoffFromMove(const unsigned int x, const unsigned int y, const unsigned int move, GridPtr costMap);
+	Type getPayoffFromMove(const unsigned int x, const unsigned int y,
+			const unsigned int move, GridPtr costMap);
 	void recalculateWorker();
 public:
-	CostMap(Size size = Size(5,5), const float resolution = 0.05);
+	CostMap(Size size = Size(5, 5), const float resolution = 0.05);
 	~CostMap();
 
-	void addPayoffObject(Payoff payoffObject, bool store = false);
+	int addPayoffObject(Payoff payoffObject, bool store = false);
+	void deletePayoffObject(int id);
 	void clearPayoffObjects();
 	void updatePayoffTable();
-	void recalculate(unsigned int maxCycle = 100){ if(!recalculation_){cycles_=maxCycle;recalculation_ = true;}};
-	bool isRecalculating(){ return recalculation_; };
+	void recalculate(unsigned int maxCycle = 100) {
+		if (!recalculation_) {
+			cycles_ = maxCycle;
+			recalculation_ = true;
+		}
+	}
+	;bool isRecalculating() {
+		return recalculation_;
+	}
+	;
 	Position getBestMove(const Position position);
 
-	inline Size size(){
+	inline Size size() {
 		return size_;
 	}
 
-	inline float resolution(){
+	inline float resolution() {
 		return resolution_;
 	}
 
-	inline float value(const unsigned int x, const unsigned int y){
-		return costMap_->value(x,y);
+	inline float value(const unsigned int x, const unsigned int y) {
+		return costMap_->value(x, y);
 	}
 };
 

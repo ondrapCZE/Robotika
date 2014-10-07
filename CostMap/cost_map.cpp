@@ -1,6 +1,7 @@
 #include "cost_map.hpp"
 #include <limits>
 #include <chrono>
+#include <functional>
 
 using namespace costMap;
 using namespace grid;
@@ -86,7 +87,7 @@ void CostMap::recalculateWorker() {
 }
 
 CostMap::CostMap(Size size, const float resolution) :
-		size_(size), resolution_(resolution), payoffTable_(
+		id_(0), size_(size), resolution_(resolution), payoffTable_(
 				(size.x / resolution), (size.y / resolution), 0), moves_ { {
 				Move(0, 0), Move(0, 0), Move(0, 0) }, { Move(-1, 0), Move(-1,
 				1), Move(0, 1) }, { Move(-1, 1), Move(0, 1), Move(1, 1) }, {
@@ -112,16 +113,25 @@ CostMap::~CostMap() {
 	}
 }
 
-void CostMap::addPayoffObject(Payoff payoffObject, bool store) {
+int CostMap::addPayoffObject(Payoff payoffObject, bool store) {
 	if (minPayoff_ > payoffObject->getMinPayoff()) {
 		minPayoff_ = payoffObject->getMinPayoff();
 	}
 
-	if (store) {
-		payoffObjects_.push_back(payoffObject);
-	}
-
 	payoffObject->updatePayoffTable(payoffTable_, resolution_);
+
+	if (store) {
+		int id = id_++;
+		payoffObjects_.push_back(PayoffID(payoffObject,id));
+		return id;
+	}else{
+		return -1;
+	}
+}
+
+void CostMap::deletePayoffObject(int id){
+	std::function<bool(PayoffID&,int)> f = [](PayoffID &payoffID, int id){ return payoffID.second == id; };
+	payoffObjects_.remove_if(std::bind(f,std::placeholders::_1,id));
 }
 
 void CostMap::clearPayoffObjects() {
@@ -133,11 +143,11 @@ void CostMap::updatePayoffTable() {
 	payoffTable_.setAllValues(0);
 
 	for (auto payoff : payoffObjects_) {
-		if (minPayoff_ > payoff->getMinPayoff()) {
-			minPayoff_ = payoff->getMinPayoff();
+		if (minPayoff_ > payoff.first->getMinPayoff()) {
+			minPayoff_ = payoff.first->getMinPayoff();
 		}
 
-		payoff->updatePayoffTable(payoffTable_, resolution_);
+		payoff.first->updatePayoffTable(payoffTable_, resolution_);
 	}
 }
 
