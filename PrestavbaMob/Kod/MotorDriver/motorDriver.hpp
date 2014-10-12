@@ -17,6 +17,7 @@ struct motorsPower {
 
 class MotorDriver {
 public:
+	virtual ~MotorDriver(){};
 	virtual std::string getName() = 0;
 	virtual unsigned int getMaxPower() = 0;
 

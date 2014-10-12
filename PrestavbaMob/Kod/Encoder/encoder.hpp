@@ -15,6 +15,7 @@ struct Encoders{
 
 class EncoderReader {
 public:
+	virtual ~EncoderReader(){};
 	virtual unsigned int getEncodersResolution()=0;
 	virtual Encoders getEncodersState()=0;
 	virtual Encoders getChangeOfEncoders()=0;
