@@ -51,15 +51,15 @@ int EncoderAtmel::readEncodersToBuffer() {
 
 bool EncoderAtmel::checkBufferValidity(const unsigned int size) {
 	uint8_t crc = 0;
-	for (uint8_t i = 0; i < (size - 1); ++i) {
+	for (uint8_t i = 0; i < size; ++i) {
 		crc = rob_fce::crc8(crc, buffer_[i]);
 	}
 
-	bool crcCheck = (crc == buffer_[(size - 1)]);
-	/*if (!crcCheck) {
+
+	/*if (crc) {
 		printf("Damaged data wrong crc \n");
 	}*/
-	return crcCheck;
+	return !crc;
 }
 
 EncoderAtmel::EncoderAtmel(const std::string I2CDevice, const int decoderAddress) {
@@ -80,9 +80,6 @@ EncoderAtmel::EncoderAtmel(const std::string I2CDevice, const int decoderAddress
 unsigned int EncoderAtmel::getEncodersResolution() {
 	return 1024; // encoders have 10bit resolution
 }
-
-//TODO: Divide this function to two. First for data acquisition and second for 
-// testing validity of data.
 
 Encoders EncoderAtmel::getEncodersState() {
 	bool error, crcCheck;
