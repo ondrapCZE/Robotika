@@ -24,6 +24,7 @@ public:
 	int stop();
 
 	~MotorDriverSabertooth() {
+		setMotorsPower(0,0);
 		close(serialDevice_);
 	};
 };
