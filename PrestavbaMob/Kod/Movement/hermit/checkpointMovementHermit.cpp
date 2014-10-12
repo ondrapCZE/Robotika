@@ -87,6 +87,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 
 		//printf("Usleep time: %li \n\r", sleepMicro);
 		std::this_thread::sleep_for(std::chrono::microseconds(sleepMicro));
+		change = checkpointChanged_ | pause_ | end_;
 	}
 
 	if (chassis_.getState().distance(end.position) <= epsilon_) {
