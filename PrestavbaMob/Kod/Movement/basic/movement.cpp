@@ -10,21 +10,21 @@
 
 #include <sys/time.h>
 
-static const float EPSILON_ANGLE = M_PI / 360.0f;
-static const float EPSILON_DISTANCE = 0.01f;
+static const double EPSILON_ANGLE = M_PI / 360.0f;
+static const double EPSILON_DISTANCE = 0.01f;
 static const int SLEEP_TIME = 20000; // us
-static const float SPEED_STEP = 0.05f;
+static const double SPEED_STEP = 0.05f;
 
 Movement::Movement(BasicDifferentialChassis* chassis) : chassis(chassis) {
 	
 }
 
-void Movement::moveCircle(const float &diameter, const float &angle, 
+void Movement::moveCircle(const double &diameter, const double &angle, 
 	const direction &circleDirection){
 	
-	float shorterDiameter = diameter/2.0f - chassis->getWheelbase()/2.0f;
-	float longerDiameter = diameter/2.0f + chassis->getWheelbase()/2.0f;
-	float wheelsRatio = shorterDiameter / longerDiameter;
+	double shorterDiameter = diameter/2.0f - chassis->getWheelbase()/2.0f;
+	double longerDiameter = diameter/2.0f + chassis->getWheelbase()/2.0f;
+	double wheelsRatio = shorterDiameter / longerDiameter;
 	
 	DistanceWheels finalWheelsDistance = chassis->getDistanceWheels();
 	switch(circleDirection){
@@ -40,16 +40,16 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 			break;
 	}
 	
-	float maxSpeed = SPEED_STEP;
+	double maxSpeed = SPEED_STEP;
 	DistanceWheels difference;
 	do{
 		difference = finalWheelsDistance - chassis->getDistanceWheels();
-		float minDistance = std::min(difference.left, difference.right);
-		float maxDistance = std::max(difference.left, difference.right);
-		float currentRatio = minDistance / maxDistance;
+		double minDistance = std::min(difference.left, difference.right);
+		double maxDistance = std::max(difference.left, difference.right);
+		double currentRatio = minDistance / maxDistance;
 		//printf("Current ratio: %f Default ratio: %f \n\r", currentRatio, wheelsRatio);
 		
-		float speed = rob_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxVelocity());
+		double speed = rob_fce::valueInRange(maxDistance * maxSpeed * 10, chassis->getMaxVelocity());
 		
 		if(circleDirection == LEFT){
 			chassis->setVelocity(VelocityWheels(currentRatio*speed, speed));
@@ -63,24 +63,24 @@ void Movement::moveCircle(const float &diameter, const float &angle,
 	
 }
 
-void Movement::moveStraight(const float &meter){
+void Movement::moveStraight(const double &meter){
 	DistanceWheels finalWheelDistance = chassis->getDistanceWheels();
 	finalWheelDistance.left += meter;
 	finalWheelDistance.right += meter;
 
-	float maxSpeed = SPEED_STEP;
+	double maxSpeed = SPEED_STEP;
 	DistanceWheels difference;
 	do{
 		DistanceWheels wheelDistance = chassis->getDistanceWheels();
 		difference = finalWheelDistance - wheelDistance;
-		float meanDifference = (difference.left + difference.right) / 2.0f;
+		double meanDifference = (difference.left + difference.right) / 2.0f;
 
-		float speed = rob_fce::valueInRange(meanDifference * maxSpeed * 15, maxSpeed);
+		double speed = rob_fce::valueInRange(meanDifference * maxSpeed * 15, maxSpeed);
 		//printf("Basic speed %f MaxSpeed %f  \n",speed,maxSpeed);
 		// slow down whell with greater distance and speed up wheel with smaller distance
 
-		float speedLeft = speed + (difference.left - meanDifference) / (SLEEP_TIME / 1000000.0f);
-		float speedRight = speed + (difference.right - meanDifference) / (SLEEP_TIME / 1000000.0f);
+		double speedLeft = speed + (difference.left - meanDifference) / (SLEEP_TIME / 1000000.0f);
+		double speedRight = speed + (difference.right - meanDifference) / (SLEEP_TIME / 1000000.0f);
 		//printf("Speed [%f,%f] \n", speedLeft, speedRight);
 
 		chassis->setVelocity(VelocityWheels(speedLeft, speedRight));
@@ -92,16 +92,16 @@ void Movement::moveStraight(const float &meter){
 	}while (std::hypot(difference.left,difference.right) > EPSILON_DISTANCE);
 }
 
-void Movement::rotate(const float &angle){
+void Movement::rotate(const double &angle){
 	finalState = chassis->getState();
 	finalState.theta += angle;
 
 	State chassisState = chassis->getState();
-	float angleDifference = chassisState.theta - finalState.theta;
-	float maxSpeed = SPEED_STEP;
+	double angleDifference = chassisState.theta - finalState.theta;
+	double maxSpeed = SPEED_STEP;
 	//printf("Angle difference: %f epsilon: %f \n", angleDifference, EPSILON_ANGLE);
 	while (std::abs(angleDifference) > EPSILON_ANGLE) {
-		float motorSpeed = rob_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
+		double motorSpeed = rob_fce::valueInRange(maxSpeed * angleDifference, maxSpeed);
 
 		//printf("Angle difference: %f , speed: %f \n", angleDifference, motorSpeed);
 		chassis->setVelocity(VelocityWheels(motorSpeed, -motorSpeed));

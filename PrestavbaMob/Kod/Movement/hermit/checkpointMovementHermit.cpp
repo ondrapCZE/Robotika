@@ -12,15 +12,15 @@
 //#include "movement.h"
 
 Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual,
-		const Checkpoint& target, const float inter) {
-	float checkedInter = rob_fce::valueInRange(inter, 0.0f, 1.0f);
-	float powInter2 = checkedInter * checkedInter;
-	float powInter3 = powInter2 * checkedInter;
+		const Checkpoint& target, const double inter) {
+	double checkedInter = rob_fce::valueInRange(inter, 0.0, 1.0);
+	double powInter2 = checkedInter * checkedInter;
+	double powInter3 = powInter2 * checkedInter;
 
-	float h1 = 2 * powInter3 - 3 * powInter2 + 1;
-	float h2 = -2 * powInter3 + 3 * powInter2;
-	float h3 = powInter3 - 2 * powInter2 + checkedInter;
-	float h4 = powInter3 - powInter2;
+	double h1 = 2 * powInter3 - 3 * powInter2 + 1;
+	double h2 = -2 * powInter3 + 3 * powInter2;
+	double h3 = powInter3 - 2 * powInter2 + checkedInter;
+	double h4 = powInter3 - powInter2;
 
 	Position curvePosition = actual.position * h1 + target.position * h2
 			+ actual.outVector * h3 + target.outVector * h4;
@@ -30,10 +30,10 @@ Position checkpointMovementHermit::getPointHermit(const Checkpoint& actual,
 void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		const Checkpoint &end) {
 
-	float distance = start.position.distance(end.position);
-	float step = 1.0f / (distance * pointsOnMeter);
+	double distance = start.position.distance(end.position);
+	double step = 1.0 / (distance * pointsOnMeter);
 
-	float s = step;
+	double s = step;
 	timeval timer[2];
 	bool change = checkpointChanged_ | pause_ | end_;
 	Direction dir = FORWARD;
@@ -52,8 +52,8 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 
 		//compute distance between actual robot position and interPosition
 		distance = chassis_.getState().distance(interPosition);
-		float angle = chassis_.getState().angle(interPosition);
-		float diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
+		double angle = chassis_.getState().angle(interPosition);
+		double diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
 
 		if (dir == FORWARD) {
 			if (diffAngle < M_PI_2 && diffAngle > -M_PI_2) {
@@ -128,7 +128,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			if (incorrectLast) {
 				State state = chassis_.getState();
 				VelocityWheels velocityWheels = chassis_.getVelocityWheels();
-				float velocity = (velocityWheels.left + velocityWheels.right)
+				double velocity = (velocityWheels.left + velocityWheels.right)
 						/ 2.0;
 
 				last.position = state;

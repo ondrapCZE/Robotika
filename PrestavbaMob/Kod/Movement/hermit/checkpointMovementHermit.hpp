@@ -26,10 +26,10 @@ class checkpointMovementHermit : public checkpointMovement{
 	Callback callback_;
 
 	const unsigned int TIME = 10;
-	const float epsilon_ = 0.02;
-	const float predictDistance_ = 0.05;
-	const float epsilonZero_ = 1.0e-10;
-	float speed_ = 0.3f;
+	const double epsilon_ = 0.02;
+	const double predictDistance_ = 0.05;
+	const double epsilonZero_ = 1.0e-10;
+	double speed_ = 0.3f;
 	const unsigned int pointsOnMeter = 1000;
 	
 	enum Direction{
@@ -39,7 +39,7 @@ class checkpointMovementHermit : public checkpointMovement{
 		RIGHT
 	};
 
-	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const float inter);
+	Position getPointHermit(const Checkpoint &actual, const Checkpoint &target, const double inter);
 	
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);
 	void moveToCheckpoints();
