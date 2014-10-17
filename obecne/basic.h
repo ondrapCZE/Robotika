@@ -30,7 +30,7 @@ struct Vector{
 		return temp;
 	};
 	
-	Vector operator*(const float a) const{
+	Vector operator*(const double a) const{
 		Vector temp(x * a, y * a);
 		return temp;
 	};
@@ -54,11 +54,11 @@ struct Position {
 	Position(double x = 0, double y = 0) : x(x), y(y){
 	};
 	
-	float distance(const Position &position) const{
+	double distance(const Position &position) const{
 		return std::hypot(x - position.x, y - position.y);
 	}
 	
-	float angle(const Position &position) const{
+	double angle(const Position &position) const{
 		return std::atan2(position.y - y,position.x - x);
 	}
 
