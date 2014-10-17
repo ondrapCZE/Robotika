@@ -11,7 +11,7 @@ struct PIValue {
 	int P; /*! Proportional part. */
 	int I; /*! Integral part. */
 
-	float ISum; /*! Sum all differences between actual speed and desire speed. */
+	double ISum; /*! Sum all differences between actual speed and desire speed. */
 
 	//!  Constructor only assign input parameters in the variables.
 	PIValue(const int P = 0, const int I = 0) : P(P), I(I), ISum(0){
@@ -20,9 +20,9 @@ struct PIValue {
 
 //! Serve for preserving basic chassis parameters.
 struct DiffChassisParam {
-	float wheelbase; /*!< Size between wheels in meters. */
-	float wheelRadius; /*!< Both wheels have same radius in meters. */
-	float maxVelocity; /*!< Chassis can move only up to this speed in meters per second. */
+	double wheelbase; /*!< Size between wheels in meters. */
+	double wheelRadius; /*!< Both wheels have same radius in meters. */
+	double maxVelocity; /*!< Chassis can move only up to this speed in meters per second. */
 	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
 
 	PIValue pidLeft;
@@ -34,15 +34,15 @@ struct DiffChassisParam {
 	double metersPerTick;
 
 	//! Constructor only assign input parameters in the variables.
-	DiffChassisParam(const float wheelBase = 0,
-			const float wheelRadius = 0,
-			const float maxSpeed = 0,
+	DiffChassisParam(const double wheelBase = 0,
+			const double wheelRadius = 0,
+			const double maxSpeed = 0,
 			const unsigned int wheelTics = 0,
 			const PIValue pidLeft = PIValue(),
 			const PIValue pidRight = PIValue(),
 			EncoderReader* encoder = std::nullptr_t(),
 			MotorDriver* driver = std::nullptr_t()) :
-				wheelbase(wheelbase),
+				wheelbase(wheelBase),
 				wheelRadius(wheelRadius),
 				maxVelocity(maxSpeed),
 				wheelTics(wheelTics),
@@ -50,17 +50,17 @@ struct DiffChassisParam {
 				pidRight(pidRight),
 				encoder(encoder),
 				driver(driver) {
-		metersPerTick = (2 * M_PI * wheelRadius) / (float) wheelTics;
+		metersPerTick = (2 * M_PI * wheelRadius) / (double) wheelTics;
 	}; 
 };
 
 //! Traveled distance on both wheels in meters.
 struct DistanceWheels {
-	float left; /*! traveled distance on the left wheel in meters */
-	float right; /*! traveled distance on the right wheel in meters */
+	double left; /*! traveled distance on the left wheel in meters */
+	double right; /*! traveled distance on the right wheel in meters */
 
 	//! Constructor only assign input parameters in the variables.
-	DistanceWheels(const float left = 0, const float right = 0) : left(left), right(right) {
+	DistanceWheels(const double left = 0, const double right = 0) : left(left), right(right) {
 	};
 	
 	//! Addition between WheelsDistance.
@@ -89,11 +89,11 @@ struct DistanceWheels {
 
  //! Serve for storage speed on the wheels.
 struct VelocityWheels {
-	float left; /*! Speed on the left wheel in meters per second. */
-	float right; /*! Speed on the right wheel in meters per second. */
+	double left; /*! Speed on the left wheel in meters per second. */
+	double right; /*! Speed on the right wheel in meters per second. */
 
 	//! Constructor only assign input parameters in the PIValue variables.
-	VelocityWheels(float left = 0, float right = 0) : left(left), right(right) {
+	VelocityWheels(double left = 0, double right = 0) : left(left), right(right) {
 	};
 
 	//! Subtraction between WheelsSpeed.
@@ -119,12 +119,12 @@ public:
 	
 	virtual void stop(bool slow) = 0;
 	virtual void setVelocity(const VelocityWheels speed) = 0;
-	virtual void setVelocity(const float distance, const float angle) = 0;
+	virtual void setVelocity(const double distance, const double angle) = 0;
 	virtual State getState() = 0;
 	virtual DistanceWheels getDistanceWheels() = 0;
 	virtual VelocityWheels getVelocityWheels() = 0;
-	virtual float getMaxVelocity(){ return diffChassisParam_.maxVelocity; };
-	virtual float getWheelbase(){ return diffChassisParam_.wheelbase; };
+	virtual double getMaxVelocity(){ return diffChassisParam_.maxVelocity; };
+	virtual double getWheelbase(){ return diffChassisParam_.wheelbase; };
 };
 
 #endif

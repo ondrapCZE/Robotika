@@ -19,8 +19,8 @@ struct Distance {
 };
 
 class MobDifferentialChassis : public BasicDifferentialChassis {
-	const float EPSILON = 1e-10;
-	const float STOP_SPEED = 0.05;
+	const double EPSILON = 1e-10;
+	const double STOP_SPEED = 0.05;
 
 	State robotState_;
 	DistanceWheels wheelsDistance_;
@@ -34,12 +34,12 @@ class MobDifferentialChassis : public BasicDifferentialChassis {
 	std::mutex speedMutex_;
 
 	DistanceWheels computeDistance(Encoders distance);
-	VelocityWheels computeSpeed(DistanceWheels distance, float time); // distance in m and time in sec
+	VelocityWheels computeSpeed(DistanceWheels distance, double time); // distance in m and time in sec
 
 	void changeRobotState(DistanceWheels change);
 
 	int sendMotorPower(struct motorsPower speedMotors);
-	int PIRegulator(const float actualSpeed, const float desireSpeed, PIValue &PIParam);
+	int PIRegulator(const double actualSpeed, const double desireSpeed, PIValue &PIParam);
 
 	Encoders getChangeOfEncoders();
 	void updateEncoders(const int period); // time in ms	
@@ -53,7 +53,7 @@ public:
 	void stop(bool slow = false);
 
 	void setVelocity(const VelocityWheels speed);
-	void setVelocity(const float distance, const float angle);
+	void setVelocity(const double distance, const double angle);
 	//! 
 	/*!
 	\return actual state of the chassis
