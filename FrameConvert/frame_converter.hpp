@@ -4,8 +4,7 @@
 #include "../obecne/basic.h"
 
 class FrameConverter {
-	Position global_;
-	Position relative_;
+	Position translation_;
 	double rotation_;
 
 	bool initialized_;

@@ -2,26 +2,27 @@
 #include <cmath>
 //============= public functions ==========
 
-void FrameConverter::setRotationTranslation(const State global,
+void FrameConverter::setRotationTranslation(const State global, //TODO: check if correct
 		const State relative) {
-	global_ = global;
-	relative_ = relative;
+	translation_ = relative - global;
 	rotation_ = relative.theta - global.theta;
 	initialized_ = true;
 }
 
 Position FrameConverter::globalToRelative(const Position position) {
-	Position temp = position - global_;
 	Position final;
-	final.x = cos(rotation_) * temp.x - sin(rotation_) * temp.y;
-	final.y = sin(rotation_) * temp.x + cos(rotation_) * temp.y;
-	return final + relative_;
+	final.x = cos(rotation_) * position.x - sin(rotation_) * position.y
+			+ translation_.x;
+	final.y = sin(rotation_) * position.x + cos(rotation_) * position.y
+			+ translation_.y;
+	return final;
 }
 
 Position FrameConverter::relativeToGlobal(const Position position) {
-	Position temp = position - relative_;
 	Position final;
-	final.x = cos(rotation_) * temp.x + sin(rotation_) * temp.y;
-	final.y = -sin(rotation_) * temp.x + cos(rotation_) * temp.y;
-	return final + global_;
+	final.x = cos(rotation_) * position.x + sin(rotation_) * position.y
+			- translation_.x;
+	final.y = -sin(rotation_) * position.x + cos(rotation_) * position.y
+			- translation_.y;
+	return final;
 }
