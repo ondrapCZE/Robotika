@@ -149,15 +149,8 @@ namespace rob_fce{
 	uint8_t crc8(uint8_t crc, uint8_t data);
 
 	template <class V> inline V valueInRange(V value, V lowerBoundary, V higherBoundary) {
-		if(value < lowerBoundary){
-			return lowerBoundary;
-		}else{
-			if(value > higherBoundary){
-				return higherBoundary;
-			}else{
-				return value;
-			}
-		}
+		return value < lowerBoundary ? lowerBoundary :
+				value > higherBoundary ? higherBoundary : value;
 	}
 	
 	template <class V> inline V valueInRange(V value, V range) {
