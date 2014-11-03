@@ -42,13 +42,17 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
-		Position interPosition = getPointHermit(start, end, s);
-		while (chassis_.getState().distance(end.position) > predictDistance_
-				&& chassis_.getState().distance(interPosition)
-						< predictDistance_) {
-			s += step;
-			interPosition = getPointHermit(start, end, s);
-		};
+        Position interPosition;
+        if (chassis_.getState().distance(end.position) > predictDistance_){
+		    interPosition = getPointHermit(start, end, s);
+		    while (chassis_.getState().distance(interPosition) < predictDistance_) {
+			    s += step;
+			    interPosition = getPointHermit(start, end, s);
+		    }
+        }
+        else{
+            interPosition = end.position;
+        }
 
 		//compute distance between actual robot position and interPosition
 		distance = chassis_.getState().distance(interPosition);
