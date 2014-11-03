@@ -68,7 +68,7 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 				dir = LEFT;
 			}
 		}else{
-			if(std::abs(diffAngle) < (M_PI / 8.0)){
+			if(std::abs(diffAngle) < (M_PI / 36.0)){
 				dir = FORWARD;
 			}
 		}
@@ -147,7 +147,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 			moveToCheckpoint(last, target);
 			stopRobot = true;
 
-			if (checkpointChanged_) {
+			if (checkpointChanged_ || pause_) {
 				incorrectLast = true;
 			} else {
 				last = target;
