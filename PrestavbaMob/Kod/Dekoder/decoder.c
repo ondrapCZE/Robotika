@@ -89,7 +89,7 @@ void sendEncoders(){
 
 	uint8_t crc = 0 , i;
 	for(i=0; i<4; ++i){
-		_crc_ibutton_update(crc, messageBuf[i]);
+		crc = _crc_ibutton_update(crc, messageBuf[i]);
 	}
 
 	messageBuf[4] = crc;
@@ -115,9 +115,6 @@ ISR(PCINT1_vect, ISR_NOBLOCK){
 			//TEST
 			PORTD ^=  (1 << PD6);
 		}
-		//else{
-			//PORTD ^= (1 << PD7); // TODO: error 
-		//}
 	}			
 			
 	lastLeftState = leftState;
@@ -136,11 +133,7 @@ ISR(PCINT2_vect, ISR_NOBLOCK){
 			encodersState.right.value = encodersState.right.value - 1;
 			//TEST
 			PORTB ^=  (1 << PB1);
-		}
-		//else{
-			//PORTB ^= (1 << PB2); 
-			// TODO: error
-		//}			
+		}		
 	}			
 	
 	lastRightState = rightState;
@@ -178,23 +171,33 @@ int main(void)
 	while(TRUE){
 		if(!TWI_Transceiver_Busy()){
 			//writeLedError(1);
-			if(TWI_statusReg.RxDataInBuf){
-				// get command code
-				//writeLedError(2);
-				TWI_Get_Data_From_Transceiver(messageBuf, 1);
-				//writeLedError(3);
-				switch(messageBuf[0]){
-					case SEND_ENCODERS:
-						//writeLedError(4);
-						PORTD ^=  (1 << PD7);
-						sendEncoders();
-						break;
-					default:
-						//writeLedError(5);
-						//TWI_Start_Transceiver();
-						break;
-				}	
-			}							
+            if (TWI_statusReg.lastTransOK)
+            {
+                if (TWI_statusReg.RxDataInBuf){
+                    // get command code
+                    //writeLedError(2);
+                    TWI_Get_Data_From_Transceiver(messageBuf, 1);
+                    //writeLedError(3);
+                    switch (messageBuf[0]){
+                    case SEND_ENCODERS:
+                        //writeLedError(4);
+                        PORTD ^= (1 << PD7);
+                        sendEncoders();
+                        break;
+                    default:
+                        //writeLedError(5);
+                        //TWI_Start_Transceiver();
+                        break;
+                    }
+                }
+                if (!TWI_Transceiver_Busy())
+                {
+                    TWI_Start_Transceiver();
+                }
+            }
+            else{
+                TWI_Start_Transceiver();
+            }
 		}
 		
 		asm volatile ("NOP"::);  // Do something else while waiting			

@@ -4,7 +4,7 @@
 #include <sstream>
 #include <stdexcept>
 
-#define CHECK_BOUNDARY
+//#define CHECK_BOUNDARY
 
 #ifdef CHECK_BOUNDARY
 #define TEST_BOUNDARY(X,Y,SIZE_X,SIZE_Y) \
