@@ -34,7 +34,7 @@ public:
 };
 
 template<class AdvancedParticle, class Map>
-const float VisitorScanMap<AdvancedParticle, Map>::EPSILON = 1e-40; // TODO: set appropriate epsilon
+const float VisitorScanMap<AdvancedParticle, Map>::EPSILON = 1e-40; 
 
 template<class AdvancedParticle, class Map>
 VisitorScanMap<AdvancedParticle, Map>::VisitorScanMap(const State &relativeScan,

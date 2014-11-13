@@ -18,12 +18,12 @@ struct PIValue {
 	};
 };
 
-//! Serve for preserving basic chassis parameters.
+//! Preserve basic chassis parameters.
 struct DiffChassisParam {
 	double wheelbase; /*!< Size between wheels in meters. */
 	double wheelRadius; /*!< Both wheels have same radius in meters. */
 	double maxVelocity; /*!< Chassis can move only up to this speed in meters per second. */
-	unsigned int wheelTics; /*!< How much tics is for one turn wheel. */ 
+	unsigned int wheelTics; /*!< How much tics is for one wheel turn. */ 
 
 	PIValue pidLeft;
 	PIValue pidRight;
@@ -31,9 +31,9 @@ struct DiffChassisParam {
 	EncoderReader* encoder; /*!< Chassis have to have encoder on both wheels. */
 	MotorDriver* driver; /*!< Motor power driver on the chassis wheels. */
 
-	double metersPerTick;
+    double metersPerTick; /*!< Ratio between encoder tic and traversed wheel distance  */
 
-	//! Constructor only assign input parameters in the variables.
+	//! Constructor only assign input parameters in to the variables.
 	DiffChassisParam(const double wheelBase = 0,
 			const double wheelRadius = 0,
 			const double maxSpeed = 0,
