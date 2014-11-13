@@ -6,6 +6,7 @@
 
 #include "../motorDriver.hpp"
 
+// Implement communication with Sabertooth 2x5 over serial line with simplified protocol.
 class MotorDriverSabertooth : public MotorDriver {
 	static const unsigned int MAX_POWER = 63;
 	static const unsigned int BUFFER_SIZE = 2;
@@ -14,6 +15,7 @@ class MotorDriverSabertooth : public MotorDriver {
 	int serialDevice_;
 	unsigned char buffer_[BUFFER_SIZE];
 public:
+	//! Open communication device by absolute path (something like /dev/ttyAMA0)
 	MotorDriverSabertooth(const std::string device);
 	std::string getName();
 	unsigned int getMaxPower();
@@ -23,8 +25,9 @@ public:
 
 	int stop();
 
+	// Stop both motors and close communication device.
 	~MotorDriverSabertooth() {
-		setMotorsPower(0,0);
+		stop();
 		close(serialDevice_);
 	};
 };

@@ -20,7 +20,7 @@ Movement::Movement(BasicDifferentialChassis* chassis) : chassis(chassis) {
 }
 
 void Movement::moveCircle(const double &diameter, const double &angle, 
-	const direction &circleDirection){
+	const Direction &circleDirection){
 	
 	double shorterDiameter = diameter/2.0f - chassis->getWheelbase()/2.0f;
 	double longerDiameter = diameter/2.0f + chassis->getWheelbase()/2.0f;

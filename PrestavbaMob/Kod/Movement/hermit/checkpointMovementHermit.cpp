@@ -42,22 +42,23 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 		gettimeofday(&timer[0], NULL);
 		long int microStart = (timer[0].tv_sec * 1000000) + (timer[0].tv_usec);
 
-        Position interPosition;
-        if (chassis_.getState().distance(end.position) > predictDistance_){
-		    interPosition = getPointHermit(start, end, s);
-		    while (chassis_.getState().distance(interPosition) < predictDistance_) {
-			    s += step;
-			    interPosition = getPointHermit(start, end, s);
-		    }
-        }
-        else{
-            interPosition = end.position;
-        }
+		Position interPosition;
+		if (chassis_.getState().distance(end.position) > predictDistance_) {
+			interPosition = getPointHermit(start, end, s);
+			while (chassis_.getState().distance(interPosition)
+					< predictDistance_) {
+				s += step;
+				interPosition = getPointHermit(start, end, s);
+			}
+		} else {
+			interPosition = end.position;
+		}
 
 		//compute distance between actual robot position and interPosition
 		distance = chassis_.getState().distance(interPosition);
 		double angle = chassis_.getState().angle(interPosition);
-		double diffAngle = rob_fce::normAngle(angle - chassis_.getState().theta);
+		double diffAngle = rob_fce::normAngle(
+				angle - chassis_.getState().theta);
 
 		if (dir == FORWARD) {
 			if (diffAngle < M_PI_2 && diffAngle > -M_PI_2) {
@@ -67,8 +68,8 @@ void checkpointMovementHermit::moveToCheckpoint(const Checkpoint &start,
 			} else if (diffAngle < -M_PI_2) {
 				dir = LEFT;
 			}
-		}else{
-			if(std::abs(diffAngle) < (M_PI / 36.0)){
+		} else {
+			if (std::abs(diffAngle) < (M_PI / 36.0)) {
 				dir = FORWARD;
 			}
 		}
@@ -167,7 +168,7 @@ void checkpointMovementHermit::moveToCheckpoints() {
 
 checkpointMovementHermit::checkpointMovementHermit(
 		BasicDifferentialChassis &chassis, Callback reachedCheckpointCallback) :
-		chassis_(chassis), callback_(reachedCheckpointCallback) {
+		checkpointMovement(reachedCheckpointCallback), chassis_(chassis) {
 	end_ = false;
 	pause_ = false;
 	checkpointChanged_ = false;
@@ -225,8 +226,4 @@ void checkpointMovementHermit::pause() {
 
 void checkpointMovementHermit::resume() {
 	pause_ = false;
-}
-
-void checkpointMovementHermit::setCallback(Callback fce) {
-	callback_ = fce;
 }

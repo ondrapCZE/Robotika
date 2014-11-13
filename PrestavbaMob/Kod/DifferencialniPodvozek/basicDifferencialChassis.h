@@ -20,7 +20,7 @@ struct PIValue {
 
 //! Preserve basic chassis parameters.
 struct DiffChassisParam {
-	double wheelbase; /*!< Size between wheels in meters. */
+	double wheelBase; /*!< Size between wheels in meters. */
 	double wheelRadius; /*!< Both wheels have same radius in meters. */
 	double maxVelocity; /*!< Chassis can move only up to this speed in meters per second. */
 	unsigned int wheelTics; /*!< How much tics is for one wheel turn. */ 
@@ -42,7 +42,7 @@ struct DiffChassisParam {
 			const PIValue pidRight = PIValue(),
 			EncoderReader* encoder = std::nullptr_t(),
 			MotorDriver* driver = std::nullptr_t()) :
-				wheelbase(wheelBase),
+				wheelBase(wheelBase),
 				wheelRadius(wheelRadius),
 				maxVelocity(maxSpeed),
 				wheelTics(wheelTics),
@@ -56,10 +56,10 @@ struct DiffChassisParam {
 
 //! Traveled distance on both wheels in meters.
 struct DistanceWheels {
-	double left; /*! traveled distance on the left wheel in meters */
-	double right; /*! traveled distance on the right wheel in meters */
+	double left; /*!< traveled distance on the left wheel in meters */
+	double right; /*!< traveled distance on the right wheel in meters */
 
-	//! Constructor only assign input parameters in the variables.
+	//! Constructor only assign input parameters in to the variables.
 	DistanceWheels(const double left = 0, const double right = 0) : left(left), right(right) {
 	};
 	
@@ -67,7 +67,7 @@ struct DistanceWheels {
 	/*!
 	 \param ob2 second WheelsDistance
 	 \return new WheelsDistance where parameters are equal 
-	  to the addition between same parameter from both WheelsDistance
+	  to the addition between same parameters from both WheelsDistances
 	 */
 	DistanceWheels operator+(const DistanceWheels &ob2) const {
 		DistanceWheels temp(left + ob2.left, right + ob2.right);
@@ -78,7 +78,7 @@ struct DistanceWheels {
 	/*!
 	 \param ob2 second WheelsDistance
 	 \return new WheelsDistance where parameters are equal 
-	  to the subtraction between same parameter from both WheelsDistance
+	  to the subtraction between same parameters from both WheelsDistances
 	 */
 	DistanceWheels operator-(const DistanceWheels &ob2) const{
 		DistanceWheels temp(left - ob2.left, right - ob2.right);
@@ -87,12 +87,12 @@ struct DistanceWheels {
 };
 
 
- //! Serve for storage speed on the wheels.
+ //! Storage speed of a wheels.
 struct VelocityWheels {
-	double left; /*! Speed on the left wheel in meters per second. */
-	double right; /*! Speed on the right wheel in meters per second. */
+	double left; /*!< Speed on the left wheel in meters per second. */
+	double right; /*!< Speed on the right wheel in meters per second. */
 
-	//! Constructor only assign input parameters in the PIValue variables.
+	//! Constructor only assign input parameters in the VelocityWheels variables.
 	VelocityWheels(double left = 0, double right = 0) : left(left), right(right) {
 	};
 
@@ -100,7 +100,7 @@ struct VelocityWheels {
 	/*!
 	 \param ob2 second WheelsSpeed
 	 \return new WheelsSpeed where parameters are equal 
-	  to the subtraction between same parameter from both WheelsSpeed
+	  to the subtraction between same parameters from both WheelsSpeeds
 	 */
 	VelocityWheels operator-(VelocityWheels ob2) {
 		VelocityWheels temp(left - ob2.left, right - ob2.right);
@@ -111,20 +111,41 @@ struct VelocityWheels {
  //! Basic virtual differential chassis representation
 class BasicDifferentialChassis {
 protected:
-	DiffChassisParam &diffChassisParam_;
+	DiffChassisParam &diffChassisParam_; /*!< Chassis parameters. */
 public:
+	//! Assign chassis parameters.
 	BasicDifferentialChassis(DiffChassisParam &diffChassisParam) : diffChassisParam_(diffChassisParam) {
 	};
+	//! Virtual destructor can be redefined in derived class.
+	~BasicDifferentialChassis(){};
 	
-	
+	//! Stop chassis.
+	/*!
+	 \param slow distinguish between hard and soft stop. Hard mean immediately stop of both wheels.
+	 Slow use linear slowing function.
+	 */
 	virtual void stop(bool slow) = 0;
+	//! Set maintained velocity.
+	/*!
+	 \param speed maintained velocity on left and right wheel in m/s.
+	 */
 	virtual void setVelocity(const VelocityWheels speed) = 0;
+	//! Set maintained speed as movement on circle.
+	/*! Distance and angle ratio define circle radius which chassis will follow.
+		\param distance forward velocity
+		\param angle	rotation velocity
+	 */
 	virtual void setVelocity(const double distance, const double angle) = 0;
+	//! Return actual chassis relative state.
 	virtual State getState() = 0;
+	//! Return traveled distance on left and right wheel.
 	virtual DistanceWheels getDistanceWheels() = 0;
+	//! Return actual velocity of both wheels.
 	virtual VelocityWheels getVelocityWheels() = 0;
+	//! Return maximal velocity which chassis can achieve.
 	virtual double getMaxVelocity(){ return diffChassisParam_.maxVelocity; };
-	virtual double getWheelbase(){ return diffChassisParam_.wheelbase; };
+	//! Return length of chassis base.
+	virtual double getWheelbase(){ return diffChassisParam_.wheelBase; };
 };
 
 #endif

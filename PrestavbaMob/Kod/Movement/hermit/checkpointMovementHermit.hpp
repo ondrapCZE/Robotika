@@ -11,6 +11,11 @@
 #include "../../../../obecne/basic.h"
 //#include "movement.h"
 
+//! Implement transit over inserted checkpoint for differential drive.
+/*!
+ *  Robot ride on front checkpoint in queue is non blocking and it is performed in separate thread.
+ *  This mean that you can call all function who returns execution immediately back.
+ */
 class checkpointMovementHermit : public checkpointMovement{
 	tsqueue<Checkpoint> checkpointsQueue_;
 	BasicDifferentialChassis &chassis_;
@@ -23,7 +28,7 @@ class checkpointMovementHermit : public checkpointMovement{
 
 	std::thread moveToCheckpointsThread_;
 	
-	Callback callback_;
+
 
 	const unsigned int TIME = 10;
 	const double epsilon_ = 0.02;
@@ -44,7 +49,9 @@ class checkpointMovementHermit : public checkpointMovement{
 	void moveToCheckpoint(const Checkpoint &start,const Checkpoint &end);
 	void moveToCheckpoints();
 public:
+	//! Set differential chassis and checkpoint callback
 	checkpointMovementHermit(BasicDifferentialChassis &chassis, Callback reachedCheckpointCallback = Callback());
+	//! Set stop checkpoint movement thread and wait for its end.
 	~checkpointMovementHermit();
 
 	void addCheckpoint(const Checkpoint &checkpoint, bool front=false);
@@ -55,8 +62,6 @@ public:
 	void clearCheckpoints();
 	void pause();
 	void resume();
-
-	void setCallback(Callback fce);
 };
 
 #endif

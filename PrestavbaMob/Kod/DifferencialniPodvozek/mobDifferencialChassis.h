@@ -10,14 +10,7 @@
 #include "../MotorDriver/motorDriver.hpp"
 #include "../Encoder/encoder.hpp"
 
-struct Distance {
-	double left;
-	double right;
-
-	Distance(double left = 0, double right = 0) : left(left), right(right) {
-	};
-};
-
+//! Implement basic movement behavior and dead reckoning for mob chassis.
 class MobDifferentialChassis : public BasicDifferentialChassis {
 	const double EPSILON = 1e-10;
 	const double STOP_SPEED = 0.05;
@@ -46,23 +39,15 @@ class MobDifferentialChassis : public BasicDifferentialChassis {
 public:
 
 	MobDifferentialChassis(DiffChassisParam &diffChassisParam);
-	//! 
-	/*!
-	\param speed an struct Speed argument.
-	 */
 	void stop(bool slow = false);
 
 	void setVelocity(const VelocityWheels speed);
 	void setVelocity(const double distance, const double angle);
-	//! 
-	/*!
-	\return actual state of the chassis
-	 */
 	State getState();
-
 	DistanceWheels getDistanceWheels();
 	VelocityWheels getVelocityWheels();
 	
+	//! End pid loop.
 	~MobDifferentialChassis();
 };
 
