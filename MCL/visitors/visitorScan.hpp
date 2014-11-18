@@ -88,7 +88,7 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 	int stopIndex = (laserScan_->angle_max - minAngle_)
 			/ laserScan_->angle_increment;
 
-	for (index += shift ; index < stopIndex; index += step_) {
+	for (index += shift_; index < stopIndex; index += step_) {
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction
