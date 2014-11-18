@@ -4,14 +4,17 @@
 #include "../../obecne/basic.h"
 namespace mcl{
 
+//! Particles variance of states
 template <class AdvancedParticle>
 class VisitorStateVariance : public Visitor<AdvancedParticle>{
 	const State &state_;
 	State stateVariance_;
 	unsigned int count_;
 public:
+	//! Set arithmetic mean of particles states
 	VisitorStateVariance(const State &state);
 	void visit(AdvancedParticle *particle);
+	//! Return states variance
 	State stateVariance();
 };
 

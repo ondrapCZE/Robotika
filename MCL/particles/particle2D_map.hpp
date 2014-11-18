@@ -6,18 +6,26 @@
 
 namespace mcl {
 
+//! Expanded Particle2D with Map as template class according to a Map
 template<class Map, class Updater>
 class Particle2DMap: public Particle2D {
 	Map map_;
 public:
+	//! Set particle state and map
 	Particle2DMap(const double &x = 0, const double &y = 0,
 			const double &theta = 0, const Map &map = Map());
 
+	//! Create deep copy of the particle
 	Particle2DMap(const Particle2DMap& particle);
+
+	//! Create deep copy of the particle
 	Particle2DMap& operator=(const Particle2DMap& particle);
 
+	//! Return map as its interface
 	map::MapInterface& map();
+	//! Update particle map
 	void updateMap(Updater& updater);
+	//! Accept visitor
 	void accept(Visitor<Particle2DMap> &visitor);
 };
 

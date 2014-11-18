@@ -1,6 +1,6 @@
 /*!
 	\brief 	Basic structure, class and function for robotic usage
- *	Units for position is in meters. Angle use radian.
+ 	 Units are in meters and rad.
 
 	\author Ondrej Pilat
 	\date 3/12/2012
@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <cmath>
 
+//! Describe vector in 2D
 struct Vector{
 	double x;
 	double y;
@@ -36,6 +37,7 @@ struct Vector{
 	};
 };
 
+//! Size in 2D
 struct Size{
 		double x;
 		double y;
@@ -130,6 +132,7 @@ struct State : public Position{
 	};
 };
 
+//! Describe circle
 struct Circle{
 	Position center;
 	double radius;
@@ -144,15 +147,19 @@ namespace rob_fce{
 	 */
 	double normAngle(double Angle);
 
+	//! Return angle between two positions
 	double angle(const Position &start,const Position &end);
 	
+	//! Compute cyclic redundancy check
 	uint8_t crc8(uint8_t crc, uint8_t data);
 
+	//! Round input value in specific range.
 	template <class V> inline V valueInRange(V value, V lowerBoundary, V higherBoundary) {
 		return value < lowerBoundary ? lowerBoundary :
 				value > higherBoundary ? higherBoundary : value;
 	}
 	
+	//! Round input value in specific range.
 	template <class V> inline V valueInRange(V value, V range) {
 		return valueInRange(value,-range,range);
 	}

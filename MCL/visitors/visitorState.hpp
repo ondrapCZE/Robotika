@@ -5,6 +5,7 @@
 
 namespace mcl{
 
+//! Particles arithmetic mean of states
 template <class AdvancedParticle>
 class VisitorState : public Visitor<AdvancedParticle>{
 	State state_;
@@ -12,9 +13,13 @@ class VisitorState : public Visitor<AdvancedParticle>{
 public:
 	VisitorState();
 	void visit(AdvancedParticle *particle);
+	//! Return arithmetic mean of state
 	inline State state();
+	//! Return arithmetic mean of position x
 	inline float x();
+	//! Return arithmetic mean of position y
 	inline float y();
+	//! Return arithmetic mean of particles orientation
 	inline float theta();
 };
 

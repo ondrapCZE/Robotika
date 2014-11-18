@@ -7,6 +7,7 @@
 
 namespace mcl {
 
+//! Adjust particle weight according to laser scan data and particle map
 template<class AdvancedParticle, class Map>
 class VisitorScan: virtual public Visitor<AdvancedParticle> {
 	static const double EPSILON;
@@ -26,6 +27,16 @@ class VisitorScan: virtual public Visitor<AdvancedParticle> {
 	const unsigned int shift_;
 
 public:
+	//! Set laser scan parameter
+	/*! \param state relative position of scan center due to robot center
+	 *  \param laserScan ROS message containing laser scan measurements
+	 *  \param minAngle minimal angle of an useful measurement
+	 *  \param maxAngle maximal angle of an useful measurement
+	 *  \param deviation measurement data deviation
+	 *  \param step decide which every step-th measurement use
+	 *  \param maxRange adjust measurement max range (use if real max range is differ from documentation)
+	 *  \param shift use every (step-th + shift) measurement
+	 */
 	VisitorScan(const State &state,
 			const sensor_msgs::LaserScan::ConstPtr& laserScan,
 			const float &minAngle, const float &maxAngle,
@@ -36,7 +47,7 @@ public:
 };
 
 template<class AdvancedParticle, class Map>
-const double VisitorScan<AdvancedParticle, Map>::EPSILON = 1e-200; // TODO: set appropriate epsilon
+const double VisitorScan<AdvancedParticle, Map>::EPSILON = 1e-200;
 
 template<class AdvancedParticle, class Map>
 VisitorScan<AdvancedParticle, Map>::VisitorScan(const State &state,
@@ -77,7 +88,7 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 	int stopIndex = (laserScan_->angle_max - minAngle_)
 			/ laserScan_->angle_increment;
 
-	for (; index < stopIndex; index += step_) {
+	for (index += shift ; index < stopIndex; index += step_) {
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction

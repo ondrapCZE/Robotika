@@ -5,12 +5,15 @@
 
 namespace mcl{
 
+//! Find best particle and make its copy
 template <class AdvancedParticle>
 class VisitorBest : public Visitor<AdvancedParticle>{
 	AdvancedParticle particle_;
 public:
+	//! Initialize particle weight
 	VisitorBest(){ particle_.weight(0) ;};
 
+	//! Return best particle
 	AdvancedParticle& particle(){ return particle_; };
 	void visit(AdvancedParticle *particle);
 };

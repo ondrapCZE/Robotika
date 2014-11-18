@@ -9,6 +9,10 @@
 
 namespace mcl {
 
+//! Move particle.
+/*! Movement model consist of rotation, straight move, rotation
+ * and it involve normal error in each part.
+ */
 template<class AdvancedParticle>
 class VisitorMove: public Visitor<AdvancedParticle> {
 	const double alpha_;
@@ -22,7 +26,20 @@ class VisitorMove: public Visitor<AdvancedParticle> {
 	std::mt19937 randomGenerator_;
 	std::normal_distribution<double> normDistr_;
 public:
+	//! Set movement
+	/*! \param aplha first rotation in rad
+	 *  \param distance straight move length in meters
+	 *  \param beta last rotation in rad
+	 */
 	VisitorMove(double alpha, double distance, double beta);
+	//! Set movement and its error
+	/*! \param aplha first rotation in rad
+	 *  \param distance straight move length in meters
+	 *  \param beta last rotation in rad
+	 *  \param aplhaError error deviation in first rotation
+	 *  \param distanceError error deviation in straight move
+	 *  \param betaError error deviation in last rotation
+	 */
 	VisitorMove(double alpha, double distance, double beta, double alphaError,
 			double distanceError, double betaError);
 	void visit(AdvancedParticle *particle);

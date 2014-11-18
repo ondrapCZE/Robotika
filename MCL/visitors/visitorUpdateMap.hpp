@@ -5,6 +5,7 @@
 
 namespace mcl {
 
+//! Update particle map due to measurements from laser scan
 template<class AdvancedParticle>
 class VisitorUpdateMap: public Visitor<AdvancedParticle> {
 	// laser scanner relative position according to the particle
@@ -18,6 +19,13 @@ class VisitorUpdateMap: public Visitor<AdvancedParticle> {
 	const float maxAngle_;
 	const float maxRange_;
 public:
+	//! Set laser scan parameters
+	/*! \param laserState scan center relative position considering to robot center
+	 *  \param laserScan ROS message containing laser scan measurement
+	 *  \param minAngle minimal angle of an useful measurement
+	 *  \param maxAngle maximal angle of an useful measurement
+	 *  \param maxRange adjust measurement max range (use if real max range is differ from documentation)
+	 */
 	VisitorUpdateMap(const State laserState,
 			const sensor_msgs::LaserScan::ConstPtr& laserScan,
 			const float &minAngle, const float &maxAngle,

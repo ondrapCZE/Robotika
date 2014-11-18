@@ -10,6 +10,7 @@
 namespace map {
 namespace occupancy {
 
+//! Occupancy map
 class OccupancyMap: virtual public MapInterface {
 	static const float IS_OCCUPIED_VALUE;
 	static const float IS_FREE_VALUE;
@@ -20,14 +21,19 @@ class OccupancyMap: virtual public MapInterface {
 
 	grid::Grid<float> grid_;
 public:
+	//! Set map size and resolution
 	OccupancyMap(const Size size = Size(10, 10), const float resolution = 0.05); // size is in meters and will be recalculate in cells number
+	//! Create deep copy of the map
 	OccupancyMap(const OccupancyMap& map);
+	//! Create deep copy of the map
 	OccupancyMap& operator=(const OccupancyMap& map);
 
+	//! Return map value on specific position
 	inline float& map(const double &x, const double &y) {
 		return grid_.value(x / resolution_, y / resolution_);
 	}
-	; // in global coordinates, return value from map
+	;
+	//! Return default cells occupancy probability
 	inline float defaultProb() {
 		return DEFAULT_PROB;
 	}

@@ -6,6 +6,7 @@
 
 namespace mcl {
 
+//! Adjust particle weight according to laser scan data and general map
 template<class AdvancedParticle, class Map>
 class VisitorScanMap: virtual public Visitor<AdvancedParticle> {
 	static const float EPSILON;
@@ -22,19 +23,29 @@ class VisitorScanMap: virtual public Visitor<AdvancedParticle> {
 	const float maxAngle_;
 	const unsigned int step_;
 
-	// map
+	// general map
 	Map &map_;
+
+	inline double computeWeight(const double mean, const double deviation);
 public:
+	//! Set laser scan parameter
+	/*! \param relativeScan relative position of scan center due to robot center
+	 *  \param laserScan ROS message containing laser scan measurements
+	 *  \param minAngle minimal angle of an useful measurement
+	 *  \param maxAngle maximal angle of an useful measurement
+	 *  \param step decide which every step-th measurement use
+	 *  \param deviation measurement data deviation
+	 *  \param map general map used for particle weighting
+	 */
 	VisitorScanMap(const State &relativeScan,
 			const sensor_msgs::LaserScan::ConstPtr& laserScan,
 			const float &minAngle, const float &maxAngle,
 			const unsigned int &step, const float &deviation, Map &map);
-	inline double computeWeight(const double mean, const double deviation);
 	void visit(AdvancedParticle *particle);
 };
 
 template<class AdvancedParticle, class Map>
-const float VisitorScanMap<AdvancedParticle, Map>::EPSILON = 1e-40; 
+const float VisitorScanMap<AdvancedParticle, Map>::EPSILON = 1e-40;
 
 template<class AdvancedParticle, class Map>
 VisitorScanMap<AdvancedParticle, Map>::VisitorScanMap(const State &relativeScan,

@@ -10,15 +10,24 @@
 
 namespace mcl {
 
+//! Template class for the MCL algorithm
 template<class AdvancedParticle, class Visitor>
 class Mcl {
 public:
 	typedef std::shared_ptr<AdvancedParticle> ParticlePtr;
-
+	//! Initialize random generator
 	Mcl();
+	//! Insert new particle in MCL set
 	void addParticle(ParticlePtr particle);
+	//! Apply visitor at all particles in set
 	void visit(Visitor &visitor);
+	//! Resample particles.
+	/*! It chooses new particle set from old one.
+	 * 	Particle will be selected with probability according to its weight.
+	 * 	\param count new set size
+	 */
 	void resample(int count = -1);
+	//! Return best particle copy accordingly their weight
 	ParticlePtr bestParticle();
 private:
 	typedef std::forward_list<ParticlePtr> List;
