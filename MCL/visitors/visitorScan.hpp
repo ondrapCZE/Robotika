@@ -89,6 +89,10 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 			/ laserScan_->angle_increment;
 
 	for (index += shift_; index < stopIndex; index += step_) {
+		if(laserScan_->ranges[index] < 1e-5){ // cannot receive beam
+			continue;
+		}
+
 		float angle = laserScan_->angle_max
 				- index * laserScan_->angle_increment;
 // get distance to the nearest wall in beam direction
@@ -114,7 +118,7 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		if (particle->weight() < EPSILON)
 			particle->weight(EPSILON);
 	}
-	//printf("Particle weight %f\n", particle->weight());
+	printf("Particle weight %f\n", particle->weight());
 }
 
 }

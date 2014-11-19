@@ -4,10 +4,11 @@
 #include "../obecne/basic.h"
 
 class FrameConverter {
-	Position translation_;
-	double rotation_;
+	State globRelTrans_;
+	State relGlobTrans_;
 
 	bool initialized_;
+	Position rotatePosition(const Position position, const double angle);
 public:
 	FrameConverter(){initialized_ = false;};
 	void setRotationTranslation(const State global, const State relative);
