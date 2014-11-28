@@ -118,7 +118,6 @@ void VisitorScan<AdvancedParticle, Map>::visit(AdvancedParticle *particle) {
 		if (particle->weight() < EPSILON)
 			particle->weight(EPSILON);
 	}
-	printf("Particle weight %f\n", particle->weight());
 }
 
 }
