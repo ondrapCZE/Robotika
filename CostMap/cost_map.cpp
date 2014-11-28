@@ -16,7 +16,7 @@ CostMap::Type CostMap::getPayoffFromMove(const unsigned int x,
 	}
 
 	Type payoff = payoffTable_.value(x + moves_[move][1].x,
-			y + moves_[move][1].y) - 1;
+			y + moves_[move][1].y) - movePayoff(move);
 
 	payoff += 0.05
 			* (costMap->inGrid(x + moves_[move][0].x, y + moves_[move][0].y) ?
@@ -88,14 +88,17 @@ void CostMap::recalculateWorker() {
 
 CostMap::CostMap(Size size, const float resolution) :
 		id_(0), size_(size), resolution_(resolution), payoffTable_(
-				(size.x / resolution), (size.y / resolution), 0), moves_ { {
-				Move(0, 0), Move(0, 0), Move(0, 0) }, { Move(-1, 0), Move(-1,
-				1), Move(0, 1) }, { Move(-1, 1), Move(0, 1), Move(1, 1) }, {
-				Move(0, 1), Move(1, 1), Move(1, 0) }, { Move(-1, -1), Move(-1,
-				0), Move(-1, 1) }, { Move(1, 1), Move(1, 0), Move(1, -1) }, {
-				Move(0, -1), Move(-1, -1), Move(-1, 0) }, { Move(1, -1), Move(0,
-				-1), Move(-1, -1) }, { Move(1, 0), Move(1, -1), Move(0, -1) } }, recalculateThread_(
-				&CostMap::recalculateWorker, this) {
+				(size.x / resolution), (size.y / resolution), 0), moves_ {
+				{ Move(0, 0), Move(0, 0), Move(0, 0) }, // stay on place
+				{ Move(-1, 1), Move(0, 1), Move(1, 1) }, // straight movements
+				{ Move(1, 1), Move(1, 0), Move(1, -1) },
+				{ Move(-1, -1), Move(0, -1), Move(1, -1) },
+				{ Move(-1, 1), Move(-1,	0), Move(-1, -1) },
+				{ Move(0, 1), Move(-1, 1), Move(-1, 0) }, // diagonal movements
+				{ Move(0, 1), Move(1, 1), Move(1, 0) },
+				{ Move(-1, 0), Move(-1,-1), Move(0, -1) },
+				{ Move(0, -1), Move(1, -1), Move(-1, 0) } },
+				recalculateThread_(	&CostMap::recalculateWorker, this) {
 
 	end_ = false;
 	recalculation_ = false;
@@ -139,7 +142,7 @@ void CostMap::clearPayoffObjects() {
 }
 
 void CostMap::updatePayoffTable() {
-	minPayoff_ = -1;
+	minPayoff_ = -3;
 	payoffTable_.setAllValues(0);
 
 	for (auto payoff : payoffObjects_) {

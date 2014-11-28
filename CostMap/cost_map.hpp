@@ -60,6 +60,9 @@ class CostMap {
 	int minPayoff_;
 	float gamma_;
 
+	inline int movePayoff(const unsigned int move){
+		return move == 0 ? 0 : -2 - ((move - 1) / 4);
+	};
 	Type getPayoffFromMove(const unsigned int x, const unsigned int y,
 			const unsigned int move, GridPtr costMap);
 	void recalculateWorker();
