@@ -16,7 +16,7 @@ CostMap::Type CostMap::getPayoffFromMove(const unsigned int x,
 	}
 
 	Type payoff = payoffTable_.value(x + moves_[move][1].x,
-			y + moves_[move][1].y) - movePayoff(move);
+			y + moves_[move][1].y) + movePayoff(move);
 
 	payoff += 0.05
 			* (costMap->inGrid(x + moves_[move][0].x, y + moves_[move][0].y) ?
@@ -169,7 +169,7 @@ Position CostMap::getBestMove(const Position position) {
 			payoff = tempPayoff;
 		}
 	}
-	printf("\n");
+	//printf("Best move: %i \n", move);
 
 	return Position(position.x + moves_[move][1].x * resolution_,
 			position.y + moves_[move][1].y * resolution_);
